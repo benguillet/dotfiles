@@ -1,0 +1,8 @@
+# ~/.tmuxinator/services.yml
+project_name: services
+project_root: ~/
+tabs:
+  - redis: redis.start
+  - rabbit-mq: rabbitmq-server
+  - postgres: postgres.start
+  - memcached: memcached -vvv
