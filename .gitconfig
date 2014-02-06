@@ -1,0 +1,29 @@
+[user]
+	name = Benjamin Guillet
+	email = benjamin.guillet@gmail.com
+[color]
+    diff = auto
+    status = auto
+    branch = auto
+[format]
+    pretty = "Commit:  %C(blue)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
+[alias]
+	co = checkout
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    assume   = update-index --assume-unchanged
+    unassume = update-index --no-assume-unchanged
+    assumed  = "!git ls-files -v | grep ^h | cut -c 3-"
+    standup  = "!git log --since yesterday --author `git config user.email` --pretty=short"
+    ; Delete all local branches that have been merged into the current branch, except master
+    cleanup = !sh -c 'git branch --merged | grep -v "master$" | grep -v "^*" | xargs git branch -d'
+[core]
+	editor = vim
+	excludesfile = ~/.gitignore
+[code]
+	editor = vim
+[credential]
+	helper = osxkeychain
+[push]
+	default = simple
+[heroku]
+	account = work
