@@ -22,6 +22,7 @@ alias tma='tmux attach -d -t'
 alias tmn='tmux new -s'
 alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
+alias tmux="TERM=screen-256color-bce tmux"
 
 alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
 alias lighty.stop='killall lighttpd'
@@ -37,14 +38,6 @@ alias memcached.stop='killall memcached'
 # Get external IP
 alias ifconfig-ext='curl ifconfig.me'
 
-# Colors!
-alias svn='colorsvn'
-alias make='colormake'
-alias tail='colortail'
-alias diff='colordiff'
-alias tmux="TERM=screen-256color-bce tmux"
-alias crontab="VIM_CRONTAB=true crontab"
-
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
 
@@ -55,7 +48,7 @@ alias crontab="VIM_CRONTAB=true crontab"
 # DISABLE_LS_COLORS="true"
 
 # Uncomment following line if you want to disable autosetting terminal title.
-DISABLE_AUTO_TITLE="true"
+# DISABLE_AUTO_TITLE="true"
 
 # Uncomment following line if you want red dots to be displayed while waiting for completion
 # COMPLETION_WAITING_DOTS="true"
@@ -67,18 +60,6 @@ setopt interactivecomments
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git rbenv autojump brew rails rake bundler gem bower sublime extract)
-
-# Python
-#export WORKON_HOME=$HOME/.virtualenvs
-#export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python2.7
-#export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
-#export PIP_VIRTUALENV_BASE=$WORKON_HOME
-#export PIP_RESPECT_VIRTUALENV=true
-#if [[ -r /usr/local/share/python/virtualenvwrapper.sh ]]; then
-#    source /usr/local/share/python/virtualenvwrapper.sh
-#else
-#    echo "WARNING: Can't find virtualenvwrapper.sh"
-#fi
 
 function gi() { curl http://gitignore.io/api/$@ ;}
 
