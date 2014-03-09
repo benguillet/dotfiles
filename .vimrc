@@ -1,70 +1,37 @@
-syn on " Syntax on
-set nocompatible " Use Vim defaults
+set nocompatible 
 
+" Vundle config
 filetype off
 
 set rtp+=~/.vim/bundle/vundle/\
 call vundle#rc()
 
 Bundle 'gmarik/vundle'
-Bundle 'chrisbra/NrrwRgn'
-Bundle 'tpope/vim-fugitive'
-Bundle 'leshill/vim-json'
-Bundle 'ecomba/vim-ruby-refactoring'
-Bundle 'pangloss/vim-javascript'
-Bundle 'nono/jquery.vim'
-" Bundle 'vim-scripts/rubycomplete.vim'
-Bundle 'vim-ruby/vim-ruby'
-Bundle 'spf13/PIV'
-Bundle 'tpope/vim-rails.git'
+Bundle 'bling/vim-airline'
+Bundle 'airblade/vim-gitgutter'
+
+" Color schemes
 Bundle 'nanotech/jellybeans.vim'
-" Bundle 'Rip-Rip/clang_complete'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'Lokaltog/vim-powerline'
-Bundle 'Raimondi/delimitMate'
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'ervandew/supertab'
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'honza/vim-snippets'
-Bundle 'garbas/vim-snipmate'
-Bundle 'godlygeek/tabular'
-Bundle 'gregsexton/MatchTag'
-Bundle 'mileszs/ack.vim'
-Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
-Bundle 'scrooloose/syntastic'
-Bundle 'kien/ctrlp.vim'
-Bundle 'tpope/vim-commentary'
-Bundle 'tpope/vim-endwise'
-Bundle 'tpope/vim-eunuch'
-Bundle 'tpope/vim-markdown'
-Bundle 'tpope/vim-repeat'
-Bundle 'tpope/vim-speeddating'
-Bundle 'tpope/vim-surround'
-Bundle 'tsaleh/vim-matchit'
-Bundle 'vim-scripts/YankRing.vim'
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'thoughtbot/vim-rspec'
+Bundle 'tomasr/molokai'
 
 filetype on
 filetype plugin on
 filetype plugin indent on
 
-:if $VIM_CRONTAB == "true"
-:set nobackup
-:set nowritebackup
-:endif
+" Color schemes
+syntax on                        " Activate syntax highlighting
+" colorscheme molokai
+colorscheme jellybeans
 
-set bs=2 " backspacing over everything in insert mode
-set ai " Auto indenting
-set history=100 " keep 100 lines of history
-set expandtab " tabs are spaces
-set softtabstop=4 " how many spaces for one tab
-set tabstop=4
-set shiftwidth=4 " nb of tabs when auto indent
+set bs=2                         " Backspacing over everything in insert mode
+set autoindent                   " Auto indenting
+set history=100                  " Keep 100 lines of history
+set expandtab                    " Use spaces instaed of tabs
+set softtabstop=2                " how many spaces for one tab
+set tabstop=2
+set shiftwidth=2                 " # of spaces when autoindent
 set smartindent
 set cindent
-set autoindent
 set number
 set encoding=utf-8
 set scrolloff=5
@@ -78,8 +45,8 @@ set ttyfast
 set backspace=indent,eol,start
 set laststatus=2
 set showmatch
-set viminfo='20,\"200 " keep a .viminfo file
-set hlsearch " highlight the last searched term
+set viminfo='20,\"200           " keep a .viminfo file
+set hlsearch                    " highlight the last searched term
 set incsearch
 set wrap
 set textwidth=79
@@ -93,22 +60,6 @@ set undofile
 set undolevels=1000
 set undoreload=10000
 set background=dark
-colorscheme jellybeans 
-
-let mapleader = ","
-let g:yankring_history_dir='$HOME/.vim/'
-let g:DisableAutoPHPFolding = 1 " Disable PHP code folding
-" let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
-" let g:SuperTabDefaultCompletionType = "context"
-
-let g:ctrlp_map = '<leader>o'
-set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
-set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ 'link': 'some_bad_symbolic_links',
-  \ }
 
 " When editing a file, always jump to the last cursor position
 autocmd BufReadPost *
@@ -118,68 +69,18 @@ autocmd BufReadPost *
 \ endif |
 \ endif
 
-
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
+" Deactivate arrow keys
+noremap <Up>    <NOP>
+noremap <Down>  <NOP>
+noremap <Left>  <NOP>
 noremap <Right> <NOP>
-nmap + <C-a>
-nmap = <C-a>
-nmap - <C-x>
-nmap _ <C-x>
-noremap H ^
-noremap L $
-nmap <silent> ,/ :nohlsearch<CR>
-nnoremap <silent> ss :split<CR>
-nnoremap <silent> vv :vsplit<CR>
-vmap > >gv
-vmap < <gv
-nmap <leader>u mQviwU`Q
-nmap <leader>l mQviwu`Q
-map <Leader>a ggVG"
-noremap <leader>p "+p`]a
-noremap <leader>c "*y
-noremap <F1> <Esc>
-inoremap ii <Esc>`^
-nnoremap ; :
-nmap <Leader>v :source $MYVIMRC<CR>
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
 
-" Rspec.vim mappings
-map <Leader>t :call RunCurrentSpecFile()<CR>
-map <Leader>s :call RunNearestSpec()<CR>
-map <Leader>l :call RunLastSpec()<CR>
-let g:rspec_command = "!rspec --drb {spec}"
-
-" nnoremap <F2> :silent 1,$!xmllint --format --recover - 2>/dev/null<cr>
-" autocmd Filetype html command :silent open -a "Google Chrome" %<CR>
-" autocmd Filetype markdown map <D-Enter> :silent ! markdown % > /tmp/%<.html; open -a "Google Chrome" /tmp/%<.html<CR>
-
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
-autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
-autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
-autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
-
+" Autotrail whitespaces
 fun! <SID>StripTrailingWhitespaces()
     let l = line(".")
     let c = col(".")
     %s/\s\+$//e
     call cursor(l, c)
 endfun
-
-autocmd FileType c,cpp,java,php,ruby,python autocmd BufWritePre <buffer> :call <SID>StripTrailingWhitespaces()
-augroup myfiletypes
-    autocmd!
-    autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et
-augroup END
 
 set completeopt=menu,menuone
