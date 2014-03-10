@@ -12,7 +12,7 @@ Bundle 'airblade/vim-gitgutter'
 
 " Color schemes
 Bundle 'nanotech/jellybeans.vim'
-Bundle 'tomasr/molokai'
+Bundle 'chriskempson/base16-vim'
 
 filetype on
 filetype plugin on
@@ -20,8 +20,25 @@ filetype plugin indent on
 
 " Color schemes
 syntax on                        " Activate syntax highlighting
-" colorscheme molokai
-colorscheme jellybeans
+set background=dark
+" colorscheme jellybeans
+colorscheme base16-railscasts
+
+" Railscast colorscheme
+highlight clear SignColumn
+highlight VertSplit    ctermbg=236
+highlight ColorColumn  ctermbg=237
+highlight LineNr       ctermbg=236 ctermfg=240
+highlight CursorLineNr ctermbg=236 ctermfg=240
+highlight CursorLine   ctermbg=236
+highlight StatusLineNC ctermbg=238 ctermfg=0
+highlight StatusLine   ctermbg=240 ctermfg=12
+highlight IncSearch    ctermbg=0   ctermfg=3
+highlight Search       ctermbg=0   ctermfg=9
+highlight Visual       ctermbg=3   ctermfg=0
+highlight Pmenu        ctermbg=240 ctermfg=12
+highlight PmenuSel     ctermbg=0   ctermfg=3
+highlight SpellBad     ctermbg=0   ctermfg=1
 
 set bs=2                         " Backspacing over everything in insert mode
 set autoindent                   " Auto indenting
@@ -59,7 +76,6 @@ set undodir=~/.vim/undo
 set undofile
 set undolevels=1000
 set undoreload=10000
-set background=dark
 
 " When editing a file, always jump to the last cursor position
 autocmd BufReadPost *
