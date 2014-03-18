@@ -76,6 +76,7 @@ set undodir=~/.vim/undo
 set undofile
 set undolevels=1000
 set undoreload=10000
+set cursorline
 
 " When editing a file, always jump to the last cursor position
 autocmd BufReadPost *
