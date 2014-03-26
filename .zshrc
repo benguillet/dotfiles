@@ -7,8 +7,12 @@ ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="agnoster"
 DEFAULT_USER="benjaminguillet"
 
-# Misc aliases
+# Editors
 alias v='vim'
+alias a='atom'
+alias s='subl .'
+
+# Misc aliases
 alias fs='foreman start'
 alias ll='ls -l'
 alias la='ls -a'
@@ -62,7 +66,7 @@ setopt interactivecomments
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git rbenv autojump brew rails rake bundler gem bower sublime extract tmuxinator)
+plugins=(git rbenv autojump brew rails rake bundler gem sublime extract tmuxinator)
 
 function gi() { curl http://gitignore.io/api/$@ ;}
 
