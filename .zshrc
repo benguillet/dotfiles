@@ -23,6 +23,7 @@ alias yolo='git commit -am "#YOLO" && git push -f origin master'
 
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'
+alias cdev='bundle exec cucumber --tags @dev'
 
 # Tmux
 alias tma='tmux attach -d -t'
