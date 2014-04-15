@@ -1,6 +1,6 @@
 {
 	"bold_folder_labels": true,
-	"color_scheme": "Packages/Tomorrow Color Schemes/Tomorrow-Night.tmTheme",
+	"color_scheme": "Packages/RailsCasts Colour Scheme/RailsCastsColorScheme.tmTheme",
 	"detect_slow_plugins": true,
 	"dictionary": "Packages/Language - French - Français/fr_FR (modern).dic",
 	"ensure_newline_at_eof_on_save": true,
@@ -17,9 +17,12 @@
 		"Tomorrow Color Schemes",
 		"SublimeLinter"
 	],
-	"rulers": [80],
 	"open_files_in_new_window": false,
 	"remember_open_files": false,
+	"rulers":
+	[
+		80
+	],
 	"scroll_past_end": true,
 	"show_full_path": true,
 	"tab_size": 2,
