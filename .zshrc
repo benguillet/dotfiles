@@ -36,6 +36,7 @@ alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
 alias lighty.stop='killall lighttpd'
 alias postgres.start='pg_ctl -D /usr/local/var/postgres -l logfile start'
 alias postgres.stop='pg_ctl -D /usr/local/var/postgres -l logfile stop'
+alias mongo.start="mongod --config /usr/local/etc/mongod.conf"
 alias mysql.start='mysql.server start'
 alias mysql.stop='mysql.server stop'
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
