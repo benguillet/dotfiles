@@ -9,6 +9,7 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 Bundle 'bling/vim-airline'
 Bundle 'airblade/vim-gitgutter'
+Bundle 'kien/ctrlp.vim'
 
 " Color schemes
 Bundle 'nanotech/jellybeans.vim'
