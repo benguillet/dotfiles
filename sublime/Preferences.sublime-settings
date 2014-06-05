@@ -10,13 +10,7 @@
 	"highlight_line": true,
 	"highlight_modified_tabs": true,
 	"hot_exit": false,
-	"ignored_packages":
-	[
-		"SCSS",
-		"Vintage",
-		"Tomorrow Color Schemes",
-		"SublimeLinter"
-	],
+	"ignored_packages": [],
 	"open_files_in_new_window": false,
 	"remember_open_files": false,
 	"rulers":
