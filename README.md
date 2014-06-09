@@ -1,11 +1,11 @@
 ## dot-files
-A small compilation and backup of my dot files on Mac OS X 10.9.
+A small compilation and backup of my dot files on OS X 10.9.
 
 It includes:
-* ZSH + oh-my-zsh + custom theme
-* My Vim setup (plugins are managed with vundle)
-* My tmux setup
-* My git setup
+* Zsh + oh-my-zsh
+* My Vim setup (plugins are managed with Vundle)
+* My Tmux setup
+* My Git setup
 * and more...
 
 ### Railscasts theme
@@ -36,27 +36,32 @@ It includes:
       highlight PmenuSel     ctermbg=0   ctermfg=3
       highlight SpellBad     ctermbg=0   ctermfg=1
 
+**Sublime** | [Railscasts Extended](https://github.com/jzelenkov/sublime-railscasts-extended), by Jev Zelenkov
+
 **iTerm2** | [Base16](https://github.com/chriskempson/base16-iterm2), by Chris Kempson
 
     $ open color-schemes/railscasts/base16-railscasts-custom.dark.256.itermcolors
+
+**Tmux**
+
     $ vi ~/.tmux.conf
 
-      # ~/.tmux.conf
-      set -g default-terminal "screen-256color"
-      set -g status-bg colour235
-      set -g status-fg white
+    # ~/.tmux.conf
+    set -g default-terminal "screen-256color"
+    set -g status-bg colour235
+    set -g status-fg white
 
-      set-window-option -g window-status-current-fg black
-      set-window-option -g window-status-current-bg green
+    set-window-option -g window-status-current-fg black
+    set-window-option -g window-status-current-bg green
 
-      set -g pane-border-fg colour235
-      set -g pane-border-bg black
-      set -g pane-active-border-fg green
-      set -g pane-active-border-bg black
+    set -g pane-border-fg colour235
+    set -g pane-border-bg black
+    set -g pane-active-border-fg green
+    set -g pane-active-border-bg black
 
-**Zsh**
+**Zsh** | [agnoster](https://github.com/robbyrussell/oh-my-zsh/blob/master/themes/agnoster.zsh-theme), by Isaac Wolkerstorfer
 
-Recommended theme: **agnoster**.
+Requires a powerline-patched font. I use DejaVu Sans Mono for Powerline, 12pt.
 
 ### Solarized
 ![](color-schemes/solarized/screenshot.png)
@@ -65,6 +70,7 @@ Recommended theme: **agnoster**.
 
     $ open color-schemes/solarized/solarized_dark.itermcolors
 
-**Zsh**
+**Zsh** | [agnoster](https://github.com/robbyrussell/oh-my-zsh/blob/master/themes/agnoster.zsh-theme), by Isaac Wolkerstorfer
 
-Recommended theme: **agnoster**.
+Requires a powerline-patched font. I use DejaVu Sans Mono for Powerline, 12pt.
+
