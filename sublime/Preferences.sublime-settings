@@ -22,7 +22,7 @@
 	],
 	"scroll_past_end": true,
 	"show_full_path": true,
-	"soda_folder_icons": true,
+	"soda_folder_icons": false,
 	"tab_size": 2,
 	"theme": "Soda Dark.sublime-theme",
 	"translate_tabs_to_spaces": true,
