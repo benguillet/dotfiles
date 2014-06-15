@@ -30,6 +30,7 @@ alias tma='tmux attach -d -t'
 alias tmn='tmux new -s'
 alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
+alias tmr='tmux rename-session -t'
 alias tmux="TERM=screen-256color-bce tmux"
 
 alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
