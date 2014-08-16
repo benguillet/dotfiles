@@ -2,25 +2,36 @@ set nocompatible
 
 " Vundle config
 filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
-set rtp+=~/.vim/bundle/vundle/\
-call vundle#rc()
+" =======
+" Bundles
+" =======
 
-Bundle 'gmarik/vundle'
-Bundle 'bling/vim-airline'
-Bundle 'airblade/vim-gitgutter'
-Bundle 'kien/ctrlp.vim'
+Plugin 'gmarik/Vundle.vim'
+Plugin 'bling/vim-airline'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'kien/ctrlp.vim'
+
+" Syntax
+Plugin 'fatih/vim-go'
+
 
 " Color schemes
-Bundle 'nanotech/jellybeans.vim'
-Bundle 'chriskempson/base16-vim'
+Plugin 'nanotech/jellybeans.vim'
+Plugin 'chriskempson/base16-vim'
 
-filetype on
-filetype plugin on
+call vundle#end()
 filetype plugin indent on
 
+" ========
+" Settings
+" ========
+
 " Color schemes
-syntax on                        " Activate syntax highlighting
+" Activate syntax highlighting
+syntax on 
 set background=dark
 " colorscheme jellybeans
 colorscheme base16-railscasts
