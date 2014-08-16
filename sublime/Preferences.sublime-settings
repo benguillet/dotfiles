@@ -1,7 +1,15 @@
 {
+	"bold_folder_labels": true,
+	"caret_style": "wide",
+	"color_scheme": "Packages/Railscasts Extended/Railscasts Extended.tmTheme",
 	"detect_slow_plugins": true,
 	"dictionary": "Packages/Language - French - Français/fr_FR (modern).dic",
+	"ensure_newline_at_eof_on_save": false,
 	"find_selected_text": true,
+	"font_face": "DejaVu Sans Mono for Powerline",
+	"font_size": 12.0,
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
 	"hot_exit": false,
 	"ignored_packages":
 	[
@@ -13,19 +21,11 @@
 	[
 		80
 	],
-	"theme": "Soda Dark.sublime-theme",
-	"color_scheme": "Packages/Railscasts Extended/Railscasts Extended.tmTheme",
-	"bold_folder_labels": true,
-	"soda_folder_icons": false,
+	"scroll_past_end": true,
 	"show_full_path": true,
-	"caret_style": "wide",
-	"highlight_line": true,
-	"highlight_modified_tabs": true,
-	"font_face": "Monaco",
-	"font_size": 12.0,
+	"soda_folder_icons": false,
 	"tab_size": 2,
+	"theme": "Soda Dark.sublime-theme",
 	"translate_tabs_to_spaces": true,
-	"trim_trailing_white_space_on_save": true,
-	"ensure_newline_at_eof_on_save": true,
-	"scroll_past_end": true
+	"trim_trailing_white_space_on_save": true
 }
