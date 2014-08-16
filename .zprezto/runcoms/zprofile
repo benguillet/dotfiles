@@ -1,0 +1,67 @@
+#
+# Executes commands at login pre-zshrc.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+
+
+# Browser
+if [[ "$OSTYPE" == darwin* ]]; then
+  export BROWSER='open'
+fi
+
+# Editors
+export EDITOR='vim'
+export BUNDLER_EDITOR='subl'
+export VISUAL='vim'
+export PAGER='less'
+
+# Compilation
+export ARCHFLAGS="-arch x86_64"
+
+# SSL
+export SSL_CERT_FILE=/usr/local/opt/curl-ca-bundle/share/ca-bundle.crt
+
+# RBENV
+export RBENV_ROOT="$HOME/.rbenv"
+
+# Language
+if [[ -z "$LANG" ]]; then
+  export LANG='en_US.UTF-8'
+fi
+
+# Paths
+# Ensure path arrays do not contain duplicates.
+typeset -gU cdpath fpath mailpath path
+
+# Set the list of directories that Zsh searches for programs.
+HOMEBREW=/usr/local/bin:/usr/local/sbin
+NPM=/usr/local/share/npm/bin
+PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin:/usr/texbin
+
+export GOPATH="$HOME/.go"
+export PATH=$HOMEBREW:$NPM:$GOPATH/bin:$PATH
+
+# Less
+# Set the default Less options.
+# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
+# Remove -X and -F (exit if the content fits on one screen) to enable it.
+export LESS='-F -g -i -M -R -S -w -X -z-4'
+
+# Set the Less input preprocessor.
+if (( $+commands[lesspipe.sh] )); then
+  export LESSOPEN='| /usr/bin/env lesspipe.sh %s 2>&-'
+fi
+
+# Temporary Files
+if [[ ! -d "$TMPDIR" ]]; then
+  export TMPDIR="/tmp/$USER"
+  mkdir -p -m 700 "$TMPDIR"
+fi
+
+TMPPREFIX="${TMPDIR%/}/zsh"
+if [[ ! -d "$TMPPREFIX" ]]; then
+  mkdir -p "$TMPPREFIX"
+fi
+

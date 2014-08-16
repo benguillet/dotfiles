@@ -1,0 +1,59 @@
+#
+# Executes commands at the start of an interactive session.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Editors
+alias v='vim'
+alias a='atom'
+alias s='subl .'
+
+# Git
+alias gst='git status'
+alias gsb='git status -s'
+alias gb='git branch'
+
+# Misc aliases
+alias fs='foreman start'
+alias ll='ls -l'
+alias la='ls -a'
+alias lla='ls -la'
+alias yolo='git commit -am "#YOLO" && git push -f origin master'
+
+# Turn off the special expansion of zsh for rake (hard brackets issue)
+alias rake='noglob rake'
+alias be='bundle exec'
+alias cdev='bundle exec cucumber --tags @dev'
+
+# Tmux
+alias tma='tmux attach -d -t'
+alias tmn='tmux new -s'
+alias tml='tmux list-sessions'
+alias tmk='tmux kill-session -t'
+alias tmr='tmux rename-session -t'
+alias tmux="TERM=screen-256color-bce tmux"
+
+alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
+alias lighty.stop='killall lighttpd'
+alias postgres.start='pg_ctl -D /usr/local/var/postgres -l logfile start'
+alias postgres.stop='pg_ctl -D /usr/local/var/postgres -l logfile stop'
+alias mongo.start="mongod --config /usr/local/etc/mongod.conf"
+alias mysql.start='mysql.server start'
+alias mysql.stop='mysql.server stop'
+alias redis.start='redis-server /usr/local/etc/redis.conf'
+alias memcached.start='memcached -vvv'
+alias memcached.stop='killall memcached'
+alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
+
+# Get external IP
+alias ifconfig-ext='curl ifconfig.me'
+
+# Autojump
+ . `brew --prefix`/etc/autojump.zsh
