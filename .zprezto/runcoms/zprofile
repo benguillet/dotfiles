@@ -12,7 +12,7 @@ if [[ "$OSTYPE" == darwin* ]]; then
 fi
 
 # Editors
-export EDITOR='vim'
+export EDITOR='subl -w'
 export BUNDLER_EDITOR='subl'
 export VISUAL='vim'
 export PAGER='less'
