@@ -22,10 +22,12 @@ alias gb='git branch'
 
 # Misc aliases
 alias fs='foreman start'
+alias rc='rails console'
 alias ll='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
 alias yolo='git commit -am "#YOLO" && git push -f origin master'
+alias wn='echo "\n\n\n\n\n\n\n\n"'
 
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'
@@ -38,19 +40,22 @@ alias tmn='tmux new -s'
 alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
 alias tmr='tmux rename-session -t'
-alias tmux="TERM=screen-256color-bce tmux"
+alias tmux='TERM=screen-256color-bce tmux'
 
 alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
 alias lighty.stop='killall lighttpd'
 alias postgres.start='pg_ctl -D /usr/local/var/postgres -l logfile start'
 alias postgres.stop='pg_ctl -D /usr/local/var/postgres -l logfile stop'
-alias mongo.start="mongod --config /usr/local/etc/mongod.conf"
+alias mongo.start='mongod --config /usr/local/etc/mongod.conf'
 alias mysql.start='mysql.server start'
 alias mysql.stop='mysql.server stop'
 alias redis.start='redis-server /usr/local/etc/redis.conf'
 alias memcached.start='memcached -vvv'
 alias memcached.stop='killall memcached'
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
+
+# Redshift Access
+alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIFT_PROD_SERVER}:${REDSHIFT_PROD_PORT}/${REDSHIFT_PROD_NAME}" 
 
 # Get external IP
 alias ifconfig-ext='curl ifconfig.me'
