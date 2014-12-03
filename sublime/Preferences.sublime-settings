@@ -3,9 +3,9 @@
 	"caret_style": "wide",
 	"color_scheme": "Packages/Railscasts Extended/Railscasts Extended.tmTheme",
 	"detect_slow_plugins": true,
-	"dictionary": "Packages/Language - French - Français/fr_FR (modern).dic",
 	"ensure_newline_at_eof_on_save": false,
 	"find_selected_text": true,
+	"findreplace_small": true,
 	"font_face": "DejaVu Sans Mono for Powerline",
 	"font_size": 12.0,
 	"highlight_line": true,
@@ -23,9 +23,11 @@
 	],
 	"scroll_past_end": true,
 	"show_full_path": true,
+	"sidebar_small": true,
 	"soda_folder_icons": false,
 	"tab_size": 2,
-	"theme": "Soda Dark.sublime-theme",
+	"tabs_small": true,
+	"theme": "predawn.sublime-theme",
 	"translate_tabs_to_spaces": true,
 	"trim_trailing_white_space_on_save": true
 }
