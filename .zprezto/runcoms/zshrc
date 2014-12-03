@@ -61,4 +61,4 @@ alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIF
 alias ifconfig-ext='curl ifconfig.me'
 
 # Autojump
- . `brew --prefix`/etc/autojump.zsh
+[[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
