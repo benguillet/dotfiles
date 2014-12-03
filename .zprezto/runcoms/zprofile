@@ -17,12 +17,6 @@ export BUNDLER_EDITOR='subl'
 export VISUAL='vim'
 export PAGER='less'
 
-# Compilation
-export ARCHFLAGS="-arch x86_64"
-
-# SSL
-export SSL_CERT_FILE=/usr/local/opt/curl-ca-bundle/share/ca-bundle.crt
-
 # RBENV
 export RBENV_ROOT="$HOME/.rbenv"
 
