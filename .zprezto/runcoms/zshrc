@@ -60,3 +60,26 @@ alias ifconfig-ext='curl ifconfig.me'
 
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
+
+# Docker cleanup helpers
+docker_cleanup_containers() {
+  CONTAINERS=docker ps -q -a --filter "status=exited" 2>/dev/null
+  TODAY=`date`
+  if [ ! -z "$CONTAINERS" ]; then
+    printf "=== [%s] Cleaning unused docker containers.\n" "$TODAY"
+    docker rm $CONTAINERS
+  else
+    printf "=== [%s] No unused containers found, not cleaning.\n" "$TODAY"
+  fi
+}
+
+docker_cleanup_images() {
+  IMAGES=docker images -f "dangling=true" -q 2>/dev/null
+  TODAY=`date`
+  if [ ! -z "$IMAGES" ]; then
+    printf "=== [%s] Cleaning unused docker images.\n" "$TODAY"
+    docker rmi $IMAGES
+  else
+    printf "=== [%s] No unused images found, not cleaning.\n" "$TODAY"
+  fi
+}
