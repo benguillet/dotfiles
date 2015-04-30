@@ -1,8 +1,8 @@
 ## dot-files
-A small compilation and backup of my dot files on OS X 10.9.
+A small compilation and backup of my dot files on OS X.
 
 It includes:
-* Zsh + oh-my-zsh
+* Zsh + zprezto
 * My Vim setup (plugins are managed with Vundle)
 * My Tmux setup
 * My Git setup
