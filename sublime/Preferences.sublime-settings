@@ -2,7 +2,9 @@
 	"bold_folder_labels": true,
 	"caret_style": "wide",
 	"color_scheme": "Packages/Railscasts Extended/Railscasts Extended.tmTheme",
+	"copy_with_empty_selection": true,
 	"detect_slow_plugins": true,
+	"drag_text": false,
 	"ensure_newline_at_eof_on_save": false,
 	"find_selected_text": true,
 	"findreplace_small": true,
@@ -27,7 +29,7 @@
 	"soda_folder_icons": false,
 	"tab_size": 2,
 	"tabs_small": true,
-	"theme": "predawn.sublime-theme",
+	"theme": "predawn-DEV.sublime-theme",
 	"translate_tabs_to_spaces": true,
-	"trim_trailing_white_space_on_save": true
+	"trim_trailing_white_space_on_save": false
 }
