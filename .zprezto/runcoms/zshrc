@@ -26,8 +26,6 @@ alias rc='rails console'
 alias ll='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
-alias yolo='git commit -am "#YOLO" && git push -f origin master'
-alias wn='echo "\n\n\n\n\n\n\n\n"'
 
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'
@@ -52,6 +50,9 @@ alias memcached.start='memcached -vvv'
 alias memcached.stop='killall memcached'
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
 
+# Empire
+alias count_proc="cut -d '.' -f 2 | uniq -c"
+
 # Redshift Access
 alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIFT_PROD_SERVER}:${REDSHIFT_PROD_PORT}/${REDSHIFT_PROD_NAME}" 
 
@@ -61,25 +62,26 @@ alias ifconfig-ext='curl ifconfig.me'
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
 
-# Docker cleanup helpers
-docker_cleanup_containers() {
-  CONTAINERS=docker ps -q -a --filter "status=exited" 2>/dev/null
+# Docker remove helpers
+docker_rm_containers() {
+  CONTAINERS=docker ps -q -a 2>/dev/null
   TODAY=`date`
   if [ ! -z "$CONTAINERS" ]; then
-    printf "=== [%s] Cleaning unused docker containers.\n" "$TODAY"
-    docker rm $CONTAINERS
+    printf "=== [%s] Removing all docker containers.\n" "$TODAY"
+    docker rm -f $CONTAINERS
   else
-    printf "=== [%s] No unused containers found, not cleaning.\n" "$TODAY"
+    printf "=== [%s] No containers found, not removing.\n" "$TODAY"
   fi
 }
 
-docker_cleanup_images() {
-  IMAGES=docker images -f "dangling=true" -q 2>/dev/null
+docker_rm_images() {
+  IMAGES=docker images -q 2>/dev/null
   TODAY=`date`
   if [ ! -z "$IMAGES" ]; then
-    printf "=== [%s] Cleaning unused docker images.\n" "$TODAY"
-    docker rmi $IMAGES
+    printf "=== [%s] Removing all docker images.\n" "$TODAY"
+    docker rmi -f $IMAGES
   else
-    printf "=== [%s] No unused images found, not cleaning.\n" "$TODAY"
+    printf "=== [%s] No images found, not removing.\n" "$TODAY"
   fi
 }
+
