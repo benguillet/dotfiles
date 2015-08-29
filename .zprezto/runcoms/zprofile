@@ -34,7 +34,7 @@ HOMEBREW=/usr/local/bin:/usr/local/sbin
 NPM=/usr/local/share/npm/bin
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin:/usr/texbin
 
-export GOPATH="$HOME/.go"
+export GOPATH="$HOME/go"
 export PATH=$HOMEBREW:$NPM:$GOPATH/bin:$PATH
 
 # Less
