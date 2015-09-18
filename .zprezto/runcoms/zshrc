@@ -78,7 +78,7 @@ docker_rm_containers() {
 }
 
 docker_rm_images() {
-  IMAGES=docker images -q 2>/dev/null
+  IMAGES=$(docker images -q --filter "dangling=true")
   TODAY=`date`
   if [ ! -z "$IMAGES" ]; then
     printf "=== [%s] Removing all docker images.\n" "$TODAY"
