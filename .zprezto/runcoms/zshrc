@@ -54,7 +54,7 @@ alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $
 alias count_proc="cut -d '.' -f 2 | uniq -c"
 
 # Redshift Access
-alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIFT_PROD_SERVER}:${REDSHIFT_PROD_PORT}/${REDSHIFT_PROD_NAME}" 
+alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIFT_PROD_SERVER}:${REDSHIFT_PROD_PORT}/${REDSHIFT_PROD_NAME}"
 
 # Get external IP
 alias ifconfig-ext='curl ifconfig.me'
