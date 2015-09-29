@@ -11,3 +11,5 @@
 \set dbsize 'SELECT datname, pg_size_pretty(pg_database_size(datname)) db_size FROM pg_database ORDER BY db_size;'
 \set tablesize 'SELECT nspname || \'.\' || relname AS \"relation\", pg_size_pretty(pg_relation_size(C.oid)) AS "size" FROM pg_class C LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace) WHERE nspname NOT IN (\'pg_catalog\', \'information_schema\') ORDER BY pg_relation_size(C.oid) DESC LIMIT 40;'
 \set totalindexsize 'with sizes as ( SELECT sum(c.relpages::bigint*8192)::bigint AS size FROM pg_class c LEFT JOIN pg_namespace n ON (n.oid = c.relnamespace) WHERE n.nspname NOT IN (\'pg_catalog\', \'information_schema\') AND n.nspname !~ \'^pg_toast\' AND c.relkind=\'i\' GROUP BY c.relname ORDER BY sum(c.relpages) DESC) select pg_size_pretty(sum(size)) as total_index_size from sizes;'
+\set cachehit 'SELECT \'index hit rate\' AS name, (sum(idx_blks_hit)) / sum(idx_blks_hit + idx_blks_read) AS ratio FROM pg_statio_user_indexes UNION ALL SELECT \'table hit rate\' AS name, sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) AS ratio FROM pg_statio_user_tables;'
+
