@@ -35,6 +35,10 @@ alias rake='noglob rake'
 alias be='bundle exec'
 alias cdev='bundle exec cucumber --tags @dev'
 
+# Docker
+alias machine='docker-machine'
+alias compose='docker-compose'
+
 # Tmux
 alias tma='tmux attach -d -t'
 alias tmn='tmux new -s'
@@ -43,9 +47,6 @@ alias tmk='tmux kill-session -t'
 alias tmr='tmux rename-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
-alias lighty.start='lighttpd -f $HOME/.lighttpd.conf'
-alias lighty.stop='killall lighttpd'
-alias mongo.start='mongod --config /usr/local/etc/mongod.conf'
 alias mysql.start='mysql.server start'
 alias mysql.stop='mysql.server stop'
 alias redis.start='redis-server /usr/local/etc/redis.conf'
@@ -64,27 +65,4 @@ alias ifconfig-ext='curl ifconfig.me'
 
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
-
-# Docker remove helpers
-docker_rm_containers() {
-  CONTAINERS=docker ps -q -a 2>/dev/null
-  TODAY=`date`
-  if [ ! -z "$CONTAINERS" ]; then
-    printf "=== [%s] Removing all docker containers.\n" "$TODAY"
-    docker rm -f $CONTAINERS
-  else
-    printf "=== [%s] No containers found, not removing.\n" "$TODAY"
-  fi
-}
-
-docker_rm_images() {
-  IMAGES=$(docker images -q --filter "dangling=true")
-  TODAY=`date`
-  if [ ! -z "$IMAGES" ]; then
-    printf "=== [%s] Removing all docker images.\n" "$TODAY"
-    docker rmi -f $IMAGES
-  else
-    printf "=== [%s] No images found, not removing.\n" "$TODAY"
-  fi
-}
 
