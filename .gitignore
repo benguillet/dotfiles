@@ -1,3 +1,4 @@
 .ssh/*
 .rake_tasks
+config/database.yml.bak
 .DS_Store
