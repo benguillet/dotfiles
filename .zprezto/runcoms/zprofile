@@ -61,3 +61,6 @@ if [[ ! -d "$TMPPREFIX" ]]; then
   mkdir -p "$TMPPREFIX"
 fi
 
+# Set correct exports for Docker
+eval "$(docker-machine env default)"
+
