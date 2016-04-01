@@ -33,3 +33,5 @@
 	account = work
 [merge]
 	ff = only
+[rebase]
+	autosquash = true
