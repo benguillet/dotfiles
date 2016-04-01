@@ -18,6 +18,8 @@
 
   ; Delete all local branches that have been merged into the current branch, except master
 	cleanup = !sh -c 'git branch --merged | grep -v "master$" | grep -v "^*" | xargs git branch -d'
+  ; Show all local branches sorted by last commit date
+  branches = for-each-ref --sort=-committerdate refs/heads/
 [core]
 	editor = vim
 	excludesfile = ~/.gitignore
