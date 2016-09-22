@@ -25,6 +25,9 @@ if [[ -z "$LANG" ]]; then
   export LANG='en_US.UTF-8'
 fi
 
+# Turn off kqueue, tmux 2.2 is not doing it
+export EVENT_NOKQUEUE=1
+
 # Paths
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
