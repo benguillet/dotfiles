@@ -24,8 +24,6 @@ alias gsb='git status -s'
 alias gb='git branch'
 
 # Misc aliases
-alias fs='foreman start'
-alias rc='rails console'
 alias ll='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
@@ -47,11 +45,6 @@ alias tmk='tmux kill-session -t'
 alias tmr='tmux rename-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
-alias mysql.start='mysql.server start'
-alias mysql.stop='mysql.server stop'
-alias redis.start='redis-server /usr/local/etc/redis.conf'
-alias memcached.start='memcached -vvv'
-alias memcached.stop='killall memcached'
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
 
 # Empire
