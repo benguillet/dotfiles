@@ -19,6 +19,7 @@ alias a='atom'
 alias s='subl .'
 
 # Git
+alias git='hub'
 alias gst='git status'
 alias gsb='git status -s'
 alias gb='git branch'
