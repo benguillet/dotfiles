@@ -21,6 +21,8 @@ alias s='subl .'
 # Git
 alias git='hub'
 alias gst='git status'
+alias com='git commit'
+alias push='git push'
 alias gsb='git status -s'
 alias gb='git branch'
 
