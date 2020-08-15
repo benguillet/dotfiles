@@ -10,21 +10,25 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
+# Load rbenv automatically
+eval "$(rbenv init -)"
+
 # Disable autocorrect
 unsetopt CORRECT
 
 # Editors
 alias v='vim'
-alias a='atom'
 alias s='subl .'
+alias c='code .'
 
 # Git
-alias git='hub'
+alias m='smerge .'
 alias gst='git status'
 alias com='git commit'
 alias push='git push'
 alias gsb='git status -s'
 alias gb='git branch'
+alias gut='git'
 
 # Misc aliases
 alias ll='ls -l'
@@ -53,12 +57,16 @@ alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $
 # Empire
 alias count_proc="cut -d '.' -f 2 | uniq -c"
 
-# Redshift Access
-alias gnoob="psql postgres://${REDSHIFT_PROD_USER}:${REDSHIFT_PROD_PW}@${REDSHIFT_PROD_SERVER}:${REDSHIFT_PROD_PORT}/${REDSHIFT_PROD_NAME}"
-
-# Get external IP
-alias ifconfig-ext='curl ifconfig.me'
-
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
+
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
