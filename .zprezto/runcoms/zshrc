@@ -29,6 +29,7 @@ alias push='git push'
 alias gsb='git status -s'
 alias gb='git branch'
 alias gut='git'
+alias gpm='git checkout master && comm -12 <(git branch | sed "s/ *//g") <(git remote prune origin | sed "s/^.*origin\///g") | xargs -L1 -J % git branch -D %'
 
 # Misc aliases
 alias ll='ls -l'
@@ -41,7 +42,6 @@ alias be='bundle exec'
 alias cdev='bundle exec cucumber --tags @dev'
 
 # Docker
-alias machine='docker-machine'
 alias compose='docker-compose'
 
 # Tmux
@@ -54,19 +54,14 @@ alias tmux='TERM=screen-256color-bce tmux'
 
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
 
-# Empire
-alias count_proc="cut -d '.' -f 2 | uniq -c"
-
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
 
-
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-
 export NVM_DIR="$HOME/.nvm"
-  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

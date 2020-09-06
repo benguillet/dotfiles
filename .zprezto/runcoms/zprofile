@@ -47,9 +47,11 @@ NPM=/usr/local/share/npm/bin
 PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin:/usr/texbin
 
 # activate vendor folder with Go 1.5
-export GO15VENDOREXPERIMENT=1
 export GOPATH="$HOME/go"
 export PATH=$HOMEBREW:$NPM:$GOPATH/bin:$PATH
+
+# Default all heroku cli commands to be run in figurehr team
+export HEROKU_ORGANIZATION=figurehr
 
 # Less
 # Set the default Less options.
@@ -76,3 +78,4 @@ fi
 
 
 export PATH="$HOME/.cargo/bin:$PATH"
+export GPG_TTY=$(tty)
