@@ -51,7 +51,7 @@ export GOPATH="$HOME/go"
 export PATH=$HOMEBREW:$NPM:$GOPATH/bin:$PATH
 
 # Default all heroku cli commands to be run in figurehr team
-export HEROKU_ORGANIZATION=figurehr
+#export HEROKU_ORGANIZATION=figurehr
 
 # Less
 # Set the default Less options.
@@ -74,7 +74,6 @@ TMPPREFIX="${TMPDIR%/}/zsh"
 if [[ ! -d "$TMPPREFIX" ]]; then
   mkdir -p "$TMPPREFIX"
 fi
-
 
 
 export PATH="$HOME/.cargo/bin:$PATH"
