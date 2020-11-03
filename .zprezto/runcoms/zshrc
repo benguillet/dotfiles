@@ -36,7 +36,6 @@ alias lla='ls -la'
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'
 alias be='bundle exec'
-alias cdev='bundle exec cucumber --tags @dev'
 
 # Docker
 alias compose='docker-compose'
@@ -60,3 +59,4 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # asdf setup: used for managing ruby, node versions etc.
 . /usr/local/opt/asdf/asdf.sh
+

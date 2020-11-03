@@ -77,4 +77,7 @@ fi
 
 
 export PATH="$HOME/.cargo/bin:$PATH"
+# necessary to install the pg gem, dependency: brew install libpq
+export PATH="/usr/local/opt/libpq/bin:$PATH"
+
 export GPG_TTY=$(tty)
