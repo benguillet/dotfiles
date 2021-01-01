@@ -21,7 +21,7 @@
 [credential]
 	helper = osxkeychain
 [push]
-	default = simple
+	default = current
 [merge]
 	ff = only
 [rebase]
