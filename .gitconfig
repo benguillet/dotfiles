@@ -22,8 +22,10 @@
 	helper = osxkeychain
 [push]
 	default = current
+	autoSetupRemote = true
 [merge]
 	ff = only
+	conflictstyle = diff3
 [rebase]
 	autosquash = true
 [commit]

@@ -80,4 +80,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # necessary to install the pg gem, dependency: brew install libpq
 export PATH="/usr/local/opt/libpq/bin:$PATH"
 
+#export PATH="/nix/store:$PATH"
+
 export GPG_TTY=$(tty)
+
+. $HOME/.nix-profile/etc/profile.d/nix.sh
+

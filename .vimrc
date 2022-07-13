@@ -1,4 +1,5 @@
 set nocompatible 
+set confirm
 
 " Vundle config
 filetype off

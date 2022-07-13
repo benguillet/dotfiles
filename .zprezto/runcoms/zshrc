@@ -26,7 +26,7 @@ alias push='git push'
 alias gsb='git status -s'
 alias gb='git branch'
 alias gut='git'
-alias gpm='git checkout master && comm -12 <(git branch | sed "s/ *//g") <(git remote prune origin | sed "s/^.*origin\///g") | xargs -L1 -J % git branch -D %'
+alias gpm='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias wip='com -S -n -m "WIP"'
 alias tst='tig status'
 
@@ -34,6 +34,7 @@ alias tst='tig status'
 alias ll='ls -l'
 alias la='ls -a'
 alias lla='ls -la'
+alias lt='lt'
 
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'
@@ -51,6 +52,8 @@ alias tmr='tmux rename-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
 alias sound.restart="sudo kill -9 `ps ax | grep 'coreaudio[a-z]' | awk '{print $1}'`"
+alias bluetooth.restart="pgrep bluetooth | xargs sudo kill"
+alias ui.restart="sudo killall -HUP WindowServer"
 
 # Autojump
 [[ -s `brew --prefix`/etc/autojump.sh ]] && . `brew --prefix`/etc/autojump.sh
@@ -61,4 +64,6 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # asdf setup: used for managing ruby, node versions etc.
 . /usr/local/opt/asdf/asdf.sh
+
+eval "$(direnv hook zsh)"
 
