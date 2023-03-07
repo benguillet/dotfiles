@@ -2,7 +2,7 @@
 A small compilation and backup of my dot files on OS X.
 
 It includes:
-* Zsh + zprezto
+* Zim
 * My Vim setup (plugins are managed with Vundle)
 * My Tmux setup
 * My Git setup

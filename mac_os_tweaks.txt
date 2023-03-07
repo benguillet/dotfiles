@@ -1,9 +1,0 @@
-# Get Rid of the Delay When Showing and Hiding the Dock
-defaults write com.apple.dock autohide-time-modifier -float 0.20; killall Dock
-
-# Disable Window Animation
-defaults write com.apple.dock expose-animation-duration -float 0; killall Dock
-
-# If you use multiple monitors, and you're frustrated with the cmd-tab app switcher only appearing on the last monitor you touched the dock, this will make it show up on all monitors.
-defaults write com.apple.Dock appswitcher-all-displays -bool true; killall Dock
-

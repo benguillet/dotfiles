@@ -1,0 +1,59 @@
+require 'rake'
+
+task :osx do
+  # Used plistwatch to find the keys
+  # brew install go
+  # go install github.com/catilac/plistwatch@latest
+  # ~/go/bin/plistwatch
+
+  #  ## Dock
+  # Position dock to left of the screen
+  sh "defaults write com.apple.dock orientation 'left'"
+  # Get Rid of the Delay When Showing and Hiding the Dock
+  sh "defaults write com.apple.dock autohide-time-modifier -float 0.20"
+
+  ## Hotcorners
+  # sh "defaults write com.apple.dock wvous-tl-corner -int 3"
+  # sh "defaults write com.apple.dock wvous-bl-corner -int 4"
+  # sh "defaults write com.apple.dock wvous-tr-corner -int 2"
+
+  ## Trackpad
+  # sh "defaults write com.apple.driver.AppleBluetoothMultitouctrackpad Clicking -int 1"
+
+  ## Keyboard
+  # sh "defaults write NSGlobalDomain KeyRepeat -int 1"
+  # sh "defaults write NSGlobalDomain InitialKeyRepeat -int 10"
+
+  ## Finder
+  # Show file extensions
+
+  ## Misc
+  # Disable Window Animation
+  sh "defaults write com.apple.dock expose-animation-duration -float 0"
+  # If you use multiple monitors, and you're frustrated with the cmd-tab app switcher
+  # only appearing on the last monitor you touched the dock,
+  # this will make it show up on all monitors.
+  #sh "defaults write com.apple.Dock appswitcher-all-displays -bool true"
+
+  # Remapping capslock to escape is manual, nocommand
+
+  sh "killall Dock"
+  sh "killall Finder"
+
+  puts "IMPORTANT: Restart for all changes to take effect"
+end
+
+task :symlinks do
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.gitconfig ~/.gitconfig"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.ssh ~/"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.tmux.conf ~/.tmux.conf"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.tool-versions ~/.tool-versions"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.vimrc ~/.vimrc"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.zimrc ~/.zimrc"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.zprofile ~/.zprofile"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
+end
+
+task :setup => [:osx, :symlinks]
+

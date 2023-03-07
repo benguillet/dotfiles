@@ -65,5 +65,6 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 # asdf setup: used for managing ruby, node versions etc.
 . /usr/local/opt/asdf/asdf.sh
 
+eval "$(github-copilot-cli alias -- "$0")"
 eval "$(direnv hook zsh)"
 

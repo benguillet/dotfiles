@@ -1,0 +1,33 @@
+[user]
+	name = Ben Guillet
+	email = benjamin.guillet@gmail.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFGdmOocENRrd3K+BLvaGxBhMtNNP0aZw59ii4U7pEUE
+[color]
+	ui = true
+[format]
+	pretty = "Commit:  %C(blue)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
+[alias]
+  	co = checkout
+  	g = grep --break --heading --line-number
+  	cp = cherry-pick
+  	br = branch
+  	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  	recent = "!f() { git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head; }; f"
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[push]
+	autoSetupRemote = true
+[rebase]
+	autosquash = true
+[code]
+	editor = vim
+[commit]
+	gpgsign = true
+[init]
+	defaultBranch = main
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RFX
+[interactive]
+	diffFilter = diff-so-fancy --patch

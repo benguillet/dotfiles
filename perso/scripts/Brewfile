@@ -1,0 +1,5 @@
+brew "autojump"
+brew "diff-so-fancy"
+
+# Better shell history
+brew "fzf"
