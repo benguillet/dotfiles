@@ -30,5 +30,6 @@
 	defaultBranch = main
 [core]
 	pager = diff-so-fancy | less --tabs=4 -RFX
+	excludesfile = /Users/ben/.gitignore_global
 [interactive]
 	diffFilter = diff-so-fancy --patch
