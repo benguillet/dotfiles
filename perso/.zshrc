@@ -161,6 +161,7 @@ alias tmux='TERM=screen-256color-bce tmux'
 
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+. ~/.asdf/plugins/java/set-java-home.zsh
 
 # Copilot CLI aliases
 eval "$(github-copilot-cli alias -- "$0")"
@@ -169,3 +170,8 @@ eval "$(github-copilot-cli alias -- "$0")"
 eval "$(direnv hook zsh)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# Created by `pipx` on 2024-04-02 04:07:17
+export PATH="$PATH:/Users/ben/.local/bin"
+

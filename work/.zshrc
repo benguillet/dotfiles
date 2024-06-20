@@ -137,6 +137,7 @@ alias c='code .'
 alias gst='git status'
 alias com='git commit'
 alias push='git push'
+alias pull='git pull'
 alias gsb='git status -s'
 alias gpm='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias wip='com -S -n -m "WIP"'
@@ -169,3 +170,4 @@ eval "$(github-copilot-cli alias -- "$0")"
 eval "$(direnv hook zsh)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
