@@ -1,6 +1,8 @@
 ## Personal configuration
 
-1. Run OS X tweaks to feel more at home.
+1. Run OS X tweaks to feel more at home. List of Mac OS settings:
+    - https://gist.github.com/millermedeiros/6615994
+    - https://github.com/mathiasbynens/dotfiles/blob/master/.macos
 2. Install visual softwares, prio: access to creds and files (1p, dropbox)
     - 1Password
     - Dropbox
