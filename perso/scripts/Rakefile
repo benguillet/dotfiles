@@ -2,9 +2,10 @@ require 'rake'
 
 task :osx do
   # Used plistwatch to find the keys
-  # brew install go
+  # asdf plugin add golfing
+  # asdf install golang latest
   # go install github.com/catilac/plistwatch@latest
-  # ~/go/bin/plistwatch
+  # .asdf/installs/golang/1.20.2/packages/bin/plistwatch
 
   ## Dock
   # Position dock to left of the screen

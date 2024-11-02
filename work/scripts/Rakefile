@@ -2,20 +2,43 @@ require 'rake'
 
 task :osx do
   # Used plistwatch to find the keys
-  # brew install go
+  # asdf plugin add golfing
+  # asdf install golang latest
   # go install github.com/catilac/plistwatch@latest
-  # ~/go/bin/plistwatch
+  # .asdf/installs/golang/1.20.2/packages/bin/plistwatch
 
   #  ## Dock
-  # Position dock to left of the screen
+  # Dock size
+  sh "defaults write com.apple.dock tilesize '34'"
+  # Dock magnification
+  sh "defaults write com.apple.dock largesize '64'"
+  # Dock on left side of screen
   sh "defaults write com.apple.dock orientation 'left'"
-  # Get Rid of the Delay When Showing and Hiding the Dock
+  # Scale effect vs. genie effect for window minimization
+  sh "defaults write com.apple.dock mineffect 'scale'"
+  # Get rid of the delay when showing and hiding the Dock
   sh "defaults write com.apple.dock autohide-time-modifier -float 0.20"
+
+  ## Spaces
+  # Re-arrange space based on most recent use
+  sh "defaults write com.apple.dock mru-spaces '0'"
 
   ## Hotcorners
   # sh "defaults write com.apple.dock wvous-tl-corner -int 3"
   # sh "defaults write com.apple.dock wvous-bl-corner -int 4"
   # sh "defaults write com.apple.dock wvous-tr-corner -int 2"
+  # Top-right corner -> Application Windows
+  sh "defaults write com.apple.dock wvous-tr-modifier '0'"
+  sh "defaults write com.apple.dock wvous-tr-corner '3'"
+  # Bottom-rih cornr -> Application Windows
+  sh "defaults write com.apple.dock wvous-br-modifier '0'"
+  sh "defaults write com.apple.dock wvous-br-corner '3'"
+  # Top-left oner - Mission Control
+  sh "defaults write com.apple.dock wvous-tl-modifier '0'"
+  sh "defaults write com.apple.dock wvous-tl-corner '2'"
+  # Bottom-letcorne -> Desktop
+  sh "defaults write com.apple.dock wvous-bl-corner '4'"
+  sh "defaults write com.apple.dock wvous-bl-modifier '0'"
 
   ## Trackpad
   # sh "defaults write com.apple.driver.AppleBluetoothMultitouctrackpad Clicking -int 1"

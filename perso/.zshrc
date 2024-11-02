@@ -131,7 +131,7 @@ unset key
 
 # Editors
 alias v='vim'
-alias c='code .'
+alias c='cursor .'
 
 # Git
 alias gst='git status'
@@ -159,19 +159,23 @@ alias tmux='TERM=screen-256color-bce tmux'
 # Autojump
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
 
-# asdf
+# asdf, TODO: replace by asdf zimrc plugin?
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 . ~/.asdf/plugins/java/set-java-home.zsh
 
 # Copilot CLI aliases
 eval "$(github-copilot-cli alias -- "$0")"
 
-# Direnv setup
+# Direnv setup; could be replaced by zimfw plugin
 eval "$(direnv hook zsh)"
 
+# TODO: replace by zimrc plugin
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
 # Created by `pipx` on 2024-04-02 04:07:17
 export PATH="$PATH:/Users/ben/.local/bin"
 
+# Overriden value from the zimrc/environment plugin
+HISTSIZE=500000 # Default 20k
+SAVEHIST=400000 # Default 10k

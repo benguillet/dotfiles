@@ -19,6 +19,7 @@
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
 [push]
 	autoSetupRemote = true
+	default = current
 [rebase]
 	autosquash = true
 [code]
@@ -31,3 +32,8 @@
 	pager = diff-so-fancy | less --tabs=4 -RFX
 [interactive]
 	diffFilter = diff-so-fancy --patch
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
