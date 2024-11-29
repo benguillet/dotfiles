@@ -78,5 +78,5 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
 end
 
-task :setup => [:osx, :symlinks]
+task :setup => [:brew, :osx, :symlinks]
 

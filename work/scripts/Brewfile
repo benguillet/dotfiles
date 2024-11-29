@@ -1,5 +1,57 @@
-brew "autojump"
-brew "diff-so-fancy"
+# Brew Bundle Brewfile Tips
+# https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f
 
-# Better shell history
-brew "fzf"
+# tap "homebrew/core"
+# tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "buo/cask-upgrade" # Allow to upgrade casks
+
+# Brew
+brew "asdf"
+brew "autojump"
+brew "awscli"
+brew "fzf" # Better shell history
+brew "git"
+brew "git-lfs"
+brew "git-delta" # Better git diff
+brew "meetingbar"
+brew "mkcert"
+brew "opentofu"
+brew "pnpm"
+brew "zsh"
+brew "stats" # Replace iStats
+brew "ripgrep" # Better ag
+brew "tlrc" # Better manpages
+brew "bat" # Better cat
+brew "direnv"
+brew "mas" # Allow to install Mac App Store apps
+brew "jordanbaird-ice" # Hide overflowing menu bar items
+
+# Casks
+# cask "monitorcontrol"
+cask "1password"
+cask "aldente"
+cask "chatgpt"
+cask "cold-turkey"
+cask "cursor"
+cask "dropbox"
+cask "google-chrome"
+cask "google-cloud-sdk" # Google Cloud CLI
+cask "istat-menus"
+cask "iterm2"
+cask "messenger"
+cask "notion"
+cask "orbstack" # Better docker
+cask "raycast"
+cask "slack"
+cask "spotify"
+cask "todoist"
+cask "whatsapp"
+cask "zoom"
+cask "rocket" # Slack-style emojis in every app
+
+
+# Mac App Store
+mas "Coin Tick", id: 1141688067
+mas "Magnet", id: 441258766
+mas "MeetingBar", id: 1532419400

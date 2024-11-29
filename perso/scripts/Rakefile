@@ -1,46 +1,190 @@
 require 'rake'
 
-task :osx do
-  # Used plistwatch to find the keys
-  # asdf plugin add golfing
-  # asdf install golang latest
-  # go install github.com/catilac/plistwatch@latest
-  # .asdf/installs/golang/1.20.2/packages/bin/plistwatch
 
-  ## Dock
-  # Position dock to left of the screen
+task :brew do
+  puts "Installing homebrew..."
+  sh '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+  sh 'echo \'eval "$(/opt/homebrew/bin/brew shellenv)"\' >> ~/.zprofile'
+  sh 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+  puts "Installing brew bundle..."
+  sh '/opt/homebrew/bin/brew bundle'
+end
+
+task :zim do
+  puts "Installing Zim..."
+  sh "curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh"
+  puts "Zim installed! Restart your terminal"
+end
+
+task :macos do
+  # Use plistwatch to find the keys
+
+  ###############################################################################
+  # General UI/UX
+  ###############################################################################
+
+  # Enabling full keyboard access for all controls (e.g. enable Tab in modal dialogs)
+  sh "defaults write NSGlobalDomain AppleKeyboardUIMode -int 3"
+
+  # Showing icons for hard drives, servers, and removable media on the desktop
+  sh "defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true"
+
+  # Use column view in all Finder windows by default
+  sh "defaults write com.apple.finder FXPreferredViewStyle Clmv"
+
+  # Preventing Time Machine from prompting to use new hard drives as backup volume
+  sh "defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true"
+
+  # Setting screenshot format to PNG
+  sh "defaults write com.apple.screencapture type -string 'png'"
+
+
+  ###############################################################################
+  # Dock, Dashboard, and hot corners
+  ###############################################################################
+
+  # Dock: Position dock to left of the screen
   sh "defaults write com.apple.dock orientation 'left'"
-  # Get Rid of the Delay When Showing and Hiding the Dock
-  sh "defaults write com.apple.dock autohide-time-modifier -float 0.20"
 
-  ## Hotcorners
-  # sh "defaults write com.apple.dock wvous-tl-corner -int 3"
-  # sh "defaults write com.apple.dock wvous-bl-corner -int 4"
-  # sh "defaults write com.apple.dock wvous-tr-corner -int 2"
+  # Remove the auto-hiding Dock delay
+  sh "defaults write com.apple.dock autohide-delay -float 0"
 
-  ## Trackpad
-  # sh "defaults write com.apple.driver.AppleBluetoothMultitouctrackpad Clicking -int 1"
+  # Remove the animation when hiding/showing the Dock
+  sh "defaults write com.apple.dock autohide-time-modifier -float 0"
 
-  ## Keyboard
-  # sh "defaults write NSGlobalDomain KeyRepeat -int 1"
-  # sh "defaults write NSGlobalDomain InitialKeyRepeat -int 10"
+  # Automatically hide and show the Dock
+  sh "defaults write com.apple.dock autohide -bool true"
 
-  ## Finder
-  # Show file extensions
+  # Dock: Don’t animate opening applications from the Dock
+  sh "defaults write com.apple.dock launchanim -bool false"
 
-  ## Misc
   # Disable Window Animation
   sh "defaults write com.apple.dock expose-animation-duration -float 0"
+
+  # Don’t show recent applications in Dock
+  sh "defaults write com.apple.dock show-recents -bool false"
+
+  # Set the icon size of Dock items to 36 pixels
+  sh "defaults write com.apple.dock tilesize -int 36"
+
+  # Change minimize/maximize window effect
+  sh "defaults write com.apple.dock mineffect -string 'scale'"
+
+  # Disable Dashboard
+  sh "defaults write com.apple.dashboard mcx-disabled -bool true"
+
+  # Don’t show Dashboard as a Space
+  sh "defaults write com.apple.dock dashboard-in-overlay -bool true"
+
+  # Don’t automatically rearrange Spaces based on most recent use
+  sh "defaults write com.apple.dock mru-spaces -bool false"
+
+  ## Hotcorners
+  # Possible values:
+  #  0: no-op
+  #  2: Mission Control
+  #  3: Show application windows
+  #  4: Desktop
+  #  5: Start screen saver
+  #  6: Disable screen saver
+  #  7: Dashboard
+  # 10: Put display to sleep
+  # 11: Launchpad
+  # 12: Notification Center
+  # 13: Lock Screen
+  # Top left screen corner → Mission Control
+  sh "defaults write com.apple.dock wvous-tl-corner -int 2"
+  sh "defaults write com.apple.dock wvous-tl-modifier -int 0"
+
+  # Top right screen corner → Show applications windows
+  sh "defaults write com.apple.dock wvous-tr-corner -int 3"
+  sh "defaults write com.apple.dock wvous-tr-modifier -int 0"
+
+  # Bottom right screen corner → Show applications windows
+  sh "defaults write com.apple.dock wvous-br-corner -int 3"
+  sh "defaults write com.apple.dock wvous-br-modifier -int 0"
+
+  # Bottom right screen corner → Desktop
+  sh "defaults write com.apple.dock wvous-bl-corner -int 4"
+  sh "defaults write com.apple.dock wvous-bl-modifier -int 0"
+
+
+
   # If you use multiple monitors, and you're frustrated with the cmd-tab app switcher
   # only appearing on the last monitor you touched the dock,
   # this will make it show up on all monitors.
   #sh "defaults write com.apple.Dock appswitcher-all-displays -bool true"
 
+  ###############################################################################
+  # Trackpad, mouse, keyboard, Bluetooth accessories, and input
+  ###############################################################################
+
+  ## Trackpad
+  sh "defaults write com.apple.driver.AppleBluetoothMultitouctrackpad Clicking -int 1"
+
+  ## Keyboard
+
+  # Set a blazingly fast keyboard repeat rate
+  sh "defaults write NSGlobalDomain KeyRepeat -int 1"
+  sh "defaults write NSGlobalDomain InitialKeyRepeat -int 10"
+
+  # Disable press-and-hold for keys in favor of key repeat
+  sh "defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false"
+
   # Remapping capslock to escape is manual, nocommand
+
+  # Disable automatic capitalization as it’s annoying when typing code
+  sh "defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false"
+
+  # Disable smart dashes as they’re annoying when typing code
+  sh "defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false"
+
+  # Disable automatic period substitution as it’s annoying when typing code
+  sh "defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false"
+
+  # Disable smart quotes as they’re annoying when typing code
+  sh "defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false"
+
+  # Disable auto-correct
+  sh "defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false"
+
+  ###############################################################################
+  # Finder
+  ###############################################################################
+
+  # Show file extensions
+  sh "defaults write NSGlobalDomain AppleShowAllExtensions -bool true"
+
+  # Finder: show path bar
+  sh "defaults write com.apple.finder ShowPathbar -bool true"
+
+  # Keep folders on top when sorting by name
+  sh "defaults write com.apple.finder _FXSortFoldersFirst -bool true"
+
+  # Disable the warning when changing a file extension
+  sh "defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false"
+
+  # Avoid creating .DS_Store files on network or USB volumes
+  sh "defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true"
+  sh "defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true"
+
+  # Expand the following File Info panes:
+# “General”, “Open with”, and “Sharing & Permissions”
+  sh "defaults write com.apple.finder FXInfoPanesExpanded -dict General -bool true OpenWith -bool true Privileges -bool true"
+
+  ###############################################################################
+  # Terminal
+  ###############################################################################
 
   # Remove last login time from terminal
   sh "touch ~/.hushlogin"
 
+  # Enabling UTF-8 ONLY in Terminal.app and setting the Pro theme by default
+  sh "defaults write com.apple.terminal StringEncodings -array 4"
+  sh "defaults write com.apple.Terminal 'Default Window Settings' -string 'Pro'"
+  sh "defaults write com.apple.Terminal 'Startup Window Settings' -string 'Pro'"
+
+  # Restart affected apps
   sh "killall Dock"
   sh "killall Finder"
 
@@ -58,4 +202,4 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
 end
 
-task :setup => [:osx, :symlinks]
+# task :setup => [:zim, :brew, :macos, :symlinks]
