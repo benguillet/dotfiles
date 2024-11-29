@@ -36,6 +36,8 @@ rake macos
 - For more information about the zimfw plugin manager, run zimfw help.
 
 ### Useful links
-List of Mac OS settings:
+- List of Mac OS settings:
     - https://gist.github.com/millermedeiros/6615994
     - https://github.com/mathiasbynens/dotfiles/blob/master/.macos
+- GitX: https://github.com/gitx/gitx
+    - Don't forget to enable Terminal usage
