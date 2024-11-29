@@ -135,10 +135,11 @@ alias c='cursor .'
 
 # Git
 alias gst='git status'
-alias com='git commit'
+alias com='git commit -S -m'
 alias push='git push'
 alias gsb='git status -s'
-alias gpm='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
+# Delete already merged branches
+alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias wip='com -S -n -m "WIP"'
 
 # fzf: Checkout a branch (sorted by most recent commit)
