@@ -141,6 +141,9 @@ alias gsb='git status -s'
 alias gpm='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias wip='com -S -n -m "WIP"'
 
+# fzf: Checkout a branch (sorted by most recent commit)
+alias gcb='git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | sed "s/^origin\///" | awk "!seen[\$0]++" | fzf -0 --preview "git show --color=always {}" | xargs -r git checkout'
+
 # Misc aliases
 alias la='ls -a'
 alias lla='ls -la'
@@ -159,21 +162,16 @@ alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
-# Autojump
-[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+# Map zoxide to old autojump alias
+alias j='z'
 
-# asdf, TODO: replace by asdf zimrc plugin?
+# asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 . ~/.asdf/plugins/java/set-java-home.zsh
+# asdf direnv plugin (makes asdf faster)
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
-# Copilot CLI aliases
-eval "$(github-copilot-cli alias -- "$0")"
-
-# Direnv setup; could be replaced by zimfw plugin
-eval "$(direnv hook zsh)"
-
-# TODO: replace by zimrc plugin
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
 # Created by `pipx` on 2024-04-02 04:07:17
@@ -182,3 +180,7 @@ export PATH="$PATH:/Users/ben/.local/bin"
 # Overriden value from the zimrc/environment plugin
 HISTSIZE=500000 # Default 20k
 SAVEHIST=400000 # Default 10k
+
+# Like autojump, but better
+eval "$(zoxide init zsh)"
+
