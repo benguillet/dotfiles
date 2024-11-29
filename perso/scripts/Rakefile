@@ -202,4 +202,9 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
 end
 
-# task :setup => [:zim, :brew, :macos, :symlinks]
+task :prefs do
+  # TODO: figure real path to copy to, or just use import preferences from Stats.app
+  # sh "cp #{__dir__.chomp('/scripts')}/preferences/Stats.plist ~/Library/Application\ Support/.."
+end
+
+# task :setup => [:brew, :zim, :macos, :symlinks]
