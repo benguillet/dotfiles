@@ -10,22 +10,23 @@ tap "buo/cask-upgrade" # Allow to upgrade casks
 brew "asdf"
 brew "autojump"
 brew "awscli"
+brew "bat" # Better cat
+brew "direnv"
 brew "fzf" # Better shell history
 brew "git"
-brew "git-lfs"
 brew "git-delta" # Better git diff
+brew "git-lfs"
+brew "jordanbaird-ice" # Hide overflowing menu bar items
+brew "mas" # Allow to install Mac App Store apps
 brew "meetingbar"
 brew "mkcert"
 brew "opentofu"
 brew "pnpm"
-brew "zsh"
-brew "stats" # Replace iStats
 brew "ripgrep" # Better ag
+brew "stats" # Replace iStats
 brew "tlrc" # Better manpages
-brew "bat" # Better cat
-brew "direnv"
-brew "mas" # Allow to install Mac App Store apps
-brew "jordanbaird-ice" # Hide overflowing menu bar items
+brew "vim"
+brew "zsh"
 
 # Casks
 # cask "monitorcontrol"
