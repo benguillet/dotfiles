@@ -3,29 +3,29 @@
 ### Quickstart
 1. Set dotfiles repo public temporarily: https://github.com/benguillet/dotfiles
 2. Clone repo:
-```bash
-git clone https://github.com/benguillet/dotfiles.git
+```sh
+$ git clone https://github.com/benguillet/dotfiles.git
 ```
-3. Install zim
+3. Install brew and essential cli tools
+```sh
+$ rake brew
 ```
-rake zim
-```
-4. Install brew and essential cli tools
-```
-rake brew
+4. Install zim (after brew because otherwise modules would install asdf, direnv etc.)
+```sh
+$ rake zim
 ```
 5. Log into 1password and dropbox; start syncing
 6. Run symlinks script (when Dropbox is done syncing)
-```
-rake symlinks
+```sh
+$ rake symlinks
 ```
 7. Install zimfw install for new modules
-```
-zimfw install
+```sh
+$ zimfw install
 ```
 8. Set Mac OS preferred settings
-```
-rake macos
+```sh
+$ rake macos
 ```
 
 ### Zim
