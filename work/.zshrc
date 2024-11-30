@@ -163,9 +163,6 @@ alias tmux='TERM=screen-256color-bce tmux'
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
-# Copilot CLI aliases
-eval "$(github-copilot-cli alias -- "$0")"
-
 # Direnv setup
 eval "$(direnv hook zsh)"
 

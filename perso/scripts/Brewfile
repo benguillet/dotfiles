@@ -25,6 +25,7 @@ brew "ripgrep" # Better ag
 brew "stats" # Replace iStats
 brew "tlrc" # Better manpages
 brew "zoxide"
+brew "vim"
 brew "zsh" # Upgrade zsh from stock macos
 
 
@@ -52,6 +53,8 @@ cask "signal"
 cask "slack"
 cask "spotify"
 cask "todoist"
+cask "transmission"
+cask "vlc"
 cask "whatsapp"
 cask "zoom"
 

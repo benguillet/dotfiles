@@ -7,26 +7,26 @@ tap "homebrew/cask"
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
 # Brew
+
+# TODO: Linux apps
 brew "asdf"
-brew "autojump"
 brew "awscli"
 brew "bat" # Better cat
 brew "direnv"
 brew "fzf" # Better shell history
+brew "gh" # Github CLI; checks action results from CLI
 brew "git"
 brew "git-delta" # Better git diff
 brew "git-lfs"
-brew "jordanbaird-ice" # Hide overflowing menu bar items
+brew "jordanbaird-ice" # Show menu bar items hidden by notch
 brew "mas" # Allow to install Mac App Store apps
-brew "meetingbar"
-brew "mkcert"
 brew "opentofu"
-brew "pnpm"
 brew "ripgrep" # Better ag
 brew "stats" # Replace iStats
 brew "tlrc" # Better manpages
 brew "vim"
-brew "zsh"
+brew "zoxide"
+brew "zsh" # Upgrade zsh from stock macos
 
 # Casks
 # cask "monitorcontrol"
@@ -36,23 +36,24 @@ cask "chatgpt"
 cask "cold-turkey"
 cask "cursor"
 cask "dropbox"
+cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
-cask "istat-menus"
 cask "iterm2"
-cask "messenger"
+cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
+cask "postico" # Postgresql client
 cask "raycast"
+cask "rocket" # Slack-style emojis in every app
+cask "signal"
 cask "slack"
 cask "spotify"
 cask "todoist"
-cask "whatsapp"
 cask "zoom"
-cask "rocket" # Slack-style emojis in every app
-
 
 # Mac App Store
 mas "Coin Tick", id: 1141688067
 mas "Magnet", id: 441258766
 mas "MeetingBar", id: 1532419400
+mas "Velja", id: 1607635845 # Rules to open correct chrome profile based on url
