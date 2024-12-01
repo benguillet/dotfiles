@@ -1,5 +1,14 @@
 require 'rake'
 
+task :brew do
+  puts "Installing homebrew..."
+  sh '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+  sh 'echo \'eval "$(/opt/homebrew/bin/brew shellenv)"\' >> ~/.zprofile'
+  sh 'eval "$(/opt/homebrew/bin/brew shellenv)"'
+  puts "Installing brew bundle..."
+  sh '/opt/homebrew/bin/brew bundle'
+end
+
 task :osx do
   # Used plistwatch to find the keys
   # asdf plugin add golfing
@@ -78,5 +87,5 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
 end
 
-task :setup => [:brew, :osx, :symlinks]
+# task :setup => [:brew, :osx, :symlinks]
 
