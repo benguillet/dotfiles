@@ -139,8 +139,12 @@ alias com='git commit'
 alias push='git push'
 alias pull='git pull'
 alias gsb='git status -s'
-alias gpm='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
+# Delete already merged branches
+alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias wip='com -S -n -m "WIP"'
+
+# fzf: Checkout a branch (sorted by most recent commit)
+alias gcb='git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | sed "s/^origin\///" | awk "!seen[\$0]++" | fzf -0 --preview "git show --color=always {}" | xargs -r git checkout'
 
 # Misc aliases
 alias la='ls -a'
@@ -157,14 +161,17 @@ alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
-# Autojump
-[ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
-
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+# asdf direnv plugin (makes asdf faster)
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
 
-# Direnv setup
-eval "$(direnv hook zsh)"
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# Overriden value from the zimrc/environment plugin
+HISTSIZE=500000 # Default 20k
+SAVEHIST=400000 # Default 10k
+
+# Like autojump, but better
+eval "$(zoxide init zsh)"

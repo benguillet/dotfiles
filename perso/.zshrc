@@ -135,7 +135,7 @@ alias c='cursor .'
 
 # Git
 alias gst='git status'
-alias com='git commit -S -m'
+alias com='git commit'
 alias push='git push'
 alias pull='git pull'
 alias gsb='git status -s'
