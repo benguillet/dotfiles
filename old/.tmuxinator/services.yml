@@ -1,8 +1,0 @@
-# ~/.tmuxinator/services.yml
-project_name: services
-project_root: ~/
-windows:
-  - redis: redis.start
-  - rabbit-mq: rabbitmq-server
-  - postgres: postgres -D /usr/local/var/postgres
-  - memcached: memcached -vvv

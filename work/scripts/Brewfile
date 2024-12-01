@@ -3,7 +3,6 @@
 
 # tap "homebrew/core"
 # tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
 # Brew
