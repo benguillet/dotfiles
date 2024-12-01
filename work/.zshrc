@@ -131,7 +131,7 @@ unset key
 
 # Editors
 alias v='vim'
-alias c='code .'
+alias c='cursor .'
 
 # Git
 alias gst='git status'
