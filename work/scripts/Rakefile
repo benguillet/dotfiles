@@ -77,9 +77,10 @@ end
 
 task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.gitconfig ~/.gitconfig"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.gitignore_global ~/.gitignore_global"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.ssh ~/"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/.tmux.conf ~/.tmux.conf"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/.tool-versions ~/.tool-versions"
+  # sh "ln -sf #{__dir__.chomp('/scripts')}/.tmux.conf ~/.tmux.conf"
+  # sh "ln -sf #{__dir__.chomp('/scripts')}/.tool-versions ~/.tool-versions"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.vimrc ~/.vimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zimrc ~/.zimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zprofile ~/.zprofile"
