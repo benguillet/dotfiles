@@ -24,8 +24,8 @@ brew "opentofu"
 brew "ripgrep" # Better ag
 brew "stats" # Replace iStats
 brew "tlrc" # Better manpages
-brew "zoxide"
 brew "vim"
+brew "zoxide"
 brew "zsh" # Upgrade zsh from stock macos
 
 
@@ -40,7 +40,6 @@ cask "dropbox"
 cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
-cask "istat-menus"
 cask "iterm2"
 cask "messenger"
 cask "mullvadvpn"
