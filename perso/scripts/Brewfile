@@ -3,7 +3,6 @@
 
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
-
 # Do the thing where u replace all mac os unix tools with linux ones
 # Brew
 brew "asdf"

@@ -4,7 +4,6 @@
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
 # Brew
-
 # TODO: Linux apps
 brew "asdf"
 brew "awscli"
