@@ -161,6 +161,9 @@ alias tml='tmux list-sessions'
 alias tmk='tmux kill-session -t'
 alias tmux='TERM=screen-256color-bce tmux'
 
+# Map zoxide to old autojump alias
+alias j='z'
+
 # asdf
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
 # asdf direnv plugin (makes asdf faster)
