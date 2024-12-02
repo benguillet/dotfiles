@@ -1,8 +1,6 @@
 # Brew Bundle Brewfile Tips
 # https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f
 
-# tap "homebrew/core"
-# tap "homebrew/bundle"
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
 # Brew
@@ -17,11 +15,9 @@ brew "gh" # Github CLI; checks action results from CLI
 brew "git"
 brew "git-delta" # Better git diff
 brew "git-lfs"
-brew "jordanbaird-ice" # Show menu bar items hidden by notch
 brew "mas" # Allow to install Mac App Store apps
 brew "opentofu"
 brew "ripgrep" # Better ag
-brew "stats" # Replace iStats
 brew "tlrc" # Better manpages
 brew "vim"
 brew "zoxide"
@@ -31,14 +27,16 @@ brew "zsh" # Upgrade zsh from stock macos
 # cask "monitorcontrol"
 cask "1password"
 cask "aldente"
+cask "arc"
 cask "chatgpt"
-cask "cold-turkey"
+cask "cold-turkey-blocker"
 cask "cursor"
 cask "dropbox"
 cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
 cask "iterm2"
+cask "jordanbaird-ice" # Show menu bar items hidden by notch
 cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
@@ -48,6 +46,7 @@ cask "rocket" # Slack-style emojis in every app
 cask "signal"
 cask "slack"
 cask "spotify"
+cask "stats" # Replace iStats
 cask "todoist"
 cask "zoom"
 
