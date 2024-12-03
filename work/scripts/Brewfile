@@ -53,4 +53,5 @@ cask "zoom"
 mas "Coin Tick", id: 1141688067
 mas "Magnet", id: 441258766
 mas "MeetingBar", id: 1532419400
+mas "Parcel - Delivery Tracking", id: 639968404
 mas "Velja", id: 1607635845 # Rules to open correct chrome profile based on url
