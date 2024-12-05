@@ -1,6 +1,6 @@
 [user]
 	name = Ben Guillet
-	email = benjamin.guillet@gmail.com
+	email = ben@finnt.com
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFGdmOocENRrd3K+BLvaGxBhMtNNP0aZw59ii4U7pEUE
 [color]
 	ui = true

@@ -28,6 +28,7 @@ cask "1password"
 cask "aldente"
 cask "arc"
 cask "chatgpt"
+cask "cleanshot"
 cask "cold-turkey-blocker"
 cask "cursor"
 cask "dropbox"
@@ -47,6 +48,7 @@ cask "slack"
 cask "spotify"
 cask "stats" # Replace iStats
 cask "todoist"
+cask "whatsapp"
 cask "zoom"
 
 # Mac App Store
