@@ -41,6 +41,7 @@ cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
 cask "postico" # Postgresql client
+cask "postman"
 cask "raycast"
 cask "rocket" # Slack-style emojis in every app
 cask "signal"
