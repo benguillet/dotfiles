@@ -154,6 +154,9 @@ alias lla='ls -la'
 alias rake='noglob rake'
 alias be='bundle exec'
 
+# Docker
+alias comp='docker compose'
+
 # Tmux
 alias tma='tmux attach -d -t'
 alias tmn='tmux new -s'
