@@ -169,7 +169,7 @@ task :macos do
   sh "defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true"
 
   # Expand the following File Info panes:
-# “General”, “Open with”, and “Sharing & Permissions”
+  # “General”, “Open with”, and “Sharing & Permissions”
   sh "defaults write com.apple.finder FXInfoPanesExpanded -dict General -bool true OpenWith -bool true Privileges -bool true"
 
   ###############################################################################
