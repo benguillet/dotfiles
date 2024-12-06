@@ -181,3 +181,6 @@ SAVEHIST=400000 # Default 10k
 
 # Like autojump, but better
 eval "$(zoxide init zsh)"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/ben/.cache/lm-studio/bin"
