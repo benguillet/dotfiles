@@ -139,6 +139,7 @@ alias com='git commit'
 alias push='git push'
 alias pull='git pull'
 alias gsb='git status -s'
+
 # Delete already merged branches
 #alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
 alias gcn="git branch --merged main | grep -v '^\*' | grep -v main | xargs -n 1 git branch -d"
@@ -148,8 +149,9 @@ alias wip='com -S -n -m "WIP"'
 alias gcb='git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | sed "s/^origin\///" | awk "!seen[\$0]++" | fzf -0 --preview "git show --color=always {}" | xargs -r git checkout'
 
 # Misc aliases
-alias la='ls -a'
-alias lla='ls -la'
+alias la='eza -a'
+alias ll='eza -l'
+alias lla='eza -la'
 
 # Turn off the special expansion of zsh for rake (hard brackets issue)
 alias rake='noglob rake'

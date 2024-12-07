@@ -9,6 +9,7 @@ brew "asdf"
 brew "awscli"
 brew "bat" # Better cat
 brew "direnv"
+brew "eza" # Better ls
 brew "fzf" # Better shell history
 brew "gh" # Github CLI; checks action results from CLI
 brew "git"
