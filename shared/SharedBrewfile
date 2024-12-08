@@ -1,10 +1,8 @@
 # Brew Bundle Brewfile Tips
 # https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f
 
-tap "buo/cask-upgrade" # Allow to upgrade casks
-
-# Do the thing where u replace all mac os unix tools with linux ones
 # Brew
+# TODO: Linux apps
 brew "asdf"
 brew "awscli"
 brew "bat" # Better cat
@@ -23,7 +21,6 @@ brew "vim"
 brew "zoxide"
 brew "zsh" # Upgrade zsh from stock macos
 
-
 # Casks
 # cask "monitorcontrol"
 cask "1password"
@@ -37,23 +34,19 @@ cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
 cask "iterm2"
-cask "messenger"
+cask "jordanbaird-ice" # Show menu bar items hidden by notch
 cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
 cask "postico" # Postgresql client
 cask "raycast"
-cask "rocket" # Slack-style emojis in every app
 cask "signal"
 cask "slack"
 cask "spotify"
+cask "stats" # Replace iStats
 cask "todoist"
-cask "transmission"
-cask "vlc"
 cask "whatsapp"
 cask "zoom"
-cask "jordanbaird-ice" # Show menu bar items hidden by notch
-cask "stats" # Replace iStats
 
 
 # Mac App Store
