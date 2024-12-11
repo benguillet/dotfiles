@@ -113,7 +113,7 @@ task :macos do
   # If you use multiple monitors, and you're frustrated with the cmd-tab app switcher
   # only appearing on the last monitor you touched the dock,
   # this will make it show up on all monitors.
-  #sh "defaults write com.apple.Dock appswitcher-all-displays -bool true"
+  sh "defaults write com.apple.Dock appswitcher-all-displays -bool true"
 
   ###############################################################################
   # Trackpad, mouse, keyboard, Bluetooth accessories, and input
