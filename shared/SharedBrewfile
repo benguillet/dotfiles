@@ -36,6 +36,7 @@ cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
 cask "iterm2"
 cask "jordanbaird-ice" # Show menu bar items hidden by notch
+cask "messenger"
 cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
