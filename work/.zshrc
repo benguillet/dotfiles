@@ -170,11 +170,6 @@ alias tmux='TERM=screen-256color-bce tmux'
 # Map zoxide to old autojump alias
 alias j='z'
 
-# asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-# asdf direnv plugin (makes asdf faster)
-source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
-
 # Libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
@@ -187,3 +182,6 @@ eval "$(zoxide init zsh)"
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/ben/.cache/lm-studio/bin"
+
+# Mise (maybe replace with plugins)
+eval "$(/opt/homebrew/bin/mise activate zsh)"

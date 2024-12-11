@@ -4,6 +4,7 @@
 # Brew
 # TODO: Linux apps
 brew "asdf"
+brew "mise"
 brew "awscli"
 brew "bat" # Better cat
 brew "direnv"
