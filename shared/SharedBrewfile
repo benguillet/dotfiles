@@ -34,6 +34,7 @@ cask "dropbox"
 cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
+cask "iina" # Backup video player for automated subtitle retrieval
 cask "iterm2"
 cask "jordanbaird-ice" # Show menu bar items hidden by notch
 cask "messenger"
@@ -47,6 +48,7 @@ cask "slack"
 cask "spotify"
 cask "stats" # Replace iStats
 cask "todoist"
+cask "vlc"
 cask "whatsapp"
 cask "zoom"
 
