@@ -158,6 +158,9 @@ task :macos do
   # Finder: show path bar
   sh "defaults write com.apple.finder ShowPathbar -bool true"
 
+  # Use list view in all Finder windows by default (only works well with above settings, showing the path bar)
+  sh "defaults write com.apple.finder FXPreferredViewStyle -string 'Nlsv'"
+
   # Keep folders on top when sorting by name
   sh "defaults write com.apple.finder _FXSortFoldersFirst -bool true"
 
