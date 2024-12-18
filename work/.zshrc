@@ -142,7 +142,9 @@ alias gsb='git status -s'
 
 # Delete already merged branches
 #alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
-alias gcn="git branch --merged main | grep -v '^\*' | grep -v main | xargs -n 1 git branch -d"
+# doesn't work with squash merge
+#alias gcn="git branch --merged main | grep -v '^\*' | grep -v main | xargs -n 1 git branch -d"
+alias gcn="git-delete-merged-branches --effort=3 --branch main"
 alias wip='com -S -n -m "WIP"'
 
 # fzf: Checkout a branch (sorted by most recent commit)

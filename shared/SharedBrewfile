@@ -4,7 +4,6 @@
 # Brew
 # TODO: Linux apps
 brew "asdf"
-brew "mise"
 brew "awscli"
 brew "bat" # Better cat
 brew "direnv"
@@ -12,9 +11,11 @@ brew "eza" # Better ls
 brew "fzf" # Better shell history
 brew "gh" # Github CLI; checks action results from CLI
 brew "git"
+brew "git-delete-merged-branches" # Allow to delete squashed-merged branches w/ effort=3
 brew "git-delta" # Better git diff
 brew "git-lfs"
 brew "mas" # Allow to install Mac App Store apps
+brew "mise"
 brew "opentofu"
 brew "ripgrep" # Better ag
 brew "tlrc" # Better manpages
