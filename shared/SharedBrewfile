@@ -1,9 +1,10 @@
 # Brew Bundle Brewfile Tips
 # https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f
 
+tap "common-fate/granted" # For granted
+
 # Brew
 # TODO: Linux apps
-brew "asdf"
 brew "awscli"
 brew "bat" # Better cat
 brew "direnv"
@@ -14,8 +15,9 @@ brew "git"
 brew "git-delete-merged-branches" # Allow to delete squashed-merged branches w/ effort=3
 brew "git-delta" # Better git diff
 brew "git-lfs"
+brew "granted" # Switch AWS roles and open them in browser easily
 brew "mas" # Allow to install Mac App Store apps
-brew "mise"
+brew "mise" # Better asdf (no shims)
 brew "opentofu"
 brew "ripgrep" # Better ag
 brew "tlrc" # Better manpages
@@ -32,6 +34,7 @@ cask "chatgpt"
 cask "cold-turkey-blocker"
 cask "cursor"
 cask "dropbox"
+cask "firefox" # For granted, allows to open multiple AWS roles concurrently in diff tabs
 cask "flux"
 cask "google-chrome"
 cask "google-cloud-sdk" # Google Cloud CLI
