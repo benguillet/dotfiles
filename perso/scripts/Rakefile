@@ -120,7 +120,8 @@ task :macos do
   ###############################################################################
 
   ## Trackpad
-  sh "defaults write com.apple.driver.AppleBluetoothMultitouctrackpad Clicking -int 1"
+  sh "defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true"
+  sh "defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true"
 
   ## Keyboard
 
@@ -190,6 +191,7 @@ task :macos do
   # Restart affected apps
   sh "killall Dock"
   sh "killall Finder"
+  sh "killall SystemUIServer"
 
   puts "IMPORTANT: Restart for all changes to take effect"
 end
