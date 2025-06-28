@@ -29,7 +29,6 @@ brew "zsh" # Upgrade zsh from stock macos
 # cask "monitorcontrol"
 cask "1password"
 cask "aldente"
-cask "arc"
 cask "chatgpt"
 cask "cold-turkey-blocker"
 cask "cursor"
