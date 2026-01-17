@@ -132,20 +132,22 @@ unset key
 # Editors
 alias v='vim'
 alias c='cursor .'
+alias cat='bat'
 
 # Git
 alias gst='git status'
 alias com='git commit'
+alias pullh='git pull https_origin'
+alias pushh='git push https_origin'
 alias push='git push'
 alias pull='git pull'
 alias gsb='git status -s'
+alias lg='lazygit'
 
 # Delete already merged branches
-#alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
-# doesn't work with squash merge
-#alias gcn="git branch --merged main | grep -v '^\*' | grep -v main | xargs -n 1 git branch -d"
 alias gcn="git-delete-merged-branches --effort=3 --branch main"
 alias wip='com -S -n -m "WIP"'
+alias pr='gh pr create --fill --reviewer couscous18'
 
 # fzf: Checkout a branch (sorted by most recent commit)
 alias gcb='git for-each-ref --sort=-committerdate refs/heads/ --format="%(refname:short)" | sed "s/^origin\///" | awk "!seen[\$0]++" | fzf -0 --preview "git show --color=always {}" | xargs -r git checkout'
@@ -162,12 +164,12 @@ alias be='bundle exec'
 # Docker
 alias comp='docker compose'
 
-# Tmux
-alias tma='tmux attach -d -t'
-alias tmn='tmux new -s'
-alias tml='tmux list-sessions'
-alias tmk='tmux kill-session -t'
-alias tmux='TERM=screen-256color-bce tmux'
+# Zellij (Tmux replacement)
+alias ze='zellij'
+alias zma='zellij attach'
+alias zmn='zellij -s'
+alias zml='zellij list-sessions'
+alias zmk='zellij kill-session'
 
 # Map zoxide to old autojump alias
 alias j='z'
@@ -187,3 +189,8 @@ export PATH="$PATH:/Users/ben/.cache/lm-studio/bin"
 
 # Mise (maybe replace with plugins)
 eval "$(/opt/homebrew/bin/mise activate zsh)"
+
+. "$HOME/.local/bin/env"
+
+# Added by Antigravity
+export PATH="/Users/ben/.antigravity/antigravity/bin:$PATH"
