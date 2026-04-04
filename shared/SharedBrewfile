@@ -24,6 +24,8 @@ brew "tlrc" # Better manpages
 brew "vim"
 brew "zoxide"
 brew "zsh" # Upgrade zsh from stock macos
+brew "tailspin" # A log file highlighter
+brew "glow" # A markdown reader
 
 # Casks
 # cask "monitorcontrol"

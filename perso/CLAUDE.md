@@ -1,0 +1,5 @@
+# Global Guidelines
+
+## Error Handling
+
+Let exceptions propagate. Do not catch exceptions unless there is a specific, intentional reason to handle them differently (e.g., translating to a domain-specific error at a system boundary). Code should fail loudly so problems are visible immediately, not silently swallowed.
