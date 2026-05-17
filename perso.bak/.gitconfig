@@ -1,0 +1,53 @@
+[user]
+	name = Ben Guillet
+	email = benjamin.guillet@gmail.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMQoEwQq3MNLiZAG1BQGBzf8EFcv19GfnjX+1KgGoM+R
+[color]
+	ui = true
+[format]
+	pretty = "Commit:  %C(blue)%H%nAuthor:  %C(green)%aN <%aE>%nDate:    (%C(red)%ar%Creset) %ai%nSubject: %s%n%n%b"
+[alias]
+  	co = checkout
+  	g = grep --break --heading --line-number
+  	cp = cherry-pick
+  	br = branch
+  	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  	recent = "!f() { git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head; }; f"
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[push]
+	autoSetupRemote = true
+	default = current
+[rebase]
+	autosquash = true
+[code]
+	editor = vim
+[commit]
+	gpgsign = true
+[init]
+	defaultBranch = main
+[core]
+	pager = delta
+	excludesfile = /Users/ben/.gitignore_global
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+    features = side-by-side line-numbers decorations
+    syntax-theme = Dracula
+    plus-style = syntax "#003800"
+    minus-style = syntax "#3f0001"
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
+    hunk-header-decoration-style = cyan box ul
+
+[delta "line-numbers"]
+    line-numbers-left-style = cyan
+    line-numbers-right-style = cyan
+    line-numbers-minus-style = 124
+    line-numbers-plus-style = 28
+

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BAT_mini_label</key>
+	<false/>
+	<key>Battery_barChart_position</key>
+	<integer>1</integer>
+	<key>Battery_batteryDetails_position</key>
+	<integer>0</integer>
+	<key>Battery_battery_position</key>
+	<integer>2</integer>
+	<key>Battery_color</key>
+	<true/>
+	<key>Battery_label_position</key>
+	<integer>3</integer>
+	<key>Battery_mini_position</key>
+	<integer>4</integer>
+	<key>Battery_notifications_low</key>
+	<string>0.1</string>
+	<key>Battery_oneView</key>
+	<true/>
+	<key>Battery_processes</key>
+	<integer>8</integer>
+	<key>Battery_state</key>
+	<false/>
+	<key>Battery_widget</key>
+	<string>battery_details,bar_chart</string>
+	<key>CPU_barChart_position</key>
+	<integer>0</integer>
+	<key>CPU_bar_chart_label</key>
+	<true/>
+	<key>CPU_label_position</key>
+	<integer>3</integer>
+	<key>CPU_lineChart_position</key>
+	<integer>2</integer>
+	<key>CPU_mini_position</key>
+	<integer>1</integer>
+	<key>CPU_pieChart_position</key>
+	<integer>4</integer>
+	<key>CPU_splitValue</key>
+	<false/>
+	<key>CPU_state</key>
+	<true/>
+	<key>CPU_tachometer_position</key>
+	<integer>5</integer>
+	<key>CPU_usagePerCore</key>
+	<true/>
+	<key>CPU_widget</key>
+	<string>bar_chart</string>
+	<key>Clock_label_position</key>
+	<integer>1</integer>
+	<key>Clock_list</key>
+	<data>
+	W3sibmFtZSI6IkxvY2FsIHRpbWUiLCJlbmFibGVkIjp0cnVlLCJpZCI6Ijc4N0I1QUI3
+	LUM2QkQtNDkzRi04MzVDLTQxM0NEMUFFRTRFRCIsInR6IjoibG9jYWwiLCJmb3JtYXQi
+	OiJFIGQgfCBISDptbSJ9LHsiZm9ybWF0IjoiRSBkIHwgSEg6bW0iLCJuYW1lIjoiUGFy
+	aXMiLCJlbmFibGVkIjpmYWxzZSwidHoiOiIxIiwiaWQiOiJGOTdFRUJCQS00N0UwLTRE
+	QzYtQkJGRC05QUE4NDAyOUYxNTIifSx7ImVuYWJsZWQiOmZhbHNlLCJmb3JtYXQiOiJF
+	IGQgfCBISDptbSIsIm5hbWUiOiJNaWFtaSIsImlkIjoiQ0M1NjU3NTQtMkVGRC00MzMx
+	LUFDOUQtQjA0Qzc4QTU2Q0U5IiwidHoiOiItNSJ9XQ==
+	</data>
+	<key>Clock_sensors_monospacedFont</key>
+	<true/>
+	<key>Clock_stack_position</key>
+	<integer>0</integer>
+	<key>Clock_state</key>
+	<true/>
+	<key>Clock_widget</key>
+	<string>sensors</string>
+	<key>CombinedModules</key>
+	<false/>
+	<key>NSNavPanelExpandedSizeForSaveMode</key>
+	<string>{1321, 912}</string>
+	<key>NSNavPanelExpandedStateForSaveMode</key>
+	<true/>
+	<key>NSStatusItem Preferred Position CPU</key>
+	<real>5689</real>
+	<key>NSStatusItem Preferred Position Clock</key>
+	<real>149</real>
+	<key>NSStatusItem Preferred Position Disk</key>
+	<real>5747</real>
+	<key>NSStatusItem Preferred Position RAM</key>
+	<real>5788</real>
+	<key>NSStatusItem Restore Position Battery</key>
+	<integer>700</integer>
+	<key>NSWindow Frame NSNavPanelAutosaveName</key>
+	<string>1280 94 1321 912 0 0 3840 1575 </string>
+	<key>Network_state</key>
+	<false/>
+	<key>runAtLoginInitialized</key>
+	<true/>
+	<key>setupProcess</key>
+	<true/>
+	<key>telemetry</key>
+	<false/>
+	<key>updater_check_ts</key>
+	<integer>1732558900</integer>
+	<key>version</key>
+	<string>2.11.18</string>
+</dict>
+</plist>

@@ -1,0 +1,12 @@
+# Brew Bundle Brewfile Tips
+# https://gist.github.com/ChristopherA/a579274536aab36ea9966f301ff14f3f
+
+tap "buo/cask-upgrade" # Allow to upgrade casks
+
+
+# Shared brewfile between perso and work
+<%= File.read("../../shared/SharedBrewfile") %>
+
+# Specific to personal machine
+cask "transmission"
+cask "aldente"
