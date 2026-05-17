@@ -1,6 +1,5 @@
 require 'rake'
 
-
 task :brew do
   puts "Installing homebrew..."
   sh '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
@@ -10,14 +9,8 @@ task :brew do
   sh '/opt/homebrew/bin/brew bundle'
 end
 
-task :zim do
-  puts "Installing Zim..."
-  sh "curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh"
-  puts "Zim installed! Restart your terminal"
-end
-
 task :macos do
-  # Use plistwatch to find the keys
+   # Use plistwatch to find the keys
 
   ###############################################################################
   # General UI/UX
@@ -37,7 +30,6 @@ task :macos do
 
   # Setting screenshot format to PNG
   sh "defaults write com.apple.screencapture type -string 'png'"
-
 
   ###############################################################################
   # Dock, Dashboard, and hot corners
@@ -200,17 +192,12 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.gitconfig ~/.gitconfig"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.gitignore_global ~/.gitignore_global"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.ssh ~/"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/.tmux.conf ~/.tmux.conf"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/.tool-versions ~/.tool-versions"
+  # sh "ln -sf #{__dir__.chomp('/scripts')}/.tool-versions ~/.tool-versions"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.vimrc ~/.vimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zimrc ~/.zimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zprofile ~/.zprofile"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
 end
 
-task :prefs do
-  # TODO: figure real path to copy to, or just use import preferences from Stats.app
-  # sh "cp #{__dir__.chomp('/scripts')}/preferences/Stats.plist ~/Library/Application\ Support/.."
-end
-
-# task :setup => [:brew, :zim, :macos, :symlinks]
+# task :setup => [:brew, :osx, :symlinks]

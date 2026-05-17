@@ -3,9 +3,17 @@
 
 tap "buo/cask-upgrade" # Allow to upgrade casks
 
-
 # Shared brewfile between perso and work
 <%= File.read("../../shared/SharedBrewfile") %>
 
-# Specific to personal machine
-cask "transmission"
+# Specific to work machine
+cask "betterdisplay"
+cask "cleanshot"
+cask "dropbox"
+
+<!-- cask "signal" -->
+<!-- cask "lm-studio" # Run local LLMs w/ nice chat UI and doc uploads -->
+
+mas "Parcel - Delivery Tracking", id: 639968404
+<!-- mas "JuxtaText", id: 6504801865 # GUI diff tool -->
+<!-- mas "Microsoft Excel", id: 462058435 -->

@@ -29,7 +29,7 @@
 [init]
 	defaultBranch = main
 [core]
-	pager = delta
+	pager = hunk pager
 	excludesfile = /Users/ben/.gitignore_global
 [interactive]
 	diffFilter = delta --color-only

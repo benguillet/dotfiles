@@ -192,12 +192,17 @@ eval "$(/opt/homebrew/bin/mise activate zsh)"
 
 . "$HOME/.local/bin/env"
 
-# Added by Antigravity
-export PATH="/Users/ben/.antigravity/antigravity/bin:$PATH"
-
 # bun completions
 [ -s "/Users/ben/.bun/_bun" ] && source "/Users/ben/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/ben/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

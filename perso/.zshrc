@@ -132,16 +132,20 @@ unset key
 # Editors
 alias v='vim'
 alias c='cursor .'
+alias cat='bat'
 
 # Git
 alias gst='git status'
 alias com='git commit'
+alias pullh='git pull https_origin'
+alias pushh='git push https_origin'
 alias push='git push'
 alias pull='git pull'
 alias gsb='git status -s'
+alias lg='lazygit'
 
 # Delete already merged branches
-alias gcn='git checkout -q main && git for-each-ref refs/heads/ "--format=%(refname:short)" | while read branch; do mergeBase=$(git merge-base main $branch) && [[ $(git cherry main $(git commit-tree $(git rev-parse "$branch^{tree}") -p $mergeBase -m _)) == "-"* ]] && git branch -D $branch; done'
+alias gcn="git-delete-merged-branches --effort=3 --branch main"
 alias wip='com -S -n -m "WIP"'
 
 # fzf: Checkout a branch (sorted by most recent commit)
@@ -159,27 +163,22 @@ alias be='bundle exec'
 # Docker
 alias comp='docker compose'
 
-# Tmux
-alias tma='tmux attach -d -t'
-alias tmn='tmux new -s'
-alias tml='tmux list-sessions'
-alias tmk='tmux kill-session -t'
-alias tmux='TERM=screen-256color-bce tmux'
+# Zellij (Tmux replacement)
+alias ze='zellij'
+alias zma='zellij attach'
+alias zmn='zellij -s'
+alias zml='zellij list-sessions'
+alias zmk='zellij kill-session'
 
 # Map zoxide to old autojump alias
 alias j='z'
 
-# asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-. ~/.asdf/plugins/java/set-java-home.zsh
-# asdf direnv plugin (makes asdf faster)
-source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
-
 # Libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
-# Created by `pipx` on 2024-04-02 04:07:17
-export PATH="$PATH:/Users/ben/.local/bin"
+# brew wrapper: records `brew install`s into the perso Brewfile (must precede
+# /opt/homebrew/bin so the wrapper shadows the real brew)
+export PATH="$HOME/dotfiles/perso/scripts:$PATH"
 
 # Overriden value from the zimrc/environment plugin
 HISTSIZE=500000 # Default 20k
@@ -188,3 +187,22 @@ SAVEHIST=400000 # Default 10k
 # Like autojump, but better
 eval "$(zoxide init zsh)"
 
+# Mise (maybe replace with plugins)
+eval "$(/opt/homebrew/bin/mise activate zsh)"
+
+. "$HOME/.local/bin/env"
+
+# bun completions
+[ -s "/Users/ben/.bun/_bun" ] && source "/Users/ben/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/ben/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

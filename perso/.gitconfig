@@ -29,7 +29,7 @@
 [init]
 	defaultBranch = main
 [core]
-	pager = delta
+	pager = hunk pager
 	excludesfile = /Users/ben/.gitignore_global
 [interactive]
 	diffFilter = delta --color-only
@@ -50,4 +50,3 @@
     line-numbers-right-style = cyan
     line-numbers-minus-style = 124
     line-numbers-plus-style = 28
-

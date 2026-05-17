@@ -16,8 +16,10 @@
 	<integer>3</integer>
 	<key>Battery_mini_position</key>
 	<integer>4</integer>
+	<key>Battery_notifications_high</key>
+	<string></string>
 	<key>Battery_notifications_low</key>
-	<string>0.1</string>
+	<string>low</string>
 	<key>Battery_oneView</key>
 	<true/>
 	<key>Battery_processes</key>
@@ -54,15 +56,19 @@
 	<integer>1</integer>
 	<key>Clock_list</key>
 	<data>
-	W3sibmFtZSI6IkxvY2FsIHRpbWUiLCJmb3JtYXQiOiJFIGRkIHwgSEg6bW0iLCJlbmFi
-	bGVkIjp0cnVlLCJ0eiI6ImxvY2FsIiwiaWQiOiI3ODdCNUFCNy1DNkJELTQ5M0YtODM1
-	Qy00MTNDRDFBRUU0RUQifSx7ImlkIjoiQ0M1NjU3NTQtMkVGRC00MzMxLUFDOUQtQjA0
-	Qzc4QTU2Q0U5IiwiZW5hYmxlZCI6ZmFsc2UsIm5hbWUiOiJNaWFtaSIsImZvcm1hdCI6
-	IkUgZGQgfCBISDptbSIsInR6IjoiLTUifSx7ImZvcm1hdCI6IkUgZGQgfCBISDptbSIs
-	ImlkIjoiQzEzNTc3MjMtNEEyNy00NkVFLUI1MDMtMzZCN0ZDMjk0OTI0IiwiZW5hYmxl
-	ZCI6ZmFsc2UsInR6IjoiLTgiLCJuYW1lIjoiU2FuIEZyYW5jaXNjbyJ9LHsibmFtZSI6
-	IlBhcmlzIiwiaWQiOiJCOUJBQjMwOC0zMDJCLTRDODYtQjMzNS0xREUwOUI0OTEyMTgi
-	LCJmb3JtYXQiOiJFIGRkIHwgSEg6bW0iLCJ0eiI6IjEiLCJlbmFibGVkIjpmYWxzZX1d
+	W3siZW5hYmxlZCI6dHJ1ZSwidHoiOiJsb2NhbCIsImZvcm1hdCI6IkUgZGQgfCBISDpt
+	bSIsIm5hbWUiOiJMb2NhbCB0aW1lIiwiaWQiOiI3ODdCNUFCNy1DNkJELTQ5M0YtODM1
+	Qy00MTNDRDFBRUU0RUQifSx7ImVuYWJsZWQiOmZhbHNlLCJ0eiI6IkFtZXJpY2FcL05l
+	d19Zb3JrIiwiZm9ybWF0IjoiRSBkZCB8IEhIOm1tIiwibmFtZSI6Ik1pYW1pIiwiaWQi
+	OiJDQzU2NTc1NC0yRUZELTQzMzEtQUM5RC1CMDRDNzhBNTZDRTkifSx7ImVuYWJsZWQi
+	OmZhbHNlLCJ0eiI6IkFtZXJpY2FcL0xvc19BbmdlbGVzIiwiZm9ybWF0IjoiRSBkZCB8
+	IEhIOm1tIiwibmFtZSI6IlNhbiBGcmFuY2lzY28iLCJpZCI6IkMxMzU3NzIzLTRBMjct
+	NDZFRS1CNTAzLTM2QjdGQzI5NDkyNCJ9LHsiZW5hYmxlZCI6ZmFsc2UsInR6IjoiRXVy
+	b3BlXC9QYXJpcyIsImZvcm1hdCI6IkUgZGQgfCBISDptbSIsIm5hbWUiOiJQYXJpcyIs
+	ImlkIjoiQjlCQUIzMDgtMzAyQi00Qzg2LUIzMzUtMURFMDlCNDkxMjE4In0seyJlbmFi
+	bGVkIjpmYWxzZSwidHoiOiJBc2lhXC9UYWlwZWkiLCJmb3JtYXQiOiJFIGRkIHwgSEg6
+	bW0iLCJuYW1lIjoiVGFpcGVpIiwiaWQiOiJENzM1MDZBNy0zREUzLTRDOTQtQkI5MS00
+	NDM1REEyNjczOUQifV0=
 	</data>
 	<key>Clock_sensors_monospacedFont</key>
 	<true/>
@@ -84,10 +90,10 @@
 	<data>
 	Ym9vazgDAAAAAAQQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAIA
 	AAQAAAADAwAAAAQAAAUAAAABAQAAVXNlcnMAAAADAAAAAQEAAGJlbgAIAAAAAQEAAGRv
-	dGZpbGVzBQAAAAEBAABwZXJzbwAAAAsAAAABAQAAcHJlZmVyZW5jZXMAFAAAAAEGAAAQ
+	dGZpbGVzBgAAAAEBAABzaGFyZWQAAAsAAAABAQAAcHJlZmVyZW5jZXMAFAAAAAEGAAAQ
 	AAAAIAAAACwAAAA8AAAATAAAAAgAAAAEAwAAHUIAAAAAAAAIAAAABAMAANwdBAAAAAAA
-	CAAAAAQDAAAoKhQAAAAAAAgAAAAEAwAA1ioUAAAAAAAIAAAABAMAAOQqFAAAAAAAFAAA
-	AAEGAAB8AAAAjAAAAJwAAACsAAAAvAAAAAgAAAAABAAAQcZ+YhKUMYIYAAAAAQIAAAIA
+	CAAAAAQDAAAoKhQAAAAAAAgAAAAEAwAAskduAAAAAAAIAAAABAMAAOnedgAAAAAAFAAA
+	AAEGAAB8AAAAjAAAAJwAAACsAAAAvAAAAAgAAAAABAAAQcaFBiWMHUsYAAAAAQIAAAIA
 	AAAAAAAAHwIAAAAAAAAfAgAAAAAAAAAAAAABBQAACAAAAAQDAAADAAAAAAAAAAQAAAAD
 	AwAA9QEAAAgAAAABCQAAZmlsZTovLy8MAAAAAQEAAE1hY2ludG9zaCBIRAgAAAAEAwAA
 	AFChG3MAAAAIAAAAAAQAAEHGc4gsgAAAJAAAAAEBAABCRENCMUQ3My05QjE1LTQ3MEIt
@@ -103,19 +109,19 @@
 	<key>NSStatusItem Preferred Position CPU</key>
 	<real>5689</real>
 	<key>NSStatusItem Preferred Position CPU_bar_chart</key>
-	<real>365</real>
+	<real>383</real>
 	<key>NSStatusItem Preferred Position Clock</key>
 	<real>149</real>
 	<key>NSStatusItem Preferred Position Clock_sensors</key>
-	<real>146</real>
+	<real>175</real>
 	<key>NSStatusItem Preferred Position Disk</key>
 	<real>5747</real>
 	<key>NSStatusItem Preferred Position Disk_mini</key>
-	<real>486</real>
+	<real>453</real>
 	<key>NSStatusItem Preferred Position RAM</key>
 	<real>5788</real>
 	<key>NSStatusItem Preferred Position RAM_mini</key>
-	<real>439</real>
+	<real>5755</real>
 	<key>NSStatusItem Restore Position Battery</key>
 	<integer>700</integer>
 	<key>NSToolbar Configuration eu.exelban.Stats.Settings.Toolbar</key>
@@ -131,19 +137,37 @@
 	</dict>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
 	<string>1059 377 1321 912 0 0 3440 1415 </string>
+	<key>NSWindow Frame eu.exelban.Stats.Settings.WindowFrame</key>
+	<string>909 421 728 480 0 0 3440 1410 </string>
 	<key>Network_state</key>
 	<false/>
+	<key>clock_B9BAB308-302B-4C86-B335-1DE09B491218_popupIndex</key>
+	<integer>4</integer>
+	<key>clock_B9BAB308-302B-4C86-B335-1DE09B491218_popupState</key>
+	<false/>
+	<key>clock_C1357723-4A27-46EE-B503-36B7FC294924_popupIndex</key>
+	<integer>1</integer>
+	<key>clock_CC565754-2EFD-4331-AC9D-B04C78A56CE9_popupIndex</key>
+	<integer>2</integer>
+	<key>clock_D73506A7-3DE3-4C94-BB91-4435DA26739D_popupIndex</key>
+	<integer>3</integer>
+	<key>remote_tokens_migrated_to_keychain</key>
+	<true/>
 	<key>runAtLoginInitialized</key>
 	<true/>
 	<key>setupProcess</key>
 	<true/>
+	<key>support_ts</key>
+	<integer>1776692864</integer>
 	<key>telemetry</key>
 	<false/>
-	<key>telemetry_id</key>
-	<string>8F43408B-6BFF-449D-81AC-2AE4EBB9133F</string>
+	<key>update-interval</key>
+	<string>Once per day</string>
 	<key>updater_check_ts</key>
-	<integer>1733525207</integer>
+	<integer>1778738495</integer>
+	<key>updater_install_ts</key>
+	<integer>1777888863</integer>
 	<key>version</key>
-	<string>2.11.19</string>
+	<string>2.12.13</string>
 </dict>
 </plist>

@@ -15,52 +15,44 @@ brew "git"
 brew "git-delete-merged-branches" # Allow to delete squashed-merged branches w/ effort=3
 brew "git-delta" # Better git diff
 brew "git-lfs"
+brew "glow" # A markdown reader
 brew "granted" # Switch AWS roles and open them in browser easily
 brew "mas" # Allow to install Mac App Store apps
 brew "mise" # Better asdf (no shims)
 brew "opentofu"
 brew "ripgrep" # Better ag
+brew "tailspin" # A log file highlighter
 brew "tlrc" # Better manpages
 brew "vim"
+brew "zimfw" # Zim Framework
 brew "zoxide"
 brew "zsh" # Upgrade zsh from stock macos
-brew "tailspin" # A log file highlighter
-brew "glow" # A markdown reader
 
 # Casks
-# cask "monitorcontrol"
 cask "1password"
-cask "aldente"
 cask "chatgpt"
+cask "claude"
 cask "cold-turkey-blocker"
 cask "cursor"
-cask "dropbox"
 cask "firefox" # For granted, allows to open multiple AWS roles concurrently in diff tabs
 cask "flux"
+cask "ghostty"
 cask "google-chrome"
-cask "google-cloud-sdk" # Google Cloud CLI
-cask "iina" # Backup video player for automated subtitle retrieval
-cask "iterm2"
-cask "jordanbaird-ice" # Show menu bar items hidden by notch
-cask "messenger"
 cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
 cask "postico" # Postgresql client
 cask "raycast"
-cask "signal"
 cask "slack"
 cask "spotify"
 cask "stats" # Replace iStats
+cask "thaw" # Show menu bar items hidden by notch
 cask "todoist"
 cask "vlc"
 cask "whatsapp"
 cask "zoom"
 
-
 # Mac App Store
-mas "Coin Tick", id: 1141688067
 mas "Magnet", id: 441258766
 mas "MeetingBar", id: 1532419400
-mas "Parcel - Delivery Tracking", id: 639968404
 mas "Velja", id: 1607635845 # Rules to open correct chrome profile based on url

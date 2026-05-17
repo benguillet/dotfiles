@@ -1,1 +1,2 @@
-## Personal configuration
+## Work specific configuration
+
