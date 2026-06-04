@@ -14,6 +14,10 @@
 # Remove older command from the history if a duplicate is to be added.
 setopt HIST_IGNORE_ALL_DUPS
 
+# Allow `>` to overwrite existing files without requiring `>|`.
+# This speeds up LLMs, which otherwise get tripped up by the clobber error.
+unsetopt noclobber
+
 #
 # Input/output
 #
@@ -177,6 +181,10 @@ alias j='z'
 # Libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
+# brew wrapper: records `brew install`s into the work Brewfile (must precede
+# /opt/homebrew/bin so the wrapper shadows the real brew)
+export PATH="$HOME/Work/dotfiles/work/scripts:$PATH"
+
 # Overriden value from the zimrc/environment plugin
 HISTSIZE=500000 # Default 20k
 SAVEHIST=400000 # Default 10k
@@ -190,7 +198,7 @@ export PATH="$PATH:/Users/ben/.cache/lm-studio/bin"
 # Mise (maybe replace with plugins)
 eval "$(/opt/homebrew/bin/mise activate zsh)"
 
-. "$HOME/.local/bin/env"
+#. "$HOME/.local/bin/env"
 
 # bun completions
 [ -s "/Users/ben/.bun/_bun" ] && source "/Users/ben/.bun/_bun"
@@ -206,3 +214,10 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+eval "$(rbenv init -)"
+export NVM_DIR="/Users/ben/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
+# Scratch
+export PATH="/Users/ben/.local/bin:$PATH"

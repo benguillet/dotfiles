@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""Passthrough wrapper around the Homebrew CLI.
+
+Runs the real `brew` with all original arguments, preserving stdout, stderr,
+and the exit code exactly. After a successful `brew install`, the newly
+installed formulae/casks are appended to the work machine's Brewfile so the
+dotfiles repo stays in sync with what is actually installed.
+"""
+
+import os
+import re
+import subprocess
+import sys
+
+# The real Homebrew binary. This wrapper is itself named `brew` and sits earlier
+# on PATH, so we must point at an absolute path to avoid calling ourselves.
+REAL_BREW_CANDIDATES = ("/opt/homebrew/bin/brew", "/usr/local/bin/brew")
+
+BREWFILE = os.path.expanduser("~/Work/dotfiles/work/scripts/Brewfile.erb")
+SHARED_BREWFILE = os.path.expanduser("~/Work/dotfiles/shared/SharedBrewfile")
+
+ENTRY_RE = re.compile(r'^\s*(?:brew|cask)\s+"([^"]+)"')
+
+
+def find_real_brew():
+    for candidate in REAL_BREW_CANDIDATES:
+        if os.access(candidate, os.X_OK):
+            return candidate
+    sys.exit("brew wrapper: could not find the real brew binary")
+
+
+def looks_like_package(arg):
+    """True for plain formula/cask names (including tap/ names), False for
+    flags, local file paths, and URLs."""
+    if arg.startswith(("-", "/", "./", "../", "~")):
+        return False
+    if re.match(r"[a-z][a-z0-9+.-]*://", arg):
+        return False
+    if arg.endswith(".rb"):
+        return False
+    return True
+
+
+def parse_install(args):
+    """Return (is_install, packages, forced_kind) for the given brew args.
+
+    forced_kind is "cask", "formula", or None depending on --cask / --formula.
+    """
+    # Subcommand is the first non-flag argument.
+    subcommand = None
+    sub_index = None
+    for i, arg in enumerate(args):
+        if not arg.startswith("-"):
+            subcommand = arg
+            sub_index = i
+            break
+    if subcommand != "install":
+        return (False, [], None)
+
+    rest = args[sub_index + 1:]
+    forced_kind = None
+    if "--cask" in rest:
+        forced_kind = "cask"
+    elif "--formula" in rest:
+        forced_kind = "formula"
+
+    packages = [a for a in rest if looks_like_package(a)]
+    return (True, packages, forced_kind)
+
+
+def classify(real_brew, name, forced_kind):
+    """Return "cask" or "formula" for an installed package name."""
+    if forced_kind:
+        return forced_kind
+    short = name.rsplit("/", 1)[-1]
+    result = subprocess.run(
+        [real_brew, "list", "--cask", short],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return "cask" if result.returncode == 0 else "formula"
+
+
+def already_tracked(name):
+    """True if the package is already listed in the work or shared Brewfile."""
+    short = name.rsplit("/", 1)[-1]
+    for path in (BREWFILE, SHARED_BREWFILE):
+        if not os.path.isfile(path):
+            continue
+        with open(path) as f:
+            for line in f:
+                match = ENTRY_RE.match(line)
+                if not match:
+                    continue
+                tracked = match.group(1)
+                if tracked == name or tracked.rsplit("/", 1)[-1] == short:
+                    return True
+    return False
+
+
+def record(real_brew, packages, forced_kind):
+    additions = []
+    for name in packages:
+        if already_tracked(name):
+            continue
+        kind = classify(real_brew, name, forced_kind)
+        keyword = "cask" if kind == "cask" else "brew"
+        additions.append('{} "{}"'.format(keyword, name))
+    if not additions:
+        return
+    with open(BREWFILE, "a") as f:
+        for line in additions:
+            f.write(line + "\n")
+    for line in additions:
+        print('brew wrapper: added {} to {}'.format(line, BREWFILE))
+
+
+def main():
+    args = sys.argv[1:]
+    real_brew = find_real_brew()
+
+    # Passthrough: inherit stdin/stdout/stderr so output, colours, prompts, and
+    # the exit code are exactly what the real brew produced.
+    result = subprocess.run([real_brew] + args)
+
+    if result.returncode == 0:
+        is_install, packages, forced_kind = parse_install(args)
+        if is_install and packages:
+            record(real_brew, packages, forced_kind)
+
+    sys.exit(result.returncode)
+
+
+if __name__ == "__main__":
+    main()

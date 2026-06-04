@@ -1,7 +1,7 @@
 [user]
 	name = Ben Guillet
-	email = ben@finnt.com
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFGdmOocENRrd3K+BLvaGxBhMtNNP0aZw59ii4U7pEUE
+	email = ben@ycombinator.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM8u45ld0sOrnABAM806v8j9ocpT3m9jVwrf9AVvPL5R
 [color]
 	ui = true
 [format]
@@ -17,6 +17,7 @@
 	format = ssh
 [gpg "ssh"]
 	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	allowedSignersFile = /Users/ben/.ssh/allowed_signers
 [push]
 	autoSetupRemote = true
 	default = current

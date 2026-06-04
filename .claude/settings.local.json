@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash([ -e \"/Users/ben/$f\" ])",
+      "Bash([ -L \"/Users/ben/$f\" ])"
+    ]
+  }
+}
