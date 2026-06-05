@@ -25,6 +25,12 @@ already do that. Do not reference the current task, PR, or caller ("used by X",
 "added for the Y flow") — those belong in the commit message or PR description,
 not the code.
 
+## Error Handling
+
+Never swallow exceptions silently: Let things break when it's unexpected
+behavior, we use Sentry to know when such things happen and be aware of edge
+cases. Only rescue errors that are expected.
+
 
 <!-- ycli:start -->
 ## Using `ycli`
