@@ -221,3 +221,7 @@ export NVM_DIR="/Users/ben/.nvm"
 
 # Scratch
 export PATH="/Users/ben/.local/bin:$PATH"
+
+# direnv: load per-directory env from .envrc / .env (must be last so it hooks
+# after other shell setup).
+eval "$(direnv hook zsh)"

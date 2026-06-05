@@ -31,6 +31,20 @@ Never swallow exceptions silently: Let things break when it's unexpected
 behavior, we use Sentry to know when such things happen and be aware of edge
 cases. Only rescue errors that are expected.
 
+## Local Links for Frontend Work (YC code monorepo)
+
+When doing any frontend work on the YC code monorepo, **always try to give me
+clickable local links with the relevant record IDs** so I can open the page and
+try the change immediately.
+
+- Build links against the local dev server. **Don't hardcode the host/port** —
+  it varies by stack/workspace. Get the base URL with `yc stacks url`.
+- Use **real record IDs** from the data involved (e.g. the app, interview,
+  company, or user the change touches), not `:id` placeholders. If you don't
+  have a concrete ID, query for one (Rails console / DB) rather than emitting a
+  template URL.
+- Link to the specific page(s) the change affects so I can verify it end to end.
+
 
 <!-- ycli:start -->
 ## Using `ycli`
