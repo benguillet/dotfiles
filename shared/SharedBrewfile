@@ -5,8 +5,11 @@ tap "common-fate/granted" # For granted
 
 # Brew
 # TODO: Linux apps
+brew "agent-browser"
 brew "awscli"
 brew "bat" # Better cat
+brew "bun"
+brew "coreutils"
 brew "direnv"
 brew "eza" # Better ls
 brew "fzf" # Better shell history
@@ -30,14 +33,19 @@ brew "zsh" # Upgrade zsh from stock macos
 
 # Casks
 cask "1password"
+cask "betterdisplay"
+cask "brainfm"
 cask "chatgpt"
 cask "claude"
+cask "cleanshot"
+cask "codex"
 cask "cold-turkey-blocker"
 cask "cursor"
 cask "firefox" # For granted, allows to open multiple AWS roles concurrently in diff tabs
 cask "flux"
 cask "ghostty"
 cask "google-chrome"
+cask "linear"
 cask "mullvadvpn"
 cask "notion"
 cask "orbstack" # Better docker
@@ -49,10 +57,10 @@ cask "stats" # Replace iStats
 cask "thaw" # Show menu bar items hidden by notch
 cask "todoist"
 cask "vlc"
-cask "whatsapp"
 cask "zoom"
 
 # Mac App Store
 mas "Magnet", id: 441258766
 mas "MeetingBar", id: 1532419400
+mas "Parcel - Delivery Tracking", id: 375589283
 mas "Velja", id: 1607635845 # Rules to open correct chrome profile based on url
