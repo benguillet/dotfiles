@@ -200,6 +200,9 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshenv ~/.zshenv"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
+
+  sh "mkdir -p ~/.config/direnv"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.config/direnv/direnv.toml ~/.config/direnv/direnv.toml"
 end
 
 # task :setup => [:brew, :osx, :symlinks]
