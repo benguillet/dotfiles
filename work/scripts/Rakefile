@@ -197,6 +197,7 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.vimrc ~/.vimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zimrc ~/.zimrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zprofile ~/.zprofile"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/.zshenv ~/.zshenv"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
 end
