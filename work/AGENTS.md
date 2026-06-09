@@ -25,6 +25,11 @@ already do that. Do not reference the current task, PR, or caller ("used by X",
 "added for the Y flow") — those belong in the commit message or PR description,
 not the code.
 
+## Git Branches
+
+Always prefix local branches you create with **`ben/`** (e.g.
+`ben/fix-login-redirect`).
+
 ## Error Handling
 
 Never swallow exceptions silently: Let things break when it's unexpected
