@@ -128,6 +128,8 @@ Fill in the **Author** from context (default to the user) and **Date** to today.
 5. Save it as a markdown file with a descriptive name. If the repo has a convention for where
    design/plan docs live, follow it; otherwise put it somewhere sensible and tell the user
    the path.
+6. When the user wants it in Google Docs (or asks to publish/share it), invoke the `/gdoc`
+   skill — it publishes the latest saved version and returns the link.
 
 ## What good looks like
 
