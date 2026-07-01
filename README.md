@@ -16,6 +16,7 @@ immediately and the history lives in this repo.
 
 | Skill | What it does |
 |---|---|
+| [`appops-tech-spec`](skills/appops-tech-spec/SKILL.md) | Write a tech spec / design doc following App Ops's standard template (Background → Goal → Scope → Constraints → Design → Monitoring & Tests → Alternatives), grounded in real code references, then publish it as a Google Doc. |
 | [`sprint-demos`](skills/sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped GitLab MRs + GitHub PRs, group into demoable features, check prod status, produce prod/local demo links, screenshots, and a claude.ai artifact deck. Paired with the "Sprint demos draft (Tuesday night)" claude.ai routine. |
 
 ## Setup on a new machine
