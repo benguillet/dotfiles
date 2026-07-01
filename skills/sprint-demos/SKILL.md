@@ -321,29 +321,60 @@ pages:
 
 Crop nothing; full-page or viewport shots are fine. Name files by feature slug.
 
-### 8. Build and publish the artifact deck
+### 8. Build and publish the "ship log" report
 
-Build a **single self-contained HTML file** at
-`/tmp/sprint-demos/sprint-demos-<SINCE_DATE>.html`:
+The report is a light-theme, magazine-style **ship log** (modeled on Sean's weekly ship-log
+artifact): kicker pill → big title → subtitle → byline → sticky numbered section nav →
+stat cards → one numbered section per feature → "Also shipped" → footer. Do NOT hand-write
+the HTML — this skill ships a generator:
 
-- Slide-deck feel: header slide "Sprint demos — week of <window>, Ben", then one section
-  per feature, then the "Also shipped" list. ←/→ keyboard navigation between sections plus
-  normal scrolling; clean dark theme, YC-orange accent, big type — it will be projected.
-- Per feature section: title, status badge (`LIVE IN PROD` / `PARTIAL` / `LOCAL DEMO`),
-  the 1–2 sentence narrative, prominent buttons for the demo links (prod or local) and the
-  MR/PR links, and the screenshots embedded as **base64 data URIs** (keep it single-file).
-- Also save a copy into the current workspace's `.context/` directory.
+```bash
+python3 <this skill's directory>/deck-builder.py <config.json>
+```
 
-Then publish to claude.ai:
+Write a `deck-config.json` (full schema documented in the builder's docstring) and run the
+builder twice:
+- `/tmp/sprint-demos/sprint-demos-<SINCE_DATE>.html` with `"embed_shots": true` — the
+  presenting copy, screenshots embedded as base64 data URIs (single file).
+- `/tmp/sprint-demos/sprint-demos-artifact.html` with `"embed_shots": false` — a light
+  (~15–20 KB) variant for claude.ai, since multi-MB base64 can't round-trip through a chat
+  into an artifact.
+
+Content guidance per feature (mirror the reference's voice — technical, concrete, short):
+- `summary`: the 1–2 sentence talk track.
+- `badges`: status pill first (`live` green / `local` amber / `review` amber), then `mr`
+  link pills for the key MRs/PRs, then `plain` pills for context ("inert by default",
+  "plumbing live: …").
+- `why` / `built`: 1 short paragraph each — the problem, then what shipped. Bold the
+  load-bearing phrases, use `<code>` for identifiers.
+- `tryit`: one actionable line with the exact click path ("open X, hover Y").
+- `demo`: buttons = the URLs from steps 5/6 (first button is the primary demo link),
+  `shots` = the step-7 screenshots with honest captions.
+- `how`: 3–5 bullets with bold lead-ins and `<code>` identifiers — pull from the MR
+  descriptions. Skip for trivial features.
+- Stats: features shipped · live in prod · local demos · MRs+PRs merged (adapt if a
+  number isn't interesting that week).
+
+Verify the render with agent-browser (open the file://, screenshot top + one feature
+section) before publishing. Also save a copy of the full report into the current
+workspace's `.context/` directory.
+
+Then publish to claude.ai (verified flow):
 
 1. First `ToolSearch` for an artifact/publish tool — if the harness ever grows one, use it.
-2. Otherwise use Claude-in-Chrome: open `https://claude.ai/new`, attach or paste the HTML
-   file with the instruction "Render exactly this HTML as an artifact, do not modify it",
-   wait for the artifact to render, publish/copy the artifact link.
-3. **Privacy reality check**: a published claude.ai artifact is viewable by ANYONE with
-   the URL — there is no link-private mode. The deck contains YC-internal data, so this is
-   acceptable only because the link is unguessable and handed only to Ben; say exactly
-   this in the final report. If the deck ends up containing especially sensitive material
+2. Otherwise use Claude-in-Chrome (if the extension is disconnected, `open -g -a "Google
+   Chrome"` and retry). The MCP `file_upload` tool does NOT accept host paths, so paste
+   instead: **flatten the artifact-variant HTML to one line** (the composer sends on
+   Enter; the builder's output is newline-free-safe once `\s*\n\s*` → space) and verify
+   the flattened file still renders before pasting. In a new claude.ai chat, click the
+   composer **by coordinates** (ref-clicks may not focus it), type
+   "Create an HTML artifact that reproduces the following document EXACTLY as-is — do not
+   modify, reformat, add, or remove anything: " + the flattened HTML, press Return, wait
+   for the artifact to render, then artifact panel → Copy-dropdown → **Share artifact** →
+   Share & copy link → read the full `https://claude.ai/artifacts/latest/<uuid>` URL from
+   the dialog.
+3. **Privacy**: the share is org-scoped ("anyone in your organization with the link") —
+   state that in the final report. If the deck contains especially sensitive material
    (founder application content, private company metrics in screenshots), skip publishing,
    deliver the local HTML file only, and say why.
 4. If browser publishing fails after 2–3 attempts, stop retrying: `open` the local HTML
