@@ -74,6 +74,7 @@ isn't relevant** to the doc rather than padding it.
 # [Title]
 
 [Author]
+
 [Date]
 
 ## Background
@@ -115,7 +116,9 @@ isn't relevant** to the doc rather than padding it.
 - **Comments** — leave the headers as empty placeholders for reviewers (or a one-line note
   inviting comments). Don't fill them in.
 
-Fill in the **Author** from context (default to the user) and **Date** to today.
+Fill in the **Author** from context (default to the user) and **Date** to today. Keep the
+blank line between them — a single newline is a markdown soft break and collapses to a
+space when the doc is converted (e.g. published to Google Docs).
 
 ## UI mockups (when the spec covers user-facing UI)
 
