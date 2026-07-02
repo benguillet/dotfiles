@@ -45,10 +45,40 @@ stable across publishes — it's how an existing Doc is found for update.
   including any edits reviewers made directly in the Doc. If no match (or the user prefers a
   fresh copy), create a new Doc.
 
-## 3. Commands
+## 3. Prepare the upload copy
+
+Publish from a **temp copy** of the markdown, not the source file, and apply this transform
+to the copy:
+
+- **Join the Author and Date lines with a backslash hard break.** Spec files keep a blank
+  line between Author and Date (a bare newline is a markdown soft break and collapses to a
+  space on Drive import). For the Doc we want them on two adjacent lines of one paragraph,
+  so turn:
+
+  ```
+  [Author]
+
+  [Date]
+  ```
+
+  into:
+
+  ```
+  [Author]\
+  [Date]
+  ```
+
+  (backslash at end of the Author line, blank line removed). Drive's importer converts a
+  backslash hard break into a same-paragraph line break (`\x0b` — a trailing-two-spaces
+  break also works but editors strip it; `<br>` does NOT work, it produces two paragraphs
+  with a blank one between). Skip the transform if the file has no Author/Date block.
+
+The source `.md` keeps the blank line — it renders correctly everywhere else.
+
+## 4. Commands
 
 **`--upload` only accepts paths inside the current working directory** — always `cd` to the
-file's directory first and pass a bare filename.
+file's directory first and pass a bare filename (for the temp copy, `cd` to its directory).
 
 Create (first publish):
 
@@ -73,7 +103,7 @@ Print the `webViewLink` from the JSON output as a clickable link, and say whethe
 was created or updated. Keep the `id` around in the conversation so later /gdoc runs in the
 same session update rather than duplicate.
 
-## 4. Failure handling
+## 5. Failure handling
 
 - **If `gws` is not installed or not authenticated** (`gws auth status` shows
   `"credential_source": "none"`), do NOT fail the skill. Deliver the local markdown path as

@@ -117,8 +117,9 @@ isn't relevant** to the doc rather than padding it.
   inviting comments). Don't fill them in.
 
 Fill in the **Author** from context (default to the user) and **Date** to today. Keep the
-blank line between them — a single newline is a markdown soft break and collapses to a
-space when the doc is converted (e.g. published to Google Docs).
+blank line between them in the source file — a single newline is a markdown soft break and
+collapses to a space when converted. At publish time, /gdoc joins the two lines with a
+backslash hard break so the Doc shows them on adjacent lines of one paragraph.
 
 ## UI mockups (when the spec covers user-facing UI)
 
