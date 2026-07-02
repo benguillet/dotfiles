@@ -117,19 +117,31 @@ isn't relevant** to the doc rather than padding it.
 
 Fill in the **Author** from context (default to the user) and **Date** to today.
 
+## UI mockups (when the spec covers user-facing UI)
+
+If the design includes new or changed user-facing UI/UX, invoke the **`/mockup` skill** to
+build mockups, publish them to claude.ai/design, and screenshot them. Embed its output
+**minimally**: each screenshot inline where that state is described, plus the single
+design-project link — no meta-verbiage around them (no canvas/file names, no mockup source
+paths, no visual-language notes).
+
 ## Process
 
 1. Identify the source material (this conversation + any design docs already written).
 2. Resolve any genuinely open material decision with a quick question; otherwise proceed.
 3. Draft the spec in the template, applying the audience/altitude/tone rules above.
-4. Re-read it once with fresh eyes and cut: any sentence that explains something the reader
+4. If the spec covers user-facing UI, invoke the `/mockup` skill and embed its output per
+   the section above.
+5. Re-read it once with fresh eyes and cut: any sentence that explains something the reader
    knows, any handwave that should be a real explanation, any implementation detail that
    crept in, and any padding. Tighten.
-5. Save it as a markdown file with a descriptive name. If the repo has a convention for where
+6. Save it as a markdown file with a descriptive name. If the repo has a convention for where
    design/plan docs live, follow it; otherwise put it somewhere sensible and tell the user
    the path.
-6. When the user wants it in Google Docs (or asks to publish/share it), invoke the `/gdoc`
-   skill — it publishes the latest saved version and returns the link.
+7. When the user wants it in Google Docs (or asks to publish/share it), invoke the `/gdoc`
+   skill — it publishes the latest saved version and returns the link. Note: Drive's
+   markdown import fails on local image references — see the gdoc-image-splice memory for
+   the placeholder + Docs-API procedure that preserves embedded screenshots.
 
 ## What good looks like
 
