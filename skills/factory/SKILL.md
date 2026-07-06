@@ -132,6 +132,10 @@ final code.
 
 ## 8. HTML launch report
 
+Invoke `/work-summary` (skills/work-summary — its TEMPLATE.html and section
+contract are the canonical format) rather than hand-writing the report. What
+it must cover, for reference:
+
 Write `docs/specs/<feature>-launch-report.html` and `open` it. Required, keep
 it SHORT: 3–4 sentence summary · table of every MR/PR with links and targets ·
 numbered merge order (including manual infra steps and retarget-on-merge
