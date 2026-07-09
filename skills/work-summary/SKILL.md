@@ -1,13 +1,13 @@
 ---
 name: work-summary
-description: Produce a concise, verified end-of-work handoff report — TL;DR of what shipped, the manual steps left for the human (secrets, env vars), database changes, risks, test/seed/reset scripts, rollback plan, screenshots + bug-bash results for UI work, and all MR/PR links in safe merge order with local test URLs. TRIGGER when the user types /work-summary, or asks to "summarize the work", "what did we ship", "write the handoff", "launch report", or wants a wrap-up of a feature/session before review or merge.
+description: Produce a concise, verified end-of-work handoff report — ELI5 summary of what shipped, the manual steps left for the human (secrets, env vars), database changes, risks, test/seed/reset scripts, rollback plan, screenshots + bug-bash results for UI work, and all MR/PR links in safe merge order with local test URLs. TRIGGER when the user types /work-summary, or asks to "summarize the work", "what did we ship", "write the handoff", "launch report", or wants a wrap-up of a feature/session before review or merge.
 ---
 
 # /work-summary — the end-of-work handoff report
 
 One deliverable: an HTML report (from `TEMPLATE.html` in this skill dir) saved to
 `docs/specs/<feature-slug>-work-summary.html` (repo-relative, untracked is fine),
-`open`ed in the browser, plus a 5-line TLDR in chat. Born from the Paxel
+`open`ed in the browser, plus a 5-sentence ELI5 in chat. Born from the Paxel
 account-state launch report; the sections below are the contract — every one is
 addressed, but **empty sections collapse to one line** ("Database: no changes").
 
@@ -115,7 +115,7 @@ live. One box, copy-paste ready.
    fill it — keep its CSS/structure; delete unused sections entirely rather
    than leaving stubs.
 2. Save to `docs/specs/<slug>-work-summary.html` and `open` it.
-3. Chat message: 5-line TLDR + the report path + the single most important
+3. Chat message: 5-sentence ELI5 + the report path + the single most important
    manual step. Do NOT paste the whole report into chat.
 4. If a factory scoreboard (`.context/factory-status.md`) exists, update it to
    point at the report.
