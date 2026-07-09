@@ -39,11 +39,39 @@ when CI is red is worse than no summary.
 
 ## 2. Sections (the contract)
 
+Order matches `TEMPLATE.html` exactly. Sections 1–8 of the spec's report
+contract — ELI5, How it works, Database changes, Risks & accepted
+trade-offs, Possibly-unneeded work, MRs & PRs, Screenshots & bug bash, Test it
+manually — are mandatory for factory runs. The kept extras (Rollback plan,
+Merge order, Manual steps for you, Test / seed / reset scripts) follow the
+same **empty sections collapse to one line** rule as everything else.
+
 **ELI5** — max 5 sentences, plain language, no jargon: what was built and why,
 as if to a smart friend outside engineering.
 
 **How it works** — 1–3 Mermaid diagrams: who calls what in what order, data
 flow, state machine if any.
+
+**Database changes** — per migration: table/index/constraint added or changed,
+which app owns it, production-safety notes (strong_migrations pattern used,
+concurrent indexes, shared-DB visibility grants or their deliberate absence).
+Call out anything irreversible.
+
+**Risks & accepted trade-offs** — only decisions the reader might regret not
+knowing: known races and their backstops, security posture calls (who accepted
+them), flaky-area proximity, deploy-order hazards. Pull from adversarial-review
+survivors and decision logs; 3–7 bullets max.
+
+**Rollback plan** — per shipping unit, in reverse merge order: how to turn it
+off WITHOUT a revert when possible (env off-switch, feature gate, secret
+removal = fail-closed), then the revert-MR path, then migration caveats
+(new empty tables are safe to leave; dropping columns/data is the dangerous
+direction — say explicitly what must NOT be rolled back once data exists).
+
+**Possibly-unneeded work** — honest list of guards/complexity built for very
+edge-casey scenarios, sourced from overruled per-unit codex findings,
+overbuild-tagged panel survivors, and risk notes; each entry names what it
+guards, why to keep it, and when it could be deleted.
 
 **MRs & PRs + merge order** — one table: number/link, one-line what, where,
 target branch. Then a NUMBERED merge order that is *safe*: stacked MRs
@@ -58,33 +86,6 @@ snippets), env vars to set (name, value, which service, where it's read),
 credential edits, feature-flag flips, retarget-after-merge chores, one-off
 jobs to kick (backfills/reconciles). If none: say so.
 
-**Database changes** — per migration: table/index/constraint added or changed,
-which app owns it, production-safety notes (strong_migrations pattern used,
-concurrent indexes, shared-DB visibility grants or their deliberate absence).
-Call out anything irreversible.
-
-**Risks & accepted trade-offs** — only decisions the reader might regret not
-knowing: known races and their backstops, security posture calls (who accepted
-them), flaky-area proximity, deploy-order hazards. Pull from adversarial-review
-survivors and decision logs; 3–7 bullets max.
-
-**Possibly-unneeded work** — honest list of guards/complexity built for very
-edge-casey scenarios, sourced from overruled per-unit codex findings,
-overbuild-tagged panel survivors, and risk notes; each entry names what it
-guards, why to keep it, and when it could be deleted.
-
-**Test / seed / reset scripts** — exact paths + exact invocations for anything
-that flips local state (e.g. `yc ssh internal development -c 'bin/rails runner
-/mnt/data/workspace/code/tmp/<seed>.rb'`), what each does, and the reset
-script. Include any minted dev sessions/cookies (value + expiry + how to
-revoke). If none: one line.
-
-**Rollback plan** — per shipping unit, in reverse merge order: how to turn it
-off WITHOUT a revert when possible (env off-switch, feature gate, secret
-removal = fail-closed), then the revert-MR path, then migration caveats
-(new empty tables are safe to leave; dropping columns/data is the dangerous
-direction — say explicitly what must NOT be rolled back once data exists).
-
 **Screenshots & bug bash** (only when UI/UX changed) — embed existing
 verification screenshots (relative paths so the report is portable) in a grid
 with one-line captions; state the bug-bash/browser-verification outcome
@@ -92,6 +93,12 @@ with one-line captions; state the bug-bash/browser-verification outcome
 with NO browser evidence, say so loudly and offer to run a verification pass
 (claude-ui-test agent / the factory verification phase) before finishing the
 report — don't silently ship an unverified-UI summary.
+
+**Test / seed / reset scripts** — exact paths + exact invocations for anything
+that flips local state (e.g. `yc ssh internal development -c 'bin/rails runner
+/mnt/data/workspace/code/tmp/<seed>.rb'`), what each does, and the reset
+script. Include any minted dev sessions/cookies (value + expiry + how to
+revoke). If none: one line.
 
 **Where the time went** — a phase-by-phase timing table (from `state.json`
 phase timings and `events.jsonl` unit timings) naming the slowest item per

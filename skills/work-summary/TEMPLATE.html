@@ -45,6 +45,32 @@ as if to a smart friend outside engineering.}}</p>
      what in what order, data flow, state machine if any -->
 </pre>
 
+<h2>Database changes</h2>
+<ul>
+  <!-- per migration: table/index/constraint, owning app, prod-safety notes,
+       anything irreversible. If none: "No database changes." one-liner. -->
+</ul>
+
+<h2>Risks &amp; accepted trade-offs</h2>
+<ul>
+  <!-- 3–7 bullets, only regret-preventing ones: races + backstops, security
+       posture calls (and who accepted them), deploy-order hazards. -->
+</ul>
+
+<h2>Rollback plan</h2>
+<ol>
+  <!-- reverse merge order; prefer off-switches (env/flag/secret removal =
+       fail-closed) over reverts; migration caveats: what must NOT be rolled
+       back once data exists. -->
+</ol>
+
+<h2>Possibly-unneeded work</h2>
+<ul>
+  <!-- guards/complexity built for very edge-casey scenarios; sources: overruled
+       per-unit codex findings, overbuild-tagged panel survivors, risk notes.
+       Each: what it guards / keep because / could delete if. If none: one line. -->
+</ul>
+
 <h2>MRs &amp; PRs ({{N}})</h2>
 <table>
   <tr><th>#</th><th>Change</th><th>Where</th><th>Targets</th><th>CI</th><th>Comments</th></tr>
@@ -66,43 +92,17 @@ as if to a smart friend outside engineering.}}</p>
        If none: replace this section with one line. -->
 </div>
 
-<h2>Database changes</h2>
-<ul>
-  <!-- per migration: table/index/constraint, owning app, prod-safety notes,
-       anything irreversible. If none: "No database changes." one-liner. -->
-</ul>
-
-<h2>Risks &amp; accepted trade-offs</h2>
-<ul>
-  <!-- 3–7 bullets, only regret-preventing ones: races + backstops, security
-       posture calls (and who accepted them), deploy-order hazards. -->
-</ul>
-
-<h2>Possibly-unneeded work</h2>
-<ul>
-  <!-- guards/complexity built for very edge-casey scenarios; sources: overruled
-       per-unit codex findings, overbuild-tagged panel survivors, risk notes.
-       Each: what it guards / keep because / could delete if. If none: one line. -->
-</ul>
-
-<h2>Test / seed / reset scripts</h2>
-<div class="box">
-  <!-- exact path + exact invocation + one-line what-it-does; the reset script
-       last; any minted dev sessions/cookies with expiry + revocation. -->
-</div>
-
-<h2>Rollback plan</h2>
-<ol>
-  <!-- reverse merge order; prefer off-switches (env/flag/secret removal =
-       fail-closed) over reverts; migration caveats: what must NOT be rolled
-       back once data exists. -->
-</ol>
-
 <h2>Screenshots &amp; bug bash</h2>
 <!-- ONLY if UI/UX changed; else delete this section. -->
 <p>{{BUG_BASH: one line — states exercised, live-transition timing, console findings.}}</p>
 <div class="grid">
   <figure><img src="images/{{...}}.png" alt=""><figcaption>{{caption}}</figcaption></figure>
+</div>
+
+<h2>Test / seed / reset scripts</h2>
+<div class="box">
+  <!-- exact path + exact invocation + one-line what-it-does; the reset script
+       last; any minted dev sessions/cookies with expiry + revocation. -->
 </div>
 
 <h2>Where the time went</h2>
