@@ -136,10 +136,11 @@ feeds `research`, `plan-draft`, and `plan-finalize` as `user_facing`.
    contract:"<the task, self-contained>", notes_for_dependents:""}` — write it
    to `state.json.units` and to `artifacts/plan/dag.json` (`units:[…],
    crosschecks:[], settled:[]`).
-2. `build` workflow with that single unit (same per-unit codex review gate).
-3. **Slim** code panel: `review-panel` mode `code`,
-   `lenses:["correctness","tests","cruft"]`, one target for the unit diff,
-   `session_dir`.
+2. `build` workflow with that single unit — use the §7 arg shape (`session_dir`,
+   `scratch_dir`, `units:[the unit above]`); same per-unit codex review gate.
+3. **Slim** code panel — the §8 code-mode arg shape: `mode:"code"`, one target
+   `{key:"u1-<repo>", dir, base:"origin/<base>", head:"origin/<branch>"}`,
+   `lenses:["correctness","tests","cruft"]`, `session_dir`.
 4. If `user_facing`: ONE `claude-ui-test` Agent (screenshot + smoke of the
    change) so the report's screenshot/test-locally sections hold.
 5. If the slim panel returns confirmed findings, run `fix` (single repo) before
@@ -165,13 +166,20 @@ then proceed with documented assumptions.
   `research.md` and no `focus` short-circuits). `research` takes **no
   `codex_model`** — it is pure Claude.
 - **Sharpen:** `AskUserQuestion` rounds — each question carries a *why it
-  matters* and a *suggested default*. Synthesize the answers into **`intent.md`
-  (you write it)**: Goal / Success criteria / In scope / Out of scope /
-  Assumptions, at `<session_dir>/artifacts/intent/intent.md`.
+  matters* and a *suggested default*. Two conductor-written artifacts per round:
+  (a) append a dated section to
+  **`<session_dir>/artifacts/intent/sharpen-qa.md`** recording every question
+  asked (with its why-it-matters and suggested default) and the human's answer
+  **verbatim** — this is the durable Q&A lineage, never just prose; (b)
+  synthesize those answers into **`intent.md`** (Goal / Success criteria / In
+  scope / Out of scope / Assumptions) at
+  `<session_dir>/artifacts/intent/intent.md`.
 - Loop: research may run first to ground the questions, then re-run with a
   `focus` if the answers change what to look for.
 
-Record `research` phase (workflow-backed; its agents write `research.md`).
+Artifacts this phase (conductor-written): `artifacts/intent/sharpen-qa.md`,
+`artifacts/intent/intent.md`; the research workflow's agents write
+`artifacts/research/research.md`. Record `research` phase.
 
 ## 4. Plan draft → checkpoint → finalize
 
@@ -373,7 +381,7 @@ Skill({ skill: "work-summary", args: "<session_dir>" })
 `<session_dir>/artifacts/report/launch-report.html`** (with its screenshots). It
 will tell you to set `links.report` — only the conductor writes `state.json`, so
 you set `links.report = "artifacts/report/launch-report.html"`, flip `report` to
-`done`, and emit `report_written`. Then post the final chat message: TLDR, MR/PR
+`done`, and emit `report_written`. Then post the final chat message: ELI5, MR/PR
 links, safe merge order, and what is left for the human. Do NOT paste the whole
 report into chat.
 

@@ -30,6 +30,7 @@ rule and why the store lives outside any repo):
 └── artifacts/
     ├── intent/
     │   ├── triage.json          # triage phase output
+    │   ├── sharpen-qa.md        # sharpen⇄research: dated verbatim Q&A lineage (conductor-written)
     │   └── intent.md            # sharpen⇄research loop output
     ├── research/
     │   └── research.md

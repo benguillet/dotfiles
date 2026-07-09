@@ -11,12 +11,14 @@
 //   units:                [ … ],    // required, non-empty; dag.json/state.json unit shape
 //                                   //   (id, repo, dir, branch, base, deps, …).
 //   scenarios: [                    // required, non-empty
-//     { name: 'homepage',           //   required; also used in screenshot filenames
+//     { name: 'homepage',           //   required; /^[a-z0-9-]+$/, unique across scenarios;
+//                                   //     also used in screenshot filenames
 //       urls: ['http://…'],         //   required, non-empty
 //       seed_script: '#!/bin/bash…',//   optional; run from tmp/, never committed
 //       assertions: ['…'] },        //   required, non-empty
 //   ],
 //   integration_repo_dir: '/abs',   // required; the ONE repo the integration branch is built in
+//   feature_slug:         'slug',   // required; /^[a-z0-9-]+$/ — names the local/<slug>-integration branch
 //   login_recipe:         '…',      // optional; verbatim login steps, passed to every scenario
 // }
 export const meta = {
