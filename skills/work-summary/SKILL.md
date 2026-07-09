@@ -59,7 +59,7 @@ Call out anything irreversible.
 
 **Risks & accepted trade-offs** — only decisions the reader might regret not
 knowing: known races and their backstops, security posture calls (who accepted
-them), flaky-area proximity, deploy-order hazards. Pull from adversarial-review
+them), flaky-area proximity, deploy-order hazards. Pull from review-panel
 survivors and decision logs; 3–7 bullets max.
 
 **Rollback plan** — per shipping unit, in reverse merge order: how to turn it
