@@ -110,32 +110,6 @@ else
 fi
 parts+=("${DIM}cost: ${RESET}$(c $COST_TAN "$cost_display")")
 
-rate_part() {
-  local label="$1" path="$2" datefmt="$3"
-  local pct epoch pct_int filled color fill_str empty_str reset_display i
-  pct=$(echo "$input" | jq -r "$path.used_percentage // empty")
-  [ -z "$pct" ] && return
-  epoch=$(echo "$input" | jq -r "$path.resets_at // empty")
-  pct_int=$(awk -v p="$pct" 'BEGIN { printf "%.0f", p }')
-  filled=$(((pct_int * 6 + 50) / 100))
-  [ "$filled" -gt 6 ] && filled=6
-  [ "$filled" -lt 0 ] && filled=0
-  color=$(tier_color "$pct_int")
-  fill_str=""
-  empty_str=""
-  for ((i = 0; i < 6; i++)); do
-    if ((i < filled)); then fill_str+="●"; else empty_str+="○"; fi
-  done
-  reset_display=""
-  if [ -n "$epoch" ]; then
-    reset_display=" ${DIM}@$(date -r "$epoch" +"$datefmt" | tr '[:upper:]' '[:lower:]')${RESET}"
-  fi
-  parts+=("${DIM}${label} ${RESET}$(c "$color" "$fill_str")${DIM}${empty_str}${RESET} $(c "$color" "${pct_int}%")${reset_display}")
-}
-
-rate_part "5h" ".rate_limits.five_hour" "%-H:%M"
-rate_part "7d" ".rate_limits.seven_day" "%b %-d, %-H:%M"
-
 output="${parts[0]}"
 for part in "${parts[@]:1}"; do
   output="${output}${DIM} | ${RESET}${part}"
