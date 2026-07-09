@@ -140,7 +140,7 @@ as the `pending` phases and the `building` unit show below):
       "started_at": "2026-07-08T18:42:10Z",
       "ended_at": "2026-07-08T19:02:31Z",
       "workflow_run_id": "wf_pfinal_77bd",
-      "artifacts": ["artifacts/plan/plan.md", "artifacts/plan/dag.json"]
+      "artifacts": ["artifacts/plan/plan.md", "artifacts/plan/selection.json", "artifacts/plan/dag.json"]
     },
     "review_plan": {
       "status": "done",
@@ -278,7 +278,7 @@ through implement → codex review → gates → push → MR/PR.
 | `repo`        | string | short repo name, e.g. `code` |
 | `dir`         | string | absolute checkout path, e.g. `/Users/ben/Work/yc/code` |
 | `branch`      | string | this unit's branch |
-| `base`        | string | parent branch/ref this unit targets (its own branch for the first unit in a stack, or the parent unit's branch) |
+| `base`        | string | parent branch/ref this unit targets (the repo's default branch for the first unit in a stack, or the parent unit's branch) |
 | `deps`        | array of string | ids of units that must reach `pushed` first; `[]` if none |
 | `status`      | enum   | `pending \| building \| codex-review \| gates \| pushed \| failed \| blocked-by-parent` |
 | `mr_url`      | string | present once the MR/PR is created |
@@ -416,7 +416,7 @@ Schema per line: `{ts, type, by, unit?, detail?}`.
 |----------|--------|-------|
 | `ts`     | string | RFC 3339 UTC, from real `date -u +%Y-%m-%dT%H:%M:%SZ` — never `Date.now()`/`new Date()` (workflow scripts don't have those; agents shell out for the real clock) |
 | `type`   | enum   | one of the canonical types below |
-| `by`     | string | `conductor` \| `agent:<label>` (label matches the agent's `label` in its `Workflow()`/dispatch call, e.g. `agent:build:u1`, `agent:review-code:refuter-2`) |
+| `by`     | string | `conductor` \| `agent:<label>` — the label SHOULD identify the emitting agent (e.g. `agent:build:u1`, `agent:review-code:refuter-2`); an exact match to the agent's `label` in its `Workflow()`/dispatch call is best-effort, not guaranteed |
 | `unit`   | string | optional; the unit id this event concerns, when applicable |
 | `detail` | string | optional; short free text, under 120 chars, single line |
 
@@ -429,6 +429,11 @@ strings): `run_created`, `phase_started`, `phase_done`, `phase_failed`,
 `recovery_performed`. `artifact_written` is the generic agent-written
 artifact event — a workflow agent finished writing a phase deliverable;
 detail names the artifact path.
+
+Agents emit ONLY these canonical types — there are no free-form event types.
+A milestone that has no more specific type uses `artifact_written` (or the
+phase's own specific type, e.g. `unit_pushed`, `verify_state`), never an
+invented string.
 
 By convention (not mechanically enforced — workflow scripts have no
 filesystem access, so any event emitted *during* a workflow's run is
@@ -450,6 +455,7 @@ shows every canonical type at least once):
 {"ts":"2026-07-08T18:00:05Z","type":"phase_started","by":"conductor","detail":"triage"}
 {"ts":"2026-07-08T18:00:42Z","type":"phase_done","by":"conductor","detail":"triage: not trivial, user-facing=true"}
 {"ts":"2026-07-08T18:00:42Z","type":"phase_started","by":"conductor","detail":"research"}
+{"ts":"2026-07-08T18:13:50Z","type":"artifact_written","by":"agent:synthesize","detail":"artifacts/research/research.md (4 scouts)"}
 {"ts":"2026-07-08T18:14:09Z","type":"phase_done","by":"conductor","detail":"research: 4 scouts run"}
 {"ts":"2026-07-08T18:14:09Z","type":"phase_started","by":"conductor","detail":"plan_draft"}
 {"ts":"2026-07-08T18:41:55Z","type":"checkpoint_asked","by":"conductor","detail":"3 open questions from plan-draft critique"}

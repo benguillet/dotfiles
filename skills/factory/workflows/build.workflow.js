@@ -128,6 +128,7 @@ function buildPrompt(u, notes) {
    - Run: git -C ${u.dir} worktree list  and  git -C ${u.dir} branch --list ${u.branch}  (any leftover local work?)
    - Check for an existing MR/PR for ${u.branch} (glab mr list / gh pr list in ${u.dir}, whichever the repo uses).
    - If ${u.branch} is already pushed AND has an open MR/PR: read its diff and VERIFY it satisfies the contract in step 3. If it does, do NOT rebuild — return status="pushed" with the EXISTING branch and mr_url, and skip to step 7 (record).
+   - If the branch exists on origin WITHOUT an open MR and there is no local branch, base the worktree on origin/${u.branch} (not origin/${u.base}) and FINISH the work, then push and create the MR.
    - If partial local work exists on ${u.branch} (a local branch or a leftover worktree with commits/uncommitted changes): inspect the diff, keep the good work, and FINISH it — never wipe it and restart from scratch.
 
 2. WORKTREE — one git writer per tree, so you get your own.

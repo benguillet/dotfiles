@@ -163,6 +163,12 @@ if (draftJobs.length) {
   if (cx >= 0 && draftRes[cx]?.ok !== true) {
     return { status: 'codex-unavailable', stage: 'draft', detail: draftRes[cx]?.error || 'codex planner died after retries' }
   }
+  // claude planner is REQUIRED too: a null return means it died after retries
+  // and plan.claude.md was never written — fail rather than proceed missing it.
+  const claudeIdx = draftJobs.findIndex(j => j.key === 'claude')
+  if (claudeIdx >= 0 && !draftRes[claudeIdx]) {
+    return { status: 'failed', stage: 'draft', detail: 'claude author died' }
+  }
   // capture by key with the aligned index — never index after a filter.
   draftJobs.forEach((j, i) => {
     if (j.key === 'claude') summaries.claude = draftRes[i]?.summary || ''
@@ -210,6 +216,12 @@ if (critJobs.length) {
   // codex critic is REQUIRED too — same no-ghost-writing pause, naming the stage.
   if (cx >= 0 && critRes[cx]?.ok !== true) {
     return { status: 'codex-unavailable', stage: 'critique', detail: critRes[cx]?.error || 'codex critic died after retries' }
+  }
+  // claude critic (critique-of-codex) is REQUIRED: a null return means it died
+  // after retries and its critique file was never written — fail, don't proceed.
+  const claudeCritIdx = critJobs.findIndex(j => j.key === 'claude')
+  if (claudeCritIdx >= 0 && !critRes[claudeCritIdx]) {
+    return { status: 'failed', stage: 'critique', detail: 'claude author died' }
   }
 }
 

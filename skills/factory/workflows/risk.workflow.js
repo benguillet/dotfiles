@@ -89,7 +89,7 @@ phase('Assess')
 // in one pass and there is no per-lens artifact to resume from individually.
 const probe = await retryAgent(`Check whether the risk assessment has already been fully composed. Read-only — write nothing.
 Run: test -f ${J(RISK_MD)} && echo yes || echo no
-Then run: test -f ${J(DAG_JSON)} && grep -q '"risk"' ${J(DAG_JSON)} && echo yes || echo no
+Then run: test -f ${J(DAG_JSON)} && grep -q '"risk"' ${J(DAG_JSON)} && grep -q '"watch"' ${J(DAG_JSON)} && echo yes || echo no
 Return risk_md_exists (result of the first command) and dag_annotated (result of the second command).`,
   { label: 'probe', phase: 'Assess', effort: 'low', schema: OBJ({ risk_md_exists: BOOL, dag_annotated: BOOL }) })
 if (probe?.risk_md_exists && probe?.dag_annotated) {

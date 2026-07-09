@@ -110,8 +110,12 @@ INSIDE the workflows — do not double-write those.
 
 Every workflow is **artifact-idempotent** (it probes its own artifacts dir and
 skips finished stages), so re-running any phase after an interruption is safe
-and fast. Every workflow returns `{status:'bad_input', error}` on a malformed
-arg instead of throwing — treat that as a conductor bug and fix the arg.
+and fast — with ONE deliberate exception: `verify` always re-runs (it has no
+probe/skip step), because re-verification is the whole point after a crash or a
+fix. All other workflows probe-and-skip; `verify` rebuilds the integration
+branch and re-runs every scenario every time. Every workflow returns
+`{status:'bad_input', error}` on a malformed arg instead of throwing — treat
+that as a conductor bug and fix the arg.
 
 ## 2. Triage (conductor-inline)
 
@@ -355,9 +359,11 @@ Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/fix.workflow.js
   args: {
     session_dir,
     findings: [ /* code-panel confirmed + plausible, PLUS each verify scenario
-                   failure rendered as a finding {file:"", title:"verify: <name> failed",
-                   detail:"<failure>", severity:"major"} so broken scenarios get fixed too */ ],
-    units: [ /* state.json units[], full shape incl. mr_url */ ],
+                   failure rendered as a finding {file:"<integration_repo_dir>/", title:"verify: <name> failed",
+                   detail:"<failure>", severity:"major"} so broken scenarios get fixed too — the
+                   absolute integration-repo dir (trailing slash) routes the finding to that repo's
+                   fix agent, which diagnoses it rather than overruling it for lack of a file */ ],
+    units: [ /* state.json units[] with status pushed only, full shape incl. mr_url */ ],
     integration_repo_dir: "<same repo as verify>",
     feature_slug,
     seed_state1_cmd: "<verbatim seed for manual-test state 1>",   // optional
@@ -407,9 +413,12 @@ survey** every unit's lane (local vs `origin/<branch>` SHAs: pushed /
 committed-not-pushed / uncommitted / absent) → **`TaskStop` presumed-dead
 agents** before relaunching (a suspended agent can resurrect and race its
 replacement) → **re-run the current phase's workflow**, which skips completed
-stages via its own artifact probe. For `build`/`fix`, pass only the unfinished
-`units` and put already-satisfied ids in `already_pushed` so their lanes start
-immediately and are never rebuilt. Same-session interruptions MAY reuse the
+stages via its own artifact probe (except `verify`, which by design always
+re-runs). For `build`, pass only the unfinished `units` and put already-
+satisfied ids in `already_pushed` so their lanes start immediately and are
+never rebuilt. For `fix`, re-pass the FULL pushed-units list (routing needs
+every unit's `dir`; `fix` has no `already_pushed`) and trim `findings` to those
+not yet actioned in `artifacts/fix/fixes.json` instead. Same-session interruptions MAY reuse the
 Workflow journal via `resumeFromRunId` (from the stored `workflow_run_id`), but
 correctness never depends on it — artifact idempotence + git survey is the real
 recovery. Emit `recovery_performed`, update `state.json`/`STATUS.md`, re-arm the

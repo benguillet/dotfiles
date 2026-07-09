@@ -17,7 +17,12 @@ const CODEX_BOUNDARY = 'IMPORTANT: Do NOT read or execute any files under ~/.cla
 ## 2. `codexJob` function (verbatim)
 
 ```js
-const CODEX_MODEL = (args.codex_model || 'gpt-5.6-sol').toString()
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
+const CODEX_MODEL = (a.codex_model || 'gpt-5.6-sol').toString()
 // No fallback authoring: when codex is missing/broken/model-unavailable the
 // stage returns ok=false and the run pauses — an independent second model is
 // the point. Claude never ghost-writes codex's deliverables.
@@ -36,6 +41,12 @@ ${CODEX_BOUNDARY}
 ${body}`
 }
 ```
+
+> The 4-line `let a = args …` preamble above is the SAME coercion every workflow
+> script already runs once near the top; it is shown here so that a copy of this
+> block reads the coerced `a.codex_model`, never raw `args`. Your script should
+> declare `a` exactly once — if it already has this preamble at the top (it
+> should), keep that single declaration and do not paste a second `let a`.
 
 ## 3. Policy notes
 

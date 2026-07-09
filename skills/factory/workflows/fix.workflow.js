@@ -10,10 +10,16 @@
 // the identical (longest) dir — the common case of a stack of branches in
 // one repo checkout — the tie is broken by dependency depth (most downstream
 // unit wins; see computeDepths below): later branches in a stack are the
-// more likely site of a review finding. Findings that match no unit's dir at
-// all go into a "fleet" bucket, appended to the FIRST repo group (by first
-// appearance in `units`) with an explicit note — that agent investigates
-// whether the file actually lives on one of ITS branches before overruling.
+// more likely site of a review finding. If the dir-prefix match fails (a
+// review-panel finding carries a repo-RELATIVE `file` plus a `repo` field, so
+// its path never prefixes an absolute checkout dir), fall back to routing by
+// `repo`: when `finding.repo` resolves to exactly ONE repo group (one checkout
+// dir), attribute it to that repo's most-downstream unit (same depth tie-break)
+// rather than dumping it in the fleet bucket where it would likely be overruled.
+// Only findings matching NEITHER go into a "fleet" bucket, appended to the FIRST
+// repo group (by first appearance in `units`) with an explicit note — that agent
+// investigates whether the file actually lives on one of ITS branches before
+// overruling.
 // Findings are then grouped BY REPO DIR (not by individual unit), so one fix
 // agent per repo handles every unit/branch in its stack sequentially, in the
 // MAIN tree (not a worktree) — a repo has exactly one git writer this phase.
@@ -152,15 +158,33 @@ function computeDepths(unitList) {
   return memo
 }
 
-function findOwner(file) {
-  if (!file) return null
-  const candidates = units.filter(u => u && u.dir && dirContains(u.dir, file))
-  if (!candidates.length) return null
-  const maxLen = Math.max(...candidates.map(u => u.dir.replace(/\/+$/, '').length))
-  const tied = candidates.filter(u => u.dir.replace(/\/+$/, '').length === maxLen)
-  if (tied.length === 1) return tied[0]
-  const depths = computeDepths(tied)
-  return tied.slice().sort((a, b) => (depths.get(b.id) - depths.get(a.id)) || a.id.localeCompare(b.id))[0]
+function mostDownstream(list) {
+  if (list.length === 1) return list[0]
+  const depths = computeDepths(list)
+  return list.slice().sort((a, b) => (depths.get(b.id) - depths.get(a.id)) || a.id.localeCompare(b.id))[0]
+}
+
+function findOwner(file, repo) {
+  // (a) absolute-dir longest-prefix: the finding's file path lands inside a
+  //     unit's checkout dir.
+  if (file) {
+    const candidates = units.filter(u => u && u.dir && dirContains(u.dir, file))
+    if (candidates.length) {
+      const maxLen = Math.max(...candidates.map(u => u.dir.replace(/\/+$/, '').length))
+      const tied = candidates.filter(u => u.dir.replace(/\/+$/, '').length === maxLen)
+      return mostDownstream(tied)
+    }
+  }
+  // (b) repo-name fallback: a panel finding carries a repo-RELATIVE file plus a
+  //     `repo` field, so (a) can miss. If finding.repo resolves to exactly one
+  //     repo group (one checkout dir), route there and attribute to that repo's
+  //     most-downstream unit (same tie-break as (a)). Case-sensitive match.
+  if (repo) {
+    const repoUnits = units.filter(u => u && u.repo === repo)
+    const dirs = new Set(repoUnits.map(u => u.dir))
+    if (repoUnits.length && dirs.size === 1) return mostDownstream(repoUnits)
+  }
+  return null
 }
 
 const dirOrder = []
@@ -178,7 +202,8 @@ if (!dirOrder.length) return { status: 'bad_input', error: 'units missing dir' }
 const fleetItems = []
 for (const f of findings) {
   const file = ((f && f.file) || '').toString().trim()
-  const owner = findOwner(file)
+  const repo = ((f && f.repo) || '').toString().trim()
+  const owner = findOwner(file, repo)
   if (owner) {
     dirGroups.get(owner.dir).items.push({ finding: f, unit: owner, fleet: false })
   } else {
@@ -192,6 +217,28 @@ log(`${findings.length} finding(s) -> ${activeGroups.length} repo group(s) (${fl
 
 // ─────────────────────────── Fix ───────────────────────────
 phase('Fix')
+
+// Artifact-idempotence: if a prior run already persisted fixes.json, read it
+// back and reconstruct the return instead of re-running the fix agents and the
+// reintegrate. fixes.json is written only at the END of a successful
+// reintegrate (after the merge succeeded), so its presence implies
+// integration_rebuilt=true; the seed outcome is not recorded in it, so a cached
+// resume reports seeded=false (re-run verify to re-seed if needed).
+const fixReadback = await retryAgent(`Probe for a cached fix result. Read-only — write nothing.
+Run: test -f ${J(FIXES_JSON)} && echo yes || echo no
+If it prints "no", return exists=false, content="".
+If "yes", read ${FIXES_JSON} in full and return exists=true, content=<the file's exact verbatim contents>.`,
+  { label: 'fix-probe', phase: 'Fix', effort: 'low', schema: OBJ({ exists: BOOL, content: STR }) })
+if (fixReadback?.exists && fixReadback.content) {
+  let parsedFixes = null
+  try { parsedFixes = JSON.parse(fixReadback.content) } catch (e) { parsedFixes = null }
+  if (Array.isArray(parsedFixes)) {
+    const cachedFailed = parsedFixes.some(f => f && f.action === 'failed')
+    log(`cached fixes.json read back: ${parsedFixes.length} finding(s) — skipping fix + reintegrate (seed state not recoverable from cache)`)
+    return { status: cachedFailed ? 'partial' : 'done', fixes: parsedFixes, integration_rebuilt: true, seeded: false, cached: true }
+  }
+  log('cached fixes.json present but did not parse as an array — running full fix phase')
+}
 
 const S = {
   fix: OBJ({
@@ -240,6 +287,8 @@ Process the units above IN THAT ORDER. For each unit:
    Append ONE "fix_applied" events.jsonl line per finding as you resolve it (detail: "<unit id>: <finding title, truncated to fit>").
 4. This unit "changed" in this pass if step 2 rebased it OR step 3 left at least one surviving "fixed" commit. If it changed: run this repo's gate ONE FINAL time over the combined result (the rebase plus every surviving fix commit together — catches interactions between individually-green fixes, or a clean rebase that alone breaks something) and iterate until green. If it's still red after reasonable iteration: do NOT push this unit at all this pass — run \`git -C ${group.dir} reset --hard <PRE_PASS_TIP you recorded for this unit in step 1>\` so the branch ends this pass BYTE-IDENTICAL to how you found it (not just unpushed — a later run trusts local branch state at step 1 and would otherwise silently inherit and force-push these rejected commits on its next pass); change every "fixed" entry you recorded for this unit in step 3 to { action: "failed", reasoning: "gates red at final check (individually green, but combined state failed): <summary>" }; note the reset in "detail"; and treat this unit as UNCHANGED for the next unit's rebase check in step 2 (nothing new landed on origin). If the final gate is green, proceed to step 5.
 5. Push: \`git -C ${group.dir} push --force-with-lease origin <branch>\` (use --force-with-lease even for a plain additive commit, never plain --force — you are the only writer of this branch this run, but lease still protects against any unexpected remote movement). Post a short note on its MR/PR: determine the remote with \`git -C ${group.dir} remote get-url origin\` (GitLab -> \`glab mr note\`; GitHub -> \`gh pr comment\`) saying what changed, e.g. "Review fixes applied: 2 fixed, 1 overruled." or, if it only changed via cascade rebase with no direct findings, "Rebased on top of <this unit's base branch>'s review fixes." If step 2 disclosed a judgment-resolved conflict, include that exact disclosure line in this note too. If the unit did NOT change (or was downgraded back to unchanged in step 4), do nothing further for it — no push, no note.
+
+DIAGNOSTIC findings: any finding whose title starts with "verify: " (e.g. "verify: <scenario> failed") is a BROWSER-VERIFICATION FAILURE, not a located code defect. It carries this repo's dir as its "file" only so it routes to you — that path is NOT the offending line. Do NOT overrule it merely because it names no specific file/line. Instead: reproduce or diagnose the failing scenario, identify which unit branch in YOUR stack above actually causes it, and fix it there — folded into that unit's normal processing (apply + gate + push + MR note, exactly like any other finding). Only if you can positively establish the failure is not caused by any branch you own may you overrule it, stating that proof as the reasoning.
 
 ${findingsBlock}${fleetBlock}
 

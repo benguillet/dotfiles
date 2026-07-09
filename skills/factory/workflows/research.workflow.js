@@ -174,7 +174,7 @@ ${zipped.map((x, i) => fence(`SCOUT ${i + 1} (${x.s.kind})`, x.r.findings)).join
 ${contextNote}${mergeNote}
 1. Ensure the directory exists: run \`mkdir -p ${RESEARCH_DIR}\`.
 2. Write ${RESEARCH_MD}: TL;DR (5 bullets) / Key files map (path -> why it matters) / Conventions to follow / Risks & gotchas / Open unknowns / How to test here${userFacing ? ' / UI vocabulary' : ''}. ≤1200 words, keep every file:line reference that survives.
-3. Append ONE events.jsonl line of type "artifact_written" with detail "research.md (${zipped.length} scouts)". ${EVENT_LINE(sessionDir)}
+3. Append ONE events.jsonl line of type "artifact_written" with detail "artifacts/research/research.md (${zipped.length} scouts)". ${EVENT_LINE(sessionDir)}
 Return a ≤160-word summary of the dossier.`,
   { label: 'synthesize', phase: 'Synthesize', schema: OBJ({ summary: STR }) })
 

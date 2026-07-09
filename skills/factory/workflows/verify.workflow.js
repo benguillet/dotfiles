@@ -203,7 +203,7 @@ function scenarioPrompt(sc) {
     ? `Seed script for this scenario — copy it to a file under tmp/ and run it from there; NEVER commit it to any repo:\n${fence('SEED SCRIPT', sc.seed_script)}`
     : '(no seed script for this scenario — required data must already exist)'
   const assertionsList = sc.assertions.map((a, i) => `${i + 1}. ${a}`).join('\n')
-  return `You are browser-verifying ONE scenario for a factory build: "${sc.name}". ${READ_ONLY(sessionDir)}
+  return `You are browser-verifying ONE scenario for a factory build: "${sc.name}". ${READ_ONLY(sessionDir)} For this scenario you MAY additionally write under /tmp — precisely, per codex-job.md's rule: write files only in /tmp and the session dir (the seed script below is copied under tmp/ and run from there). Still make no repo edits and no git state changes.
 
 URLs to visit, in order: ${sc.urls.join(', ')}
 ${loginNote}

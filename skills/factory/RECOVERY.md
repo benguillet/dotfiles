@@ -52,9 +52,16 @@ cost minutes, not hours.
 5. **Re-run the CURRENT phase's workflow**, not the whole pipeline — every
    workflow is artifact-idempotent (it probes its own artifacts dir and skips
    finished stages), so a re-run for a stage that's already done returns in
-   seconds. For `build`/`fix` specifically, pass only the unfinished `units`
-   and put every already-satisfied id in `already_pushed` so those lanes
-   start immediately and are never rebuilt. Same-session interruptions MAY
+   seconds. The ONE exception is `verify`: it has no probe/skip step and ALWAYS
+   re-runs by design — re-verification is exactly what you want after a crash or
+   a fix. For `build`, pass only the unfinished `units` and put every
+   already-satisfied id in `already_pushed` so those lanes start immediately and
+   are never rebuilt. For `fix`, do the OPPOSITE: re-pass the FULL pushed-units
+   list (its routing needs every unit's `dir` to map findings onto owning
+   branches — `fix` takes no `already_pushed`), and instead trim `findings` to
+   those not already actioned in `artifacts/fix/fixes.json` (the workflow also
+   probes `fixes.json` and short-circuits when the whole fix phase already
+   completed). Same-session interruptions MAY
    also pass `resumeFromRunId` (the phase's stored `workflow_run_id`) to
    replay completed `agent()` calls from the Workflow journal cache — but
    correctness never depends on this: it doesn't survive a fresh session,

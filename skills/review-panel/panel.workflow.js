@@ -224,6 +224,33 @@ for (const c of crosschecks) {
 }
 
 phase('Find')
+
+// Artifact-idempotence: if a prior run already persisted findings.json, read it
+// back and reconstruct the return instead of re-running finders + refuters.
+// findings.json holds every verified finding (including refuted) with its
+// verdict; raw_count/deduped_count aren't stored there, so a cached resume
+// reports both as the persisted-finding count (best effort — no finders ran).
+if (sessionDir) {
+  const cachedFile = `${sessionDir}/artifacts/review-${mode}/findings.json`
+  const readback = await retryAgent(`Probe for a cached review-panel result. Read-only — write nothing.
+Run: test -f ${J(cachedFile)} && echo yes || echo no
+If it prints "no", return exists=false, content="".
+If "yes", read ${cachedFile} in full and return exists=true, content=<the file's exact verbatim contents>.`,
+    { label: `panel-probe:${mode}`, phase: 'Find', effort: 'low', schema: OBJ({ exists: BOOL, content: STR }) })
+  if (readback?.exists && readback.content) {
+    let parsed = null
+    try { parsed = JSON.parse(readback.content) } catch (e) { parsed = null }
+    if (Array.isArray(parsed)) {
+      const confirmed = parsed.filter(f => f && f.verdict === 'CONFIRMED')
+      const plausible = parsed.filter(f => f && f.verdict === 'PLAUSIBLE')
+      const refuted_count = parsed.filter(f => f && f.verdict === 'REFUTED').length
+      log(`cached findings.json read back: ${confirmed.length} confirmed, ${plausible.length} plausible, ${refuted_count} refuted — skipping finders/refuters`)
+      return { confirmed, plausible, refuted_count, raw_count: parsed.length, deduped_count: parsed.length, cached: true }
+    }
+    log('cached findings.json present but did not parse as an array — running full panel')
+  }
+}
+
 const results = await parallel(finders.map(f => () =>
   retryAgent(`${f.prompt}\n\nReturn findings via the structured schema (empty array if genuinely nothing).${finderSuffix}`,
     { label: `find:${f.key}`, phase: 'Find', schema: FINDINGS_SCHEMA, effort: 'high' })
@@ -256,7 +283,7 @@ Proposed fix: ${f.fix || 'n/a'}
 Verify against the ${isCode ? 'REAL code (read-only; never checkout/modify)' : 'PLAN TEXT and its context files'}:
 ${targetCatalog}
 ${contextFiles ? `Context files: ${contextFiles}` : ''}
-Refute if: the scenario is impossible given the ${isCode ? 'real code' : 'plan as written'}, already ${isCode ? 'mitigated elsewhere (specs, guards, backstops, TTLs)' : 'handled elsewhere in the plan'}, relitigates a settled decision, or is purely speculative.`,
+Refute if: the scenario is impossible given the ${isCode ? 'real code' : 'plan as written'}, already ${isCode ? 'mitigated elsewhere (specs, guards, backstops, TTLs)' : 'handled elsewhere in the plan'}, relitigates a settled decision, or is purely speculative.${settled ? `\nSettled decisions (a finding that relitigates ANY of these MUST be refuted):\n${settled}` : ''}`,
       { label: `refute${n + 1}:${(f.title || '').slice(0, 30)}`, phase: 'Verify', schema: VERDICT_SCHEMA, effort: 'high' })
   )).then(vs => {
     const votes = vs.filter(Boolean)
