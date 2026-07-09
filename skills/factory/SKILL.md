@@ -1,20 +1,33 @@
 ---
 name: factory
-description: Ship an approved spec as a fleet of small stacked MRs/PRs across repos — decompose, build each unit with a scoped subagent, verify in the browser with seeded data, adversarially review with a find→refute agent fleet, fix on the owning branches, and deliver an HTML launch report. Crash-resilient (survey → TaskStop zombies → relaunch) with always-visible progress (task list + status scoreboard + heartbeats). TRIGGER when the user types /factory <spec/plan path, gdoc link, or description>, or asks to "implement the spec as stacked MRs", "run the factory", or to turn an approved plan into shippable MRs end to end.
+description: Ship a prompt, spec, or approved plan as a fleet of small stacked MRs/PRs across repos through a workflow-native pipeline — triage, intent sharpening, dual-model (Claude + codex) planning, plan/risk review, parallel worktree build with per-unit adversarial codex review, axis-based review panels, browser verification with seeded data, fix on the owning branches, and an HTML launch report. Every long phase is a live Workflow watchable in /workflows, backed by an on-disk session state store (state.json / STATUS.md / events) that makes the run crash-resilient (survey → TaskStop zombies → relaunch) and always visible. TRIGGER when the user types /factory <spec/plan path, gdoc link, or description>, or asks to "implement the spec as stacked MRs", "run the factory", or to turn an approved plan into shippable MRs end to end.
 ---
 
-# /factory — spec in, reviewed MR fleet out
+# /factory — prompt in, reviewed MR fleet out
 
-Turn an approved implementation plan into merged-ready work: small stacked
-MRs/PRs, each built + tested by a scoped subagent, then browser-verified,
-adversarially reviewed, fixed, and summarized in an HTML report. Born from the
-Paxel account-state build (10 shipping units, 3 repos, 88 review agents); the
-recovery and visibility rules below are the lessons of that run — follow them
-even when they feel like ceremony.
+You are the **conductor**: the main agent loop. You do NOT build, review, plan,
+or fix anything yourself — every heavy phase is a `Workflow({scriptPath, args})`
+script that fans out its own agents, watchable live in `/workflows`. Your job is
+narrow and exact:
 
-Companion files (same dir; expand `~` to the real `$HOME` before use):
-- `RECOVERY.md` — crash recovery + environment quirks. Read it at kickoff.
-- `adversarial-review.workflow.js` — parameterized review fleet for phase 6.
+1. Resolve the prompt and set up the run.
+2. Run the interactive checkpoints (only the conductor may `AskUserQuestion`).
+3. Chain the phase workflows in order, in the exact arg shapes below.
+4. After every phase, persist the workflow's output into the session store,
+   atomic-rewrite `state.json`, regenerate `STATUS.md`, `TaskUpdate`, stamp
+   timings, append events, and post a one-line milestone.
+5. Recover from crashes per `RECOVERY.md`.
+
+Companion files (same tree; **expand `~`/`<$HOME>` to the real `$HOME`** before
+use — the `Workflow` and `Skill` tools do NOT expand it):
+
+- `RECOVERY.md` — crash recovery + environment quirks. Read at kickoff.
+- `references/state-format.md` — the `state.json` / `events.jsonl` / `STATUS.md`
+  / artifacts contract. **This is the control-plane API; field names and enums
+  are normative.** You are the ONLY writer of `state.json`.
+- `references/codex-job.md` — the codex policy (hard-stop vs skip-with-flag).
+- `workflows/*.js` — the seven phase scripts.
+- `../review-panel/` — the `/review-panel` skill, invoked twice.
 
 ## Two iron rules (the user's actual requirements)
 
@@ -22,136 +35,389 @@ Companion files (same dir; expand `~` to the real `$HOME` before use):
    moment it passes checks. Any agent can die at any time (laptop close kills
    local agents); recovery must always be "survey git, relaunch the one lost
    step", never "start over".
-2. **The user can always see what's happening.** Task list + scoreboard file +
-   milestone messages are not optional. If the user asks "status?" the answer
-   must already exist on disk.
+2. **The user can always see what's happening.** The session store
+   (`state.json` + `STATUS.md`) + task list + milestone messages are not
+   optional. If the user asks "status?" the answer must already exist on disk.
 
 ## 0. Kickoff
 
-1. Resolve the plan from `$ARGUMENTS` (file path, gdoc link, or description).
-   **/factory requires an APPROVED plan.** If there is only a spec or an idea:
-   produce the plan first (draft, optionally cross-critique with `/codex`
-   consult, reconcile), present it with open questions, and STOP for approval.
-2. Ask ONE question (AskUserQuestion): **Autonomous** (default — run everything,
-   notify at milestones) or **Checkpointed** (pause for approval after
-   decomposition and before applying review fixes).
-3. Read `RECOVERY.md`. Resolve repo-specifics from the project's CLAUDE.md
-   (test/lint commands, MR conventions, migration rules) — never assume.
-4. **Decompose** into shipping units: prefer many small stacked MRs over few
-   big ones (stacked = branch chain `<prefix>-NN-<slug>`, each MR targets its
-   parent's branch; first targets the default branch; GitHub repos get one PR —
-   no stacking). Identify the lanes: units in DIFFERENT repos/checkouts can run
-   in parallel; units sharing a checkout are strictly sequential (rule: **one
-   git writer per working tree, ever**).
-5. **Set up visibility** before any building:
-   - `TaskCreate` one task per shipping unit + one per phase (verify, review,
-     report). `TaskUpdate` status/owner at EVERY transition.
-   - Write the scoreboard: `.context/factory-status.md` — phase, per-unit
-     table (unit, branch, MR link, state, owner agent), what's in flight,
-     what's next, last-updated timestamp. Rewrite it at every milestone;
-     it is the crash-surviving source of truth.
-   - Arm a `ScheduleWakeup` heartbeat (1200–1800s) whose prompt says: check
-     agents, recover per RECOVERY.md, continue the factory pipeline per the
-     task list and `.context/factory-status.md`. Re-arm it each phase; do NOT
-     use wakeups for streaming (use Monitor when there's a pollable signal).
+1. **Resolve `$ARGUMENTS`** — a file path, gdoc link, spec, approved plan, or a
+   bare description. There is NO "requires an approved plan" gate anymore: the
+   pipeline sharpens intent and plans the work itself. Read whatever was given
+   as the raw `task_text`. Derive a kebab **`feature_slug`** (`/^[a-z0-9-]+$/`)
+   from it and a one-line `feature` description.
+2. **ONE `AskUserQuestion`**: **Autonomous** (default — run everything, notify
+   at milestones) or **Checkpointed** (also pause for final-plan approval after
+   plan amend, and for confirmed-findings approval before fix). Lowercase the
+   answer into `state.json.mode` (`autonomous` | `checkpointed`).
+3. **Create the run.** `run_id = <YYYY-MM-DD>-<feature_slug>` from
+   `date -u +%Y-%m-%d`. Then:
+   ```bash
+   mkdir -p ~/.factory/runs/<run-id>/artifacts/{intent,research,plans,plan,risk,review-plan,build,review-code,verify,fix,report}
+   ```
+   Session dir = `~/.factory/runs/<run-id>` (absolute, `$HOME`-expanded — pass
+   it as `session_dir` to every workflow). Note directory names are kebab
+   (`review-plan`, `review-code`) while `state.json` phase keys are snake
+   (`review_plan`, `review_code`).
+4. **Seed `state.json`** per `references/state-format.md` (`run_id`, `feature`,
+   `mode`, `created_at`/`updated_at` from `date -u +%Y-%m-%dT%H:%M:%SZ`, `phase`,
+   all 11 `phases` at `{status:"pending"}`, empty `units`/`checkpoints`, empty
+   `links`). Append the `run_created` event. Write `STATUS.md`.
+5. **Read `RECOVERY.md`.** Resolve each repo's test/lint/migration/MR
+   conventions from its `CLAUDE.md`/`AGENTS.md` when you reach it — never assume.
+6. **Arm the heartbeat.** `ScheduleWakeup` 1200–1800s, prompt: *"check agents,
+   recover per RECOVERY.md, continue per state.json."* Re-arm it each phase. Do
+   NOT use wakeups for streaming — use `Monitor` when there is a pollable signal.
+7. **`TaskCreate`** one task per phase (and, once planned, one per shipping
+   unit); `TaskUpdate` at every transition.
 
-## 1–3. Build the lanes
+### Conductor duties after EVERY phase (non-negotiable)
 
-For each lane, dispatch ONE scoped subagent per shipping unit, sequentially
-within the lane, parallel across lanes. Every build-agent prompt must include:
+- **Persist** the workflow's return into the phase's `artifacts/` dir when it
+  isn't already on disk (workflow agents write most artifacts themselves; you
+  fill gaps and record paths).
+- **Atomic-rewrite `state.json`** — write the full document to
+  `<session_dir>/state.json.tmp`, then `mv` it into place (never edit in place;
+  a control plane may be reading). Update `updated_at`, the phase entry
+  (`status`, `started_at`/`ended_at`, `workflow_run_id`, exhaustive `artifacts`),
+  `units[]`, and the advisory `phase`.
+- **Regenerate `STATUS.md`** (same cadence; render per state-format §5).
+- **`TaskUpdate`** phase/unit status.
+- **Stamp timings** from real `date -u +%Y-%m-%dT%H:%M:%SZ`.
+- **Append the conductor's events** (below) and post ONE milestone line to chat.
 
-- Exact branch to create and its parent; "stage only your files; NEVER
-  `git add -A`; never `--amend`; never commit scratch dirs (docs/specs,
-  .context, tmp)".
-- The full contract it implements (inline — agents don't share your context)
-  plus pointers to the spec/plan files on disk.
-- The check gate: repo test + lint commands from CLAUDE.md; iterate until
-  green; report results HONESTLY (a known-broken harness step gets a validated
-  substitute, documented — see RECOVERY.md quirks — never a skipped check).
-- Ship steps: commit (co-author trailer per repo rules) → push → create the
-  MR/PR (target = parent branch; no reviewers, no auto-merge; description
-  names its place in the stack) → leave the tree on the new branch.
-- "Report back: MR URL, files, honest check results, and what the NEXT unit
-  must know" — feed each report's contract notes into the next prompt.
-- Anti-watchdog rule: no single silent >10min command — redirect long commands
-  to a log file and poll it.
+**Events you (conductor) emit:** `run_created`, `phase_started`, `phase_done`,
+`phase_failed`, `checkpoint_asked`, `checkpoint_answered`, `report_written`,
+`recovery_performed`. Everything unit/finding-level (`unit_started`,
+`unit_codex_review`, `unit_pushed`, `mr_created`, `finding_confirmed`,
+`fix_applied`, `verify_state`, `artifact_written`) is emitted by the agents
+INSIDE the workflows — do not double-write those.
 
-Cross-repo contract notes (e.g. "the client keys acks on exact uuid echo")
-must be relayed to the agent building the other side — you are the bus.
+## 1. Pipeline overview
 
-After each unit lands: TaskUpdate, refresh the scoreboard, one-line milestone
-message to the user with the MR link.
+| # | Phase key | Script (`workflows/…` unless noted) | Consumes → Produces |
+|---|---|---|---|
+| — | `triage` | conductor-inline Agent (haiku) — **not** a Workflow | task_text → `artifacts/intent/triage.json` |
+| 1 | `research` | `research.workflow.js` | task_text (+ intent) → `artifacts/research/research.md` |
+| 2 | `plan_draft` | `plan-draft.workflow.js` | intent.md + research.md → `artifacts/plans/*` + open_questions |
+| 3 | `plan_finalize` | `plan-finalize.workflow.js` | plans/* + answers.md → `artifacts/plan/plan.md` + `dag.json` + `selection.json`; `units[]` |
+| 4 | `review_plan` ∥ `risk` | `../review-panel/panel.workflow.js` (plan) ∥ `risk.workflow.js` | plan.md → `review-plan/findings.json` ∥ `risk/risk.md` + dag.json risk annotations |
+| — | plan amend | conductor-dispatched Agent — **not** a Workflow | confirmed plan findings + risk → edits plan.md/dag.json |
+| 5 | `build` | `build.workflow.js` | full dag.json units → per-unit `build/unit-<id>.json`, pushed branches + MRs |
+| 6 | `review_code` ∥ `verify` | `../review-panel/panel.workflow.js` (code) ∥ `verify.workflow.js` | pushed diffs → `review-code/findings.json` ∥ local integration + `verify/verification.md` |
+| 7 | `fix` | `fix.workflow.js` | confirmed+plausible findings + verify failures → fixes on owning branches, rebuilt integration |
+| 8 | `report` | `/work-summary` skill | whole session store → `artifacts/report/launch-report.html` |
 
-## 4. Local integration + browser verification
+Every workflow is **artifact-idempotent** (it probes its own artifacts dir and
+skips finished stages), so re-running any phase after an interruption is safe
+and fast. Every workflow returns `{status:'bad_input', error}` on a malformed
+arg instead of throwing — treat that as a conductor bug and fix the arg.
 
-1. Build a LOCAL-ONLY integration branch (`local/<feature>-integration`)
-   merging every lane's tip; never push it. Run migrations; smoke-test the key
-   endpoint(s) with curl before spending a browser agent.
-2. Dispatch a browser agent (claude-ui-test type) with: exact URLs, login
-   recipe (see RECOVERY.md for the dev-SSO-session mint if the login app isn't
-   running), seed scripts it runs between screenshots (write them to tmp/,
-   never committed), the per-state assertions, and a hard timebox + "stop and
-   report, don't loop" rule for anything environmental.
-3. Deliverables: screenshots into `docs/specs/images/verification/`, a PASS/
-   FAIL table, and a live end-to-end transition test where the feature has one
-   (poll flip, webhook, etc.). Console errors triaged: new-feature errors are
-   failures; pre-existing noise is noted.
+## 2. Triage (conductor-inline)
 
-## 5. (While verification runs) nothing blocks — prep the report skeleton or
-idle; review can also start now since it's read-only on pushed refs.
+ONE cheap Agent call — no workflow:
 
-## 6. Adversarial review — the whole point of the factory
+```
+Agent({ subagent_type: "general-purpose", model: "haiku",
+  description: "factory triage",
+  prompt: "<task_text>. Classify: (a) trivial — implementable in ≤~50 lines, no
+    design fork, no schema/API/migration change; if unsure it is NOT trivial.
+    (b) user_facing — does it change UI/UX a person sees? Return JSON
+    {trivial:bool, user_facing:bool, reason:string}." })
+```
 
-Run `Workflow({ scriptPath: '<skill-dir>/adversarial-review.workflow.js',
-args: { diffs, crosschecks, settled, context_files } })` — see the script
-header for the args contract. Principles:
-- Finders are READ-ONLY over pushed refs (`git diff origin/base...origin/head`)
-  so they can run concurrently with anything.
-- Every diff gets ≥3 lenses (correctness+concurrency, security, house-rules+
-  test-honesty) plus domain lenses; multi-repo contracts get a dedicated
-  cross-check finder that reads BOTH sides.
-- Findings must state a concrete failure scenario; each is attacked by 2
-  independent refuters (kill on unanimous refute; note PLAUSIBLE on split).
-- Feed `settled` (decisions already made) so the fleet doesn't relitigate.
-- The Workflow journal is your crash insurance: on any interruption, resume
-  with `resumeFromRunId` — completed agents replay from cache.
+Persist the JSON return to `artifacts/intent/triage.json`; record the `triage`
+phase (no `workflow_run_id` — it isn't a workflow). `user_facing` from here
+feeds `research`, `plan-draft`, and `plan-finalize` as `user_facing`.
 
-Consolidate survivors into unique defects (the same bug arrives through
-several lenses). If Checkpointed mode: present them and wait.
+**Trivial path** (skip research, sharpen, planning, risk):
+1. Construct ONE unit inline — `{id:"u1", repo, dir:"<abs checkout>",
+   branch:"ben/<feature_slug>", base:"<repo default branch>", deps:[],
+   contract:"<the task, self-contained>", notes_for_dependents:""}` — write it
+   to `state.json.units` and to `artifacts/plan/dag.json` (`units:[…],
+   crosschecks:[], settled:[]`).
+2. `build` workflow with that single unit (same per-unit codex review gate).
+3. **Slim** code panel: `review-panel` mode `code`,
+   `lenses:["correctness","tests","cruft"]`, one target for the unit diff,
+   `session_dir`.
+4. If `user_facing`: ONE `claude-ui-test` Agent (screenshot + smoke of the
+   change) so the report's screenshot/test-locally sections hold.
+5. If the slim panel returns confirmed findings, run `fix` (single repo) before
+   reporting.
+6. `report`.
 
-## 7. Fixes
+Otherwise continue to the full pipeline.
 
-Dispatch one fix agent per repo/lane (parallel across repos, one per tree):
-each fix lands ON THE BRANCH THAT OWNS THE FILE, children rebase on top,
-`--force-with-lease` push, and a "review fixes" note is posted on each touched
-MR/PR. Fix agents may overrule a finding while implementing — require them to
-say so with reasoning (verified example: a reviewer's suggested fix that would
-have regressed data-model behavior). Re-run the unit's check gate after fixes.
-Rebuild the integration branch from the fixed tips so local testing reflects
-final code.
+## 3. Sharpen ⇄ research loop (conductor-owned)
 
-## 8. HTML launch report
+Workflow agents can't ask the user — sharpening is yours. Soft cap **≤3 loops**,
+then proceed with documented assumptions.
 
-Invoke `/work-summary` (skills/work-summary — its TEMPLATE.html and section
-contract are the canonical format) rather than hand-writing the report. What
-it must cover, for reference:
+- **Research (ground / re-focus):**
+  ```
+  Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/research.workflow.js",
+    args: { session_dir, task_text: "<raw description>",
+            intent_file: "<session_dir>/artifacts/intent/intent.md",   // OMIT until intent.md exists
+            user_facing: <triage.user_facing>,
+            focus: "<what a re-loop must dig into>" } })              // OMIT on the first pass
+  ```
+  `focus` is what forces a re-research (a bare re-run with an existing
+  `research.md` and no `focus` short-circuits). `research` takes **no
+  `codex_model`** — it is pure Claude.
+- **Sharpen:** `AskUserQuestion` rounds — each question carries a *why it
+  matters* and a *suggested default*. Synthesize the answers into **`intent.md`
+  (you write it)**: Goal / Success criteria / In scope / Out of scope /
+  Assumptions, at `<session_dir>/artifacts/intent/intent.md`.
+- Loop: research may run first to ground the questions, then re-run with a
+  `focus` if the answers change what to look for.
 
-Write `docs/specs/<feature>-launch-report.html` and `open` it. Required, keep
-it SHORT: 3–4 sentence summary · table of every MR/PR with links and targets ·
-numbered merge order (including manual infra steps and retarget-on-merge
-notes) · screenshot grid (relative paths) · "test it locally" box with real
-URLs, real record ids, the seeded session/login, and the state-flip commands ·
-quality-gates list (test counts, verification result, review stats: agents,
-raw→verified→unique-fixed, severity highlights) · outstanding manual steps.
-Then post the final chat summary: TLDR, links, merge order, what's left for
-the human.
+Record `research` phase (workflow-backed; its agents write `research.md`).
 
-## Recovery contract (applies to every phase)
+## 4. Plan draft → checkpoint → finalize
 
-On ANY agent/workflow death, stall notice, or session restart — follow
-`RECOVERY.md`. The short version: **survey first** (git status + local-vs-
-origin SHAs in every lane; scoreboard file), **TaskStop the presumed-dead
-agent before relaunching** (suspended agents can resurrect and race their
-replacement), relaunch only the lost step with a "verify inherited state,
-then continue" prompt, and update the scoreboard. Never rebuild what origin
-already has.
+**Draft:**
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/plan-draft.workflow.js",
+  args: { session_dir, user_facing: <bool>, codex_model: "<override>" } })   // codex_model optional
+```
+Reads `intent.md` + `research.md` from the session dir (do NOT pass them as
+args). Returns `{status, open_questions:[{question, why, suggested_default,
+source}], summaries:{claude, codex}}`. The `summaries` may be **empty** on a
+full-cache resume — never rely on them; the durable truth is the files under
+`artifacts/plans/`. Record `plan_draft`; its `artifacts` list is every file the
+agents wrote in `plans/` (drafts + critiques), and later grows to include
+`answers.md` and the v2 revisions (they belong to `plan_draft`'s dir).
+
+**Checkpoint — plan questions (BOTH modes, always if `open_questions` is
+non-empty):** `AskUserQuestion` (batched, each with its suggested default).
+Write the answers **verbatim and dated** to
+`<session_dir>/artifacts/plans/answers.md`. Append `answers.md` to
+`plan_draft.artifacts`; add a `checkpoints[]` entry (`stage:"plan-questions"`,
+`questions:<n>`, `answers_file:"artifacts/plans/answers.md"`); emit
+`checkpoint_asked` then `checkpoint_answered`. If there are no questions, do NOT
+create `answers.md` — `plan-finalize` keys off its absence.
+
+> Sharpen answers live in `intent.md`; `answers.md` is exclusively the
+> plan-draft open-question answers that `plan-finalize` consumes (absent when
+> there were none).
+
+**Finalize:**
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/plan-finalize.workflow.js",
+  args: { session_dir, user_facing: <bool>, codex_model: "<override>" } })   // codex_model optional
+```
+Reads `plans/*`, `intent.md`, and `answers.md` (if present) from the session
+dir. Returns `{status, chosen, rationale, units:[{id,repo,dir,branch,base,deps}],
+crosschecks:[], settled:[]}`. The returned `units` are the **lite** shape — copy
+them into `state.json.units` (add `status:"pending"`). `selection.json` makes
+`chosen`/`rationale` resume-durable. Record `plan_finalize` (artifacts `plan.md`,
+`dag.json`, `selection.json`). Create the per-unit tasks now.
+
+## 5. Plan panel ∥ risk (concurrent)
+
+Launch **both in the same message** — they run in parallel and neither blocks;
+collect both before amending. Both are read-only over `plan.md`; only `risk`
+writes (it annotates `dag.json` in place and writes `risk.md`), so there is no
+write conflict.
+
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/review-panel/panel.workflow.js",
+  args: {
+    mode: "plan",
+    targets: [{ key: "plan", path: "<session_dir>/artifacts/plan/plan.md", context: "final selected plan" }],
+    focus: [ /* your judgment: plan sections touching migrations, auth, money, data backfills, cross-repo ordering */ ],
+    context_files: ["<session_dir>/artifacts/intent/intent.md", "<session_dir>/artifacts/research/research.md"],
+    settled: [ /* ...dag.json settled, plus the decisions the human's answers locked in */ ],
+    refuters: 2,
+    session_dir,
+  } })
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/risk.workflow.js",
+  args: { session_dir } })                                            // session_dir is its ONLY arg
+```
+
+- Plan panel returns `{confirmed, plausible, refuted_count, raw_count,
+  deduped_count}` and writes `review-plan/findings.json`. Record `review_plan`.
+- Risk returns `{status, overall_risk, deploy_order, rollback_summary,
+  watch_areas, focus}` and merges per-unit `risk`/`watch` into `dag.json`.
+  **Keep `risk.focus`** — it feeds the CODE panel's `focus`. Record `risk`.
+
+## 6. Plan amend (conductor-dispatched agent)
+
+Dispatch ONE agent (not a workflow) to apply the plan panel's **CONFIRMED**
+findings + risk mitigations to `plan.md` and `dag.json`, recording each change
+under a `## Amendment log` section in `plan.md`. It edits in place; the pre-amend
+plan is still reconstructable from the v2 files + `selection.json`.
+
+After amend, **re-read `dag.json`** — its `units`, `crosschecks`, `settled`, and
+per-unit contracts are now authoritative for build. If the unit set changed,
+update `state.json.units` (lite shape) to match.
+
+**Checkpointed mode only:** present the amended plan and pause. Add a
+`checkpoints[]` entry (`stage:"plan-approval"`), set the phase you pause in to
+`paused`, emit `checkpoint_asked`/`checkpoint_answered`. Autonomous mode does not
+pause here.
+
+Plan amend has no phase key of its own — it sits between `review_plan`/`risk`
+and `build`.
+
+## 7. Build
+
+Read the **full** units from `dag.json` (id, repo, dir, branch, base, deps,
+`contract`, `notes_for_dependents`) — the lite `plan-finalize` return omits the
+contracts, and build needs them.
+
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/build.workflow.js",
+  args: {
+    session_dir,
+    scratch_dir: "<abs scratch dir outside every repo>",   // worktrees land at <scratch_dir>/wt-<unit id>
+    units: [ /* full dag.json units */ ],
+    already_pushed: [],                                     // recovery: ids of units a prior run already pushed
+    settled: [ /* dag.json settled */ ],
+    codex_model: "<override>",                              // optional
+  } })
+```
+
+The workflow launches each unit's build agent the instant its deps reach
+`pushed`, in its own worktree; independent units run concurrently, stacked units
+sequentially. Per unit: implement → **inline codex adversarial review** →
+address/overrule → repo test+lint gates → commit → push → MR/PR →
+`build/unit-<id>.json`. Returns `{status:'done'|'partial', results:[{id, status,
+branch, mr_url, checks, codex_review, overrules, notes_for_dependents,
+detail}]}`; a unit blocked by a failed parent comes back `blocked-by-parent`.
+`codex_review` may read `"unavailable: …"` — surface that loudly (the code panel
+still covers the diff), but do NOT treat it as a build failure.
+
+Update `state.json.units` from `results` (and from the agents' events/`unit-*.json`
+mid-phase at each heartbeat, so the store stays live). Record `build`.
+
+## 8. Code panel ∥ verify (concurrent)
+
+Launch **both in the same message**; collect both before fix. The panel reads
+pushed refs; verify builds a local-only integration branch — neither pushes, so
+they are safe together.
+
+**Code panel** — one target per **pushed** unit (its own incremental diff):
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/review-panel/panel.workflow.js",
+  args: {
+    mode: "code",
+    targets: [ /* per pushed unit u: */
+      { key: "<u.id>-<u.repo>", dir: "<u.dir>", base: "origin/<u.base>", head: "origin/<u.branch>", context: "<one line>" } ],
+    focus: [ /* ...risk.focus */ ],
+    crosschecks: [ /* per dag.json crosscheck string: {key:"xcheck-<n>", prompt:"<the crosscheck, naming the two diffs it correlates>"} */ ],
+    settled: [ /* ...dag.json settled + the human's locked answers */ ],
+    context_files: ["<session_dir>/artifacts/plan/plan.md"],
+    refuters: 2,
+    session_dir,
+  } })
+```
+Returns `{confirmed, plausible, …}`, writes `review-code/findings.json`. Record
+`review_code`.
+
+**Verify** — browser check over a local integration branch:
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/verify.workflow.js",
+  args: {
+    session_dir,
+    units: [ /* state.json units, the pushed ones */ ],
+    scenarios: [ {
+      name: "homepage",                     // REQUIRED, /^[a-z0-9-]+$/, UNIQUE across scenarios
+      urls: ["http://…"],                   // REQUIRED, non-empty
+      seed_script: "#!/bin/bash …",         // optional; run from tmp/, never committed
+      assertions: ["…"] } ],                // REQUIRED, non-empty
+    integration_repo_dir: "<abs dir of the ONE repo whose app is under browser test>",
+    login_recipe: "<verbatim login steps>", // optional; RECOVERY.md has the dev-SSO mint
+    feature_slug,                           // REQUIRED, /^[a-z0-9-]+$/ — names local/<slug>-integration
+  } })
+```
+You compose `scenarios` from `intent.md` success criteria + `research.md` "how to
+test" + UI vocab. Returns `{status:'done', integration:{built,migrated,smoke},
+scenarios:[{name,pass,detail,screenshots,console}], console_findings}`. **Scenario
+failures do NOT fail the workflow** — they feed fix. Record `verify`.
+
+## 9. Fix
+
+**Checkpointed mode only:** present the consolidated findings and pause first
+(`checkpoints[]` `stage:"fix-approval"`; the `fix` phase status is `paused` until
+approved; emit `checkpoint_asked`/`checkpoint_answered`).
+
+```
+Workflow({ scriptPath: "<$HOME>/.claude/skills/factory/workflows/fix.workflow.js",
+  args: {
+    session_dir,
+    findings: [ /* code-panel confirmed + plausible, PLUS each verify scenario
+                   failure rendered as a finding {file:"", title:"verify: <name> failed",
+                   detail:"<failure>", severity:"major"} so broken scenarios get fixed too */ ],
+    units: [ /* state.json units[], full shape incl. mr_url */ ],
+    integration_repo_dir: "<same repo as verify>",
+    feature_slug,
+    seed_state1_cmd: "<verbatim seed for manual-test state 1>",   // optional
+  } })
+```
+An **empty `findings` array short-circuits to a done no-op** — not a bad_input.
+The workflow fixes each finding on the branch that owns the file, cascades
+rebases down each stack, re-gates, `--force-with-lease` pushes, notes the MRs,
+rebuilds the local integration branch, and re-seeds state 1. Fixes can come back
+`action:'failed'` (a gate stayed red — the fix was dropped, not shipped red).
+Returns `{status:'done'|'partial', fixes:[{finding_title, unit, action, reasoning,
+commit}], integration_rebuilt, seeded}`. Record `fix`.
+
+## 10. Report
+
+```
+Skill({ skill: "work-summary", args: "<session_dir>" })
+```
+`/work-summary` mines the session store, verifies MR/pipeline state live, writes
+`docs/specs/<feature_slug>-work-summary.html`, and **copies it to
+`<session_dir>/artifacts/report/launch-report.html`** (with its screenshots). It
+will tell you to set `links.report` — only the conductor writes `state.json`, so
+you set `links.report = "artifacts/report/launch-report.html"`, flip `report` to
+`done`, and emit `report_written`. Then post the final chat message: TLDR, MR/PR
+links, safe merge order, and what is left for the human. Do NOT paste the whole
+report into chat.
+
+## Codex policy
+
+`plan-draft` and `plan-finalize` require codex as the independent second model.
+If it is missing/unauthenticated/model-unavailable, the workflow returns
+`{status:'codex-unavailable', stage, detail}` — **pause the phase, surface
+`detail` verbatim** (it is one actionable line, e.g. *"model gpt-5.6-sol not
+available on this account — pass codex_model override or wait for GA"*), set the
+phase `failed`, emit `phase_failed`, and wait for the human. Never let Claude
+ghost-write codex's deliverable. In `build`, codex is a per-unit gate, not a hard
+stop: an unavailable codex leaves `codex_review:"unavailable: …"` and the unit
+still ships — the code panel reviews every diff regardless. `codex_model` is the
+escape hatch on `plan-draft`/`plan-finalize`/`build` (e.g. `"gpt-5.5"`); pass it
+through only if the human overrides. See `references/codex-job.md`.
+
+## Recovery quick-reference
+
+On any agent/workflow death, stall, or fresh session, follow `RECOVERY.md`. The
+one-paragraph version: **read `state.json`** to see where the run was → **git
+survey** every unit's lane (local vs `origin/<branch>` SHAs: pushed /
+committed-not-pushed / uncommitted / absent) → **`TaskStop` presumed-dead
+agents** before relaunching (a suspended agent can resurrect and race its
+replacement) → **re-run the current phase's workflow**, which skips completed
+stages via its own artifact probe. For `build`/`fix`, pass only the unfinished
+`units` and put already-satisfied ids in `already_pushed` so their lanes start
+immediately and are never rebuilt. Same-session interruptions MAY reuse the
+Workflow journal via `resumeFromRunId` (from the stored `workflow_run_id`), but
+correctness never depends on it — artifact idempotence + git survey is the real
+recovery. Emit `recovery_performed`, update `state.json`/`STATUS.md`, re-arm the
+heartbeat.
+
+## Concurrency & house rules
+
+- **One git writer per working tree, ever.** Parallel lanes are different repos
+  or isolated worktrees only; stacked branches in one repo are sequential.
+- Launch each concurrent pair (plan-panel ∥ risk, code-panel ∥ verify) as two
+  `Workflow` calls **in the same assistant message**, and do not proceed until
+  both have returned.
+- `state.json` is conductor-only and always written tmp-then-`mv`. `STATUS.md`
+  regenerates on every rewrite; during a concurrent window its header may render
+  `**Phase:** review_code ∥ verify`.
+- The singular advisory `phase` field holds the pipeline-latest of a running
+  pair — `risk` while `review_plan ∥ risk`, `verify` while `review_code ∥
+  verify`; `phases.<name>.status` is the authoritative per-phase view.
+- Timestamps are always real (`date -u +%Y-%m-%dT%H:%M:%SZ`); never invent them.
