@@ -126,7 +126,11 @@ as the `pending` phases and the `building` unit show below):
         "artifacts/plans/plan.claude.md",
         "artifacts/plans/plan.codex.md",
         "artifacts/plans/critique-of-claude.md",
-        "artifacts/plans/critique-of-codex.md"
+        "artifacts/plans/critique-of-codex.md",
+        "artifacts/plans/critique-ux.md",
+        "artifacts/plans/answers.md",
+        "artifacts/plans/plan.claude.v2.md",
+        "artifacts/plans/plan.codex.v2.md"
       ]
     },
     "plan_finalize": {
@@ -214,11 +218,22 @@ status flips to `done` in the same rewrite.)
 | `mode`        | enum   | `autonomous` \| `checkpointed` — chosen by the conductor's one kickoff `AskUserQuestion` (Autonomous/Checkpointed), lowercased |
 | `created_at`  | string | RFC 3339 UTC (`date -u +%Y-%m-%dT%H:%M:%SZ`), set once at kickoff |
 | `updated_at`  | string | RFC 3339 UTC, set on every conductor rewrite |
-| `phase`       | enum   | current phase — one of the `phases` object's keys |
+| `phase`       | enum   | the conductor's primary/leading phase indicator — advisory, for display; one of the `phases` object's keys (see the concurrency note below) |
 | `phases`      | object | see below |
 | `units`       | array  | see below; `[]` until `plan_finalize` populates it |
 | `checkpoints` | array  | see below; `[]` if the run never paused |
 | `links`       | object | cross-cutting pointers not owned by any single phase (currently just `report`; open to more as the control plane grows) |
+
+**Concurrent phases and the singular `phase` field.** Two phase pairs run
+concurrently by design: `review_plan` ∥ `risk` and `review_code` ∥ `verify`.
+The singular `phase` field is therefore not a complete picture of what's
+running — it is the conductor's primary/leading phase indicator, advisory
+and for display; **`phases.<name>.status` is the authoritative per-phase
+state**, and a consumer that needs "everything running right now" must scan
+the `phases` object for `"status": "running"`, never read `phase` alone.
+During a concurrent window, `phase` holds the pipeline-order-latest running
+phase (`risk` while `review_plan` ∥ `risk`; `verify` while `review_code` ∥
+`verify`), and the `STATUS.md` header may render both (see §5).
 
 ### `phases.<name>`
 
@@ -236,7 +251,14 @@ once finished it gains `ended_at` and `artifacts`.
 | `started_at`       | string          | present once `status` leaves `pending` |
 | `ended_at`         | string          | present once `status` reaches `done`/`failed` |
 | `workflow_run_id`  | string          | opaque id returned by `Workflow({scriptPath, args})`; present only for workflow-backed phases, once launched. Enables same-session `resumeFromRunId` (never required for correctness — see RECOVERY.md) |
-| `artifacts`        | array of string | paths relative to the run dir, e.g. `"artifacts/research/research.md"`; `[]` while running, populated once `done` |
+| `artifacts`        | array of string | **exhaustive** — every artifact the phase produced, not a curated subset; paths relative to the session (run) dir, e.g. `"artifacts/research/research.md"`; `[]` while running, populated once `done` |
+
+Attribution for the exhaustive `artifacts` rule follows the §1 phase → dir
+mapping: a phase's list is exactly the files of its artifacts dir, so files
+that land in that dir later (`answers.md` at the checkpoint, the `plans/`
+v2 revisions written during `plan_finalize`'s revise stage) are appended to
+the *owning* phase's list — `plan_draft` in both cases — at the conductor
+rewrite that records them.
 
 `paused` (phase status) is reached only in Checkpointed mode, at the two
 checkpoints beyond plan-draft's open-questions gate (see `checkpoints`
@@ -301,6 +323,62 @@ Free-form map of paths the control plane surfaces outside the per-phase
 completes (see spec: "ALSO copy the report to
 `<session_dir>/artifacts/report/launch-report.html` and set `links.report`
 in `state.json`").
+
+### Additional state examples
+
+The main example above shows `done`, `running`, and `pending` phases and
+`pushed`/`building` units. The remaining enum values, concretely — first
+two `phases.<name>` entries (a `failed` workflow-backed phase, whose
+failure detail lives in the corresponding `phase_failed` event in
+`events.jsonl` rather than in `state.json`; and a `paused` phase, a
+Checkpointed-mode run waiting on human approval of confirmed findings
+before fixing):
+
+```json
+{
+  "review_plan": {
+    "status": "failed",
+    "started_at": "2026-07-08T19:02:31Z",
+    "ended_at": "2026-07-08T19:05:10Z",
+    "workflow_run_id": "wf_revplan_c001",
+    "artifacts": []
+  },
+  "fix": {
+    "status": "paused",
+    "started_at": "2026-07-08T20:24:10Z"
+  }
+}
+```
+
+And two `units[]` entries (one mid codex adversarial review, one whose
+build agent died after retries — `failed` units keep whatever fields they
+had earned when they failed, here a red check gate):
+
+```json
+[
+  {
+    "id": "u3",
+    "repo": "paxel",
+    "dir": "/Users/ben/Work/yc/paxel",
+    "branch": "ben/csv-export-03-worker",
+    "base": "main",
+    "deps": ["u1"],
+    "status": "codex-review",
+    "started_at": "2026-07-08T19:52:00Z"
+  },
+  {
+    "id": "u4",
+    "repo": "code",
+    "dir": "/Users/ben/Work/yc/code",
+    "branch": "ben/csv-export-04-emails",
+    "base": "ben/csv-export-02-ui",
+    "deps": ["u2"],
+    "status": "failed",
+    "started_at": "2026-07-08T20:10:00Z",
+    "checks": "red"
+  }
+]
+```
 
 ## 3. Atomic write rule (conductor-only)
 
@@ -391,7 +469,7 @@ shows every canonical type at least once):
 {"ts":"2026-07-08T20:05:20Z","type":"phase_done","by":"conductor","detail":"build: 2/2 units pushed"}
 {"ts":"2026-07-08T20:05:21Z","type":"phase_started","by":"conductor","detail":"review_code"}
 {"ts":"2026-07-08T20:05:21Z","type":"phase_started","by":"conductor","detail":"verify"}
-{"ts":"2026-07-08T20:22:09Z","type":"finding_confirmed","by":"agent:review-code:refuter-2","detail":"nil deref in ExportsController#create when account has no billing_profile"}
+{"ts":"2026-07-08T20:22:09Z","type":"finding_confirmed","by":"agent:review-code:refuter-2","unit":"u1","detail":"nil deref in ExportsController#create when account has no billing_profile"}
 {"ts":"2026-07-08T20:24:00Z","type":"verify_state","by":"agent:verify:composer","detail":"3/3 scenarios PASS, 0 new console errors"}
 {"ts":"2026-07-08T20:24:00Z","type":"phase_done","by":"conductor","detail":"verify"}
 {"ts":"2026-07-08T20:24:05Z","type":"phase_done","by":"conductor","detail":"review_code: 1 confirmed finding"}
@@ -462,10 +540,14 @@ _Last updated: 2026-07-08T19:42:11Z by conductor_
 
 Sections are fixed: run header (feature/mode/phase/started), phase table
 (phase/status/elapsed), unit table (unit/repo/branch/state/MR), "in flight
-now", "next", and a last-updated stamp. Elapsed is computed from
-`started_at`/`ended_at` (or "now" for `running`); this is a *render*, not a
-second source of truth — if `STATUS.md` and `state.json` ever disagree,
-`state.json` wins and `STATUS.md` is simply stale until the next rewrite.
+now", "next", and a last-updated stamp. The `**Phase:**` header line renders
+from `state.json`'s advisory `phase` field; during a concurrent window (see
+§2) it may show both running phases, e.g. `**Phase:** review_code ∥ verify`
+— the phase table below it is the authoritative per-phase view either way.
+Elapsed is computed from `started_at`/`ended_at` (or "now" for `running`);
+this is a *render*, not a second source of truth — if `STATUS.md` and
+`state.json` ever disagree, `state.json` wins and `STATUS.md` is simply
+stale until the next rewrite.
 
 ## 6. Run ID and store root
 
