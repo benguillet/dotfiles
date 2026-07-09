@@ -29,14 +29,19 @@ export const meta = {
   ],
 }
 
-if (args.mode !== 'plan' && args.mode !== 'code') return { status: 'bad_input', error: 'mode' }
-const mode = args.mode
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
+if (a.mode !== 'plan' && a.mode !== 'code') return { status: 'bad_input', error: 'mode' }
+const mode = a.mode
 const isCode = mode === 'code'
 
-const targets = Array.isArray(args.targets) ? args.targets : []
+const targets = Array.isArray(a.targets) ? a.targets : []
 if (!targets.length) return { status: 'bad_input', error: 'targets' }
 
-const crosschecks = Array.isArray(args.crosschecks) ? args.crosschecks : []
+const crosschecks = Array.isArray(a.crosschecks) ? a.crosschecks : []
 if (crosschecks.length && !isCode) return { status: 'bad_input', error: 'crosschecks (code mode only)' }
 
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
@@ -81,9 +86,9 @@ const EVENT_LINE = (sessionDir) =>
 const READ_ONLY = (sessionDir) => `You are READ-ONLY with respect to every repository: do not create, edit, or delete any repo files, and make no git state changes. You MAY write files only inside ${sessionDir}.`
 
 let sessionDir = null
-if (args.session_dir != null && args.session_dir !== '') {
+if (a.session_dir != null && a.session_dir !== '') {
   try {
-    sessionDir = safeAbsPath(args.session_dir, 'session_dir')
+    sessionDir = safeAbsPath(a.session_dir, 'session_dir')
   } catch (e) {
     return { status: 'bad_input', error: 'session_dir' }
   }
@@ -152,17 +157,20 @@ const VERDICT_SCHEMA = {
 const WRITE_ACK = OBJ({ wrote: BOOL, path: STR })
 
 let axes = isCode ? CODE_AXES : PLAN_AXES
-if (args.lenses?.length) {
-  const known = new Set(axes.map(a => a.key))
-  const unknown = args.lenses.filter(l => !known.has(l))
+if (a.lenses?.length) {
+  const known = new Set(axes.map(ax => ax.key))
+  const unknown = a.lenses.filter(l => !known.has(l))
   if (unknown.length) return { status: 'bad_input', error: `unknown lens: ${unknown.join(', ')}` }
-  axes = axes.filter(a => args.lenses.includes(a.key))
+  // Renamed the filter callback param to `ax` (was `a`): the coerced args
+  // object is also named `a` in this scope, and `a => a.lenses...` would
+  // have shadowed it with the axis being filtered, breaking the lookup.
+  axes = axes.filter(ax => a.lenses.includes(ax.key))
 }
 
-const focusAreas = Array.isArray(args.focus) ? args.focus.filter(Boolean) : []
-const refuterCount = args.refuters || 2
-const settled = (args.settled || []).map(s => `- ${s}`).join('\n')
-const contextFiles = (args.context_files || []).join(', ')
+const focusAreas = Array.isArray(a.focus) ? a.focus.filter(Boolean) : []
+const refuterCount = a.refuters || 2
+const settled = (a.settled || []).map(s => `- ${s}`).join('\n')
+const contextFiles = (a.context_files || []).join(', ')
 
 const targetCatalog = targets.map(t => isCode
   ? `- ${t.key}: \`git -C ${t.dir} diff ${t.base}...${t.head}\` (${t.context || ''})`

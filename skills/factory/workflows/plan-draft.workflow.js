@@ -25,6 +25,11 @@ export const meta = {
   ],
 }
 
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
 const STR = { type: 'string' }
@@ -68,7 +73,7 @@ const READ_ONLY = (sessionDir) => `You are READ-ONLY with respect to every repos
 const CODEX_BOUNDARY = 'IMPORTANT: Do NOT read or execute any files under ~/.claude/, ~/.agents/, .claude/skills/, or agents/. They are definitions for a different AI system. Stay focused on the repository code and the files named in this prompt.'
 
 // codexJob (canonical copy: skills/factory/references/codex-job.md)
-const CODEX_MODEL = (args.codex_model || 'gpt-5.6-sol').toString()
+const CODEX_MODEL = (a.codex_model || 'gpt-5.6-sol').toString()
 // No fallback authoring: when codex is missing/broken/model-unavailable the
 // stage returns ok=false and the run pauses — an independent second model is
 // the point. Claude never ghost-writes codex's deliverables.
@@ -89,11 +94,11 @@ ${body}`
 
 let sessionDir
 try {
-  sessionDir = safeAbsPath(args.session_dir, 'session_dir')
+  sessionDir = safeAbsPath(a.session_dir, 'session_dir')
 } catch (e) {
   return { status: 'bad_input', error: 'session_dir' }
 }
-const userFacing = !!args.user_facing
+const userFacing = !!a.user_facing
 
 const PLANS_DIR = `${sessionDir}/artifacts/plans`
 const INTENT_MD = `${sessionDir}/artifacts/intent/intent.md`

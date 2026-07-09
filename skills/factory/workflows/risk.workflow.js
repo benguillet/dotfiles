@@ -21,6 +21,11 @@ export const meta = {
   ],
 }
 
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
 const STR = { type: 'string' }
@@ -64,7 +69,7 @@ const READ_ONLY = (sessionDir) => `You are READ-ONLY with respect to every repos
 
 let sessionDir
 try {
-  sessionDir = safeAbsPath(args.session_dir, 'session_dir')
+  sessionDir = safeAbsPath(a.session_dir, 'session_dir')
 } catch (e) {
   return { status: 'bad_input', error: 'session_dir' }
 }

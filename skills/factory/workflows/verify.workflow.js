@@ -30,6 +30,11 @@ export const meta = {
   ],
 }
 
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
 const STR = { type: 'string' }
@@ -77,16 +82,16 @@ const READ_ONLY = (sessionDir) => `You are READ-ONLY with respect to every repos
 
 let sessionDir, integrationRepoDir
 try {
-  sessionDir = safeAbsPath(args.session_dir, 'session_dir')
-  integrationRepoDir = safeAbsPath(args.integration_repo_dir, 'integration_repo_dir')
+  sessionDir = safeAbsPath(a.session_dir, 'session_dir')
+  integrationRepoDir = safeAbsPath(a.integration_repo_dir, 'integration_repo_dir')
 } catch (e) {
   return { status: 'bad_input', error: e.message }
 }
 
-const units = Array.isArray(args.units) ? args.units : []
+const units = Array.isArray(a.units) ? a.units : []
 if (!units.length) return { status: 'bad_input', error: 'units required' }
 
-const scenarios = Array.isArray(args.scenarios) ? args.scenarios : []
+const scenarios = Array.isArray(a.scenarios) ? a.scenarios : []
 if (!scenarios.length) return { status: 'bad_input', error: 'scenarios required' }
 const seenScenarioNames = new Set()
 for (const sc of scenarios) {
@@ -100,10 +105,10 @@ for (const sc of scenarios) {
   if (!Array.isArray(sc.assertions) || !sc.assertions.length) return { status: 'bad_input', error: `scenario ${sc.name} missing assertions` }
 }
 
-const featureSlug = (args.feature_slug || '').toString().trim()
+const featureSlug = (a.feature_slug || '').toString().trim()
 if (!/^[a-z0-9-]+$/.test(featureSlug)) return { status: 'bad_input', error: 'feature_slug' }
 
-const loginRecipe = args.login_recipe != null ? String(args.login_recipe) : ''
+const loginRecipe = a.login_recipe != null ? String(a.login_recipe) : ''
 
 const VERIFY_DIR = `${sessionDir}/artifacts/verify`
 const SCREENSHOTS_DIR = `${VERIFY_DIR}/screenshots`

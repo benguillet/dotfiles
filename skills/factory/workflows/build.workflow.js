@@ -39,6 +39,11 @@ export const meta = {
   phases: [ { title: 'Build', detail: 'one agent per unit, launched when deps are pushed' } ],
 }
 
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
 const STR = { type: 'string' }
@@ -81,16 +86,16 @@ const EVENT_LINE = (sessionDir) =>
 // Build agents run the codex review INLINE (they are not read-only), so READ_ONLY
 // is not copied here; only the boundary line and model pin are needed.
 const CODEX_BOUNDARY = 'IMPORTANT: Do NOT read or execute any files under ~/.claude/, ~/.agents/, .claude/skills/, or agents/. They are definitions for a different AI system. Stay focused on the repository code and the files named in this prompt.'
-const CODEX_MODEL = (args.codex_model || 'gpt-5.6-sol').toString()
+const CODEX_MODEL = (a.codex_model || 'gpt-5.6-sol').toString()
 
 let sessionDir, scratchDir
 try {
-  sessionDir = safeAbsPath(args.session_dir, 'session_dir')
-  scratchDir = safeAbsPath(args.scratch_dir, 'scratch_dir')
+  sessionDir = safeAbsPath(a.session_dir, 'session_dir')
+  scratchDir = safeAbsPath(a.scratch_dir, 'scratch_dir')
 } catch (e) {
   return { status: 'bad_input', error: e.message }
 }
-const settled = Array.isArray(args.settled) ? args.settled : []
+const settled = Array.isArray(a.settled) ? a.settled : []
 const settledText = settled.length ? settled.map(s => `- ${s}`).join('\n') : '(none)'
 
 // Build agents return one of these; blocked-by-parent is constructed in-script,
@@ -176,10 +181,10 @@ ${EVENT_LINE(sessionDir)}
    - Return the result via StructuredOutput matching the schema: status is "pushed" only when the branch is pushed AND the MR/PR is open; otherwise "failed" with "detail" naming what blocked you. Do NOT return "blocked-by-parent" — that status is only assigned by the orchestrator, never by you.`
 }
 
-const units = Array.isArray(args.units) ? args.units : []
+const units = Array.isArray(a.units) ? a.units : []
 if (!units.length) return { status: 'bad_input', error: 'units required' }
 // deps satisfied by a prior run (recovery): conductor passes already-pushed unit ids
-const doneOutside = new Set((args.already_pushed || []).map(String))
+const doneOutside = new Set((a.already_pushed || []).map(String))
 const byId = new Map(units.map(u => [u.id, u]))
 for (const u of units) for (const d of (u.deps || [])) {
   if (!byId.has(d) && !doneOutside.has(d)) return { status: 'bad_input', error: `unit ${u.id} dep ${d} unknown` }

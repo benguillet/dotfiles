@@ -44,6 +44,11 @@ export const meta = {
   ],
 }
 
+// The harness may deliver args as a JSON-encoded string — coerce before reading.
+let a = args
+if (typeof a === 'string') { try { a = JSON.parse(a) } catch (e) { a = {} } }
+a = a || {}
+
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
 const STR = { type: 'string' }
@@ -85,23 +90,23 @@ const EVENT_LINE = (sessionDir) =>
 // ─────────────────────────── Args ───────────────────────────
 let sessionDir, integrationRepoDir
 try {
-  sessionDir = safeAbsPath(args.session_dir, 'session_dir')
-  integrationRepoDir = safeAbsPath(args.integration_repo_dir, 'integration_repo_dir')
+  sessionDir = safeAbsPath(a.session_dir, 'session_dir')
+  integrationRepoDir = safeAbsPath(a.integration_repo_dir, 'integration_repo_dir')
 } catch (e) {
   return { status: 'bad_input', error: e.message }
 }
 
-const featureSlug = (args.feature_slug || '').toString().trim()
+const featureSlug = (a.feature_slug || '').toString().trim()
 if (!/^[a-z0-9-]+$/.test(featureSlug)) return { status: 'bad_input', error: 'feature_slug' }
 
-if (!Array.isArray(args.findings)) return { status: 'bad_input', error: 'findings required' }
-if (!args.findings.length) return { status: 'done', fixes: [], integration_rebuilt: false, seeded: false, note: 'no findings' }
-const findings = args.findings
+if (!Array.isArray(a.findings)) return { status: 'bad_input', error: 'findings required' }
+if (!a.findings.length) return { status: 'done', fixes: [], integration_rebuilt: false, seeded: false, note: 'no findings' }
+const findings = a.findings
 
-const units = Array.isArray(args.units) ? args.units : []
+const units = Array.isArray(a.units) ? a.units : []
 if (!units.length) return { status: 'bad_input', error: 'units required' }
 
-const seedCmd = args.seed_state1_cmd != null ? String(args.seed_state1_cmd) : ''
+const seedCmd = a.seed_state1_cmd != null ? String(a.seed_state1_cmd) : ''
 
 const FIX_DIR = `${sessionDir}/artifacts/fix`
 const FIXES_JSON = `${FIX_DIR}/fixes.json`
