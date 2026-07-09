@@ -110,6 +110,22 @@ else
 fi
 parts+=("${DIM}cost: ${RESET}$(c $COST_TAN "$cost_display")")
 
+# auth isn't in the statusline stdin JSON; infer like Claude Code does — env API
+# key (inherited from the parent process) unless rejected, else claude.ai login
+auth_display=""
+if [ -n "$ANTHROPIC_API_KEY" ]; then
+  key_prefix="${ANTHROPIC_API_KEY:0:20}"
+  rejected=$(jq -r --arg p "$key_prefix" '.customApiKeyResponses.rejected // [] | index($p) != null' "$HOME/.claude.json" 2>/dev/null)
+  if [ "$rejected" != "true" ]; then
+    auth_display=$(c $ORANGE "key:…${ANTHROPIC_API_KEY: -4}")
+  fi
+fi
+if [ -z "$auth_display" ]; then
+  email=$(jq -r '.oauthAccount.emailAddress // empty' "$HOME/.claude.json" 2>/dev/null)
+  [ -n "$email" ] && auth_display="${DIM}${email}${RESET}"
+fi
+[ -n "$auth_display" ] && parts+=("$auth_display")
+
 output="${parts[0]}"
 for part in "${parts[@]:1}"; do
   output="${output}${DIM} | ${RESET}${part}"
