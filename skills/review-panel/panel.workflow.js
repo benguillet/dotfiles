@@ -126,7 +126,7 @@ const FINDINGS_SCHEMA = {
       items: {
         type: 'object',
         properties: {
-          repo: { type: 'string' },
+          repo: { type: 'string', description: 'short repo name — the last path segment of the diff dir, e.g. "code", "paxel"' },
           file: { type: 'string' },
           line: { type: 'integer' },
           title: { type: 'string' },
