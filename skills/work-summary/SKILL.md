@@ -19,8 +19,11 @@ minutes.
 ## 1. Gather — from artifacts first, then verify against reality
 
 Mine in this order (cheapest, most-reliable first):
-1. Session context + `.context/factory-status.md` (if a factory/scoreboard run
-   produced one) + task list — what was built and decided.
+1. Factory session store first: `~/.factory/runs/<run-id>/state.json` +
+   `events.jsonl` + `artifacts/**` (plan, dag, risk.md, findings.json,
+   unit-*.json incl. `overrules`, verification.md, screenshots) — this is the
+   primary source for factory runs; `.context/factory-status.md` only for
+   legacy runs.
 2. `git` truth: `git fetch origin`, then for every feature branch:
    `git diff --stat origin/<base>...origin/<branch>` — the diffs define what
    actually shipped (pushed code only; local-only work gets flagged as such).
@@ -36,8 +39,11 @@ when CI is red is worse than no summary.
 
 ## 2. Sections (the contract)
 
-**TL;DR** — 3–4 sentences: what the feature does, how it's built, its quality
-state (tests/verification/review), and the one thing the reader must do next.
+**ELI5** — max 5 sentences, plain language, no jargon: what was built and why,
+as if to a smart friend outside engineering.
+
+**How it works** — 1–3 Mermaid diagrams: who calls what in what order, data
+flow, state machine if any.
 
 **MRs & PRs + merge order** — one table: number/link, one-line what, where,
 target branch. Then a NUMBERED merge order that is *safe*: stacked MRs
@@ -62,6 +68,11 @@ knowing: known races and their backstops, security posture calls (who accepted
 them), flaky-area proximity, deploy-order hazards. Pull from adversarial-review
 survivors and decision logs; 3–7 bullets max.
 
+**Possibly-unneeded work** — honest list of guards/complexity built for very
+edge-casey scenarios, sourced from overruled per-unit codex findings,
+overbuild-tagged panel survivors, and risk notes; each entry names what it
+guards, why to keep it, and when it could be deleted.
+
 **Test / seed / reset scripts** — exact paths + exact invocations for anything
 that flips local state (e.g. `yc ssh internal development -c 'bin/rails runner
 /mnt/data/workspace/code/tmp/<seed>.rb'`), what each does, and the reset
@@ -82,6 +93,10 @@ with NO browser evidence, say so loudly and offer to run a verification pass
 (claude-ui-test agent / the factory verification phase) before finishing the
 report — don't silently ship an unverified-UI summary.
 
+**Where the time went** — a phase-by-phase timing table (from `state.json`
+phase timings and `events.jsonl` unit timings) naming the slowest item per
+phase.
+
 **Test it manually** — clickable local URLs built from `yc stacks url` (never
 hardcoded hosts) with REAL record ids/logins (per the user's global rules),
 plus the state-flip commands inline; prod URLs where the change is already
@@ -97,6 +112,11 @@ live. One box, copy-paste ready.
    manual step. Do NOT paste the whole report into chat.
 4. If a factory scoreboard (`.context/factory-status.md`) exists, update it to
    point at the report.
+5. For factory runs, ALSO copy the report to
+   `<session_dir>/artifacts/report/launch-report.html` and set `links.report`
+   in `state.json` — tell the conductor; only the conductor rewrites
+   `state.json`. Screenshots are referenced with relative paths so the copy
+   stays portable; when copying, also copy the screenshots dir.
 
 ## Notes
 

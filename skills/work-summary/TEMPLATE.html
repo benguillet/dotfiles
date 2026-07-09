@@ -36,13 +36,20 @@
 <h1>{{FEATURE}}</h1>
 <p class="sub">Work summary — {{DATE}}{{SPEC_LINKS: · <a href>spec</a> · <a href>mockups</a>}}</p>
 
-<p>{{TLDR: 3–4 sentences — what it does, how it's built, quality state (tests /
-verification / review), and the one thing the reader must do next.}}</p>
+<p>{{ELI5: max 5 sentences, plain language, no jargon — what was built and why,
+as if to a smart friend outside engineering.}}</p>
+
+<h2>How it works</h2>
+<pre class="mermaid">
+<!-- 1–3 diagrams total across the pre.mermaid blocks in this section: who calls
+     what in what order, data flow, state machine if any -->
+</pre>
 
 <h2>MRs &amp; PRs ({{N}})</h2>
 <table>
-  <tr><th>#</th><th>Change</th><th>Where</th><th>Targets</th><th>CI</th></tr>
-  <!-- one row per unit; Targets shows the stack parent; CI = ✅/❌ verified at write time -->
+  <tr><th>#</th><th>Change</th><th>Where</th><th>Targets</th><th>CI</th><th>Comments</th></tr>
+  <!-- one row per unit; Targets shows the stack parent; CI = ✅/❌ verified at write time;
+       Comments = unresolved-thread count, fetched live at write time -->
 </table>
 
 <h2>Merge order</h2>
@@ -71,6 +78,13 @@ verification / review), and the one thing the reader must do next.}}</p>
        posture calls (and who accepted them), deploy-order hazards. -->
 </ul>
 
+<h2>Possibly-unneeded work</h2>
+<ul>
+  <!-- guards/complexity built for very edge-casey scenarios; sources: overruled
+       per-unit codex findings, overbuild-tagged panel survivors, risk notes.
+       Each: what it guards / keep because / could delete if. If none: one line. -->
+</ul>
+
 <h2>Test / seed / reset scripts</h2>
 <div class="box">
   <!-- exact path + exact invocation + one-line what-it-does; the reset script
@@ -91,11 +105,23 @@ verification / review), and the one thing the reader must do next.}}</p>
   <figure><img src="images/{{...}}.png" alt=""><figcaption>{{caption}}</figcaption></figure>
 </div>
 
+<h2>Where the time went</h2>
+<table>
+  <tr><th>Phase</th><th>Elapsed</th><th>Slowest item</th></tr>
+  <!-- from state.json phase timings + events.jsonl unit timings -->
+</table>
+
 <h2>Test it manually</h2>
 <div class="box">
   <!-- clickable local URLs (from `yc stacks url`, real record ids/logins),
        state-flip commands inline, prod URLs where already live. -->
 </div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+</script>
+<!-- offline fallback: the raw mermaid source in the <pre> stays readable -->
 
 </body>
 </html>
