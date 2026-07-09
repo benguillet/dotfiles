@@ -14,10 +14,6 @@
 # Remove older command from the history if a duplicate is to be added.
 setopt HIST_IGNORE_ALL_DUPS
 
-# Allow `>` to overwrite existing files without requiring `>|`.
-# This speeds up LLMs, which otherwise get tripped up by the clobber error.
-unsetopt noclobber
-
 #
 # Input/output
 #
@@ -118,6 +114,11 @@ source ${ZIM_HOME}/init.zsh
 # ------------------------------
 # Post-init module configuration
 # ------------------------------
+
+# Allow `>` to overwrite existing files without requiring `>|`.
+# This speeds up LLMs, which otherwise get tripped up by the clobber error.
+# Must come after Zim init: the environment module sets NO_CLOBBER.
+unsetopt noclobber
 
 #
 # zsh-history-substring-search
