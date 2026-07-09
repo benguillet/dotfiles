@@ -144,19 +144,22 @@ const charters = {
 const SCOUT_SCHEMA = OBJ({ findings: STR })
 const SCOUT_READ_ONLY = 'You are READ-ONLY with respect to the repository: do not create, edit, or delete any repo files, and make no git state changes. Do not write any files.'
 
-const reports = (await parallel(scouts.map((s, i) => () =>
+const results = await parallel(scouts.map((s) => () =>
   retryAgent(`Research scout (${s.kind}) for a factory build task. ${charters[s.kind] || s.focus} ${SCOUT_READ_ONLY}
 ${contextNote}
 Routed focus: ${s.focus}
 Return ≤500 words of load-bearing findings with file:line references — facts a planner or implementer would otherwise have to rediscover. No filler.`,
     { label: `scout:${s.kind}`, phase: 'Scout', agentType: s.kind === 'external' ? undefined : 'Explore', schema: SCOUT_SCHEMA }),
-))).filter(Boolean)
+))
+// Zip scouts with results BEFORE filtering dead ones: filtering first would
+// shift surviving reports onto the wrong scouts' kind labels.
+const zipped = scouts.map((s, i) => ({ s, r: results[i] })).filter(x => x.r)
 
-if (!reports.length) {
+if (!zipped.length) {
   log('every scout died after retries — nothing to synthesize')
   return { status: 'failed', stage: 'scout' }
 }
-log(`${reports.length}/${scouts.length} scout report(s) returned`)
+log(`${zipped.length}/${scouts.length} scout report(s) returned`)
 
 // ─────────────────────────── Synthesize ───────────────────────────
 // Barrier is intentional: synthesis needs every scout's findings at once.
@@ -167,19 +170,19 @@ const mergeNote = focus
   : ''
 
 const synth = await retryAgent(`Synthesize one research dossier from the scout reports below. ${READ_ONLY(sessionDir)}
-${reports.map((r, i) => fence(`SCOUT ${i + 1} (${scouts[i]?.kind})`, r.findings)).join('\n')}
+${zipped.map((x, i) => fence(`SCOUT ${i + 1} (${x.s.kind})`, x.r.findings)).join('\n')}
 ${contextNote}${mergeNote}
 1. Ensure the directory exists: run \`mkdir -p ${RESEARCH_DIR}\`.
 2. Write ${RESEARCH_MD}: TL;DR (5 bullets) / Key files map (path -> why it matters) / Conventions to follow / Risks & gotchas / Open unknowns / How to test here${userFacing ? ' / UI vocabulary' : ''}. ≤1200 words, keep every file:line reference that survives.
-3. ${EVENT_LINE(sessionDir)}
+3. Append ONE events.jsonl line of type "artifact_written" with detail "research.md (${zipped.length} scouts)". ${EVENT_LINE(sessionDir)}
 Return a ≤160-word summary of the dossier.`,
   { label: 'synthesize', phase: 'Synthesize', schema: OBJ({ summary: STR }) })
 
 if (!synth) return { status: 'failed', stage: 'synthesize' }
-log(`Research dossier written (${reports.length} scouts) -> ${RESEARCH_MD}`)
+log(`Research dossier written (${zipped.length} scouts) -> ${RESEARCH_MD}`)
 
 return {
   status: 'done',
-  scouts_run: scouts.map(s => s.kind),
+  scouts_run: zipped.map(x => x.s.kind),
   summary: synth.summary,
 }

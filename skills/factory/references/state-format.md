@@ -423,7 +423,10 @@ updating this file first, since the control plane matches on these
 strings): `run_created`, `phase_started`, `phase_done`, `phase_failed`,
 `checkpoint_asked`, `checkpoint_answered`, `unit_started`,
 `unit_codex_review`, `unit_pushed`, `mr_created`, `finding_confirmed`,
-`fix_applied`, `verify_state`, `report_written`, `recovery_performed`.
+`fix_applied`, `verify_state`, `report_written`, `artifact_written`,
+`recovery_performed`. `artifact_written` is the generic agent-written
+artifact event — a workflow agent finished writing a phase deliverable;
+detail names the artifact path.
 
 By convention (not mechanically enforced — workflow scripts have no
 filesystem access, so any event emitted *during* a workflow's run is
@@ -434,7 +437,7 @@ events (`run_created`, `phase_started`, `phase_done`, `phase_failed`,
 `recovery_performed`); **agents inside workflows** emit the unit/finding-
 level events as they do the work (`unit_started`, `unit_codex_review`,
 `unit_pushed`, `mr_created`, `finding_confirmed`, `fix_applied`,
-`verify_state`).
+`verify_state`, `artifact_written`).
 
 Full worked example — one run's log from kickoff through report, in order
 (a real mid-run log would simply stop wherever the run currently is; this
