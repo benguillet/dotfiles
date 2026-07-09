@@ -112,6 +112,7 @@ const F = {
   answers: `${PLANS_DIR}/answers.md`,
   planMd: `${PLAN_DIR}/plan.md`,
   dagJson: `${PLAN_DIR}/dag.json`,
+  selectionJson: `${PLAN_DIR}/selection.json`,
 }
 
 const UNIT_LITE = OBJ({ id: STR, repo: STR, dir: STR, branch: STR, base: STR, deps: ARR(STR) })
@@ -192,7 +193,7 @@ Output ONLY the final plan — clean, standalone-executable, with NO meta-commen
   })}
 
 Then, wrapping the codex call above:
-- If codex SUCCEEDED (it wrote ${F.planMd}): the file's line 1 is \`<!-- author: codex -->\` and the next content line is the \`Chosen: …\` line. Edit ${F.planMd} to REMOVE only that \`Chosen: …\` line, keeping the \`<!-- author: codex -->\` comment and the rest of the plan exactly as written. Lift the removed line into your return: set chosen to whichever of claude|codex|merged it names, and rationale to the text after the em-dash. Append ONE events.jsonl line of type "artifact_written" with detail "artifacts/plan/plan.md". ${EVENT_LINE(sessionDir)} Return ok=true, error="", chosen, rationale (return chosen/rationale INSTEAD of the summary the step above mentioned).
+- If codex SUCCEEDED (it wrote ${F.planMd}): the file's line 1 is \`<!-- author: codex -->\` and the next content line is the \`Chosen: …\` line. Edit ${F.planMd} to REMOVE only that \`Chosen: …\` line, keeping the \`<!-- author: codex -->\` comment and the rest of the plan exactly as written. Lift the removed line into your return: set chosen to whichever of claude|codex|merged it names, and rationale to the text after the em-dash. Then ALSO write ${F.selectionJson} containing exactly \`{"chosen": "<claude|codex|merged>", "rationale": "<the one-line rationale>"}\` (valid JSON, the same values you return) so the selection survives a resume. Append ONE events.jsonl line of type "artifact_written" with detail "artifacts/plan/plan.md" and ONE with detail "artifacts/plan/selection.json". ${EVENT_LINE(sessionDir)} Return ok=true, error="", chosen, rationale (return chosen/rationale INSTEAD of the summary the step above mentioned).
 - If codex FAILED (missing/unauthenticated/model-unavailable/failed twice): do NOT write ${F.planMd} and do NOT author the plan yourself. Return ok=false, chosen="none", rationale="", and error = the ONE actionable line as instructed above.`,
     { label: 'select', phase: 'Select', effort: 'high', schema: S.select })
   if (!sel) return { status: 'failed', stage: 'select', detail: 'select agent died after retries' }
@@ -200,6 +201,16 @@ Then, wrapping the codex call above:
   chosen = sel.chosen || 'unknown'
   rationale = sel.rationale || ''
   log(`Plan selected: ${chosen} — ${rationale.slice(0, 140)}`)
+} else if (havePlan.has('selection.json')) {
+  // Resume: Select already ran and recorded its choice — recover chosen/rationale
+  // from selection.json (the Chosen line was stripped from plan.md itself).
+  const rec = await retryAgent(`Read the recorded plan selection at ${F.selectionJson}. ${READ_ONLY(sessionDir)}
+Return chosen (claude|codex|merged) and rationale exactly as stored in that JSON. Do NOT modify the file.`,
+    { label: 'select-readback', phase: 'Select', effort: 'low', schema: OBJ({ chosen: STR, rationale: STR }) })
+  if (rec) {
+    chosen = rec.chosen || 'unknown'
+    rationale = rec.rationale || ''
+  }
 }
 
 // ─────────────────────────── Extract ───────────────────────────

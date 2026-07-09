@@ -44,6 +44,7 @@ rule and why the store lives outside any repo):
     │   └── plan.codex.v2.md     # post-critique revision
     ├── plan/
     │   ├── plan.md               # final selected plan (first line: `Chosen: …`)
+    │   ├── selection.json        # {chosen, rationale} — lets a resume recover the selection after the Chosen line is stripped
     │   └── dag.json               # units/crosschecks/settled, extracted from plan.md
     ├── risk/
     │   └── risk.md
