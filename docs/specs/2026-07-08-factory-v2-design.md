@@ -97,8 +97,11 @@ span repos/worktrees and a control plane wants one directory to scan.
 └── artifacts/
     ├── intent/intent.md
     ├── research/research.md
-    ├── plans/plan.claude.md, plan.codex.md, critique-*.md, plan.claude.v2.md, plan.codex.v2.md
-    ├── plan/plan.md + dag.json
+    ├── plans/plan.claude.md, plan.codex.md          # v1 drafts, one per model
+    │        critique-of-claude.md, critique-of-codex.md, critique-ux.md
+    │        answers.md                              # human answers to open questions
+    │        plan.claude.v2.md, plan.codex.v2.md     # post-critique revisions
+    ├── plan/plan.md + dag.json                      # final selected plan (Chosen: line = rationale)
     ├── risk/risk.md
     ├── review-plan/findings.json
     ├── build/unit-<id>.json          # MR URL, checks, codex-review outcome, overrules
@@ -303,12 +306,17 @@ call, logged to `state.json`.
   `## Open questions for the human` (only requester-owned forks, each with a
   suggested default).
 - Returns: plan/critique summaries + consolidated open questions.
+- **Every authored artifact is durable**: both v1 drafts and all critiques are
+  written to `artifacts/plans/` by the authoring agents themselves (first line
+  `<!-- author: claude|codex -->`) — nothing lives only in a workflow return
+  value.
 
 ### Human checkpoint
 
 Conductor presents the open questions (AskUserQuestion, batched, with the
-suggested defaults). Answers are appended to the session store and fed into
-plan-finalize. No questions → skip.
+suggested defaults). Answers are written verbatim to
+`artifacts/plans/answers.md` (dated) and fed into plan-finalize. No questions
+→ skip.
 
 ### Plan-finalize workflow
 
@@ -317,6 +325,11 @@ plan-finalize. No questions → skip.
   critic is wrong).
 - **Codex selects** the stronger plan (or merges) → `plan.md` (first line
   records `Chosen: claude|codex|merged — rationale`).
+- The revised plans (`plan.claude.v2.md`, `plan.codex.v2.md`) are persisted
+  alongside the drafts, so the full lineage — draft → critique → revision →
+  selection — is reconstructible from `artifacts/plans/` alone (and the plan
+  amend step later edits `plan.md` in place, with each amendment recorded, so
+  the pre-amend selected plan is recoverable from the v2 files + Chosen line).
 - A final extraction step emits the machine-readable `dag.json` from the
   chosen plan's shipping-units section:
 
