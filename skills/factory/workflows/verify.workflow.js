@@ -86,8 +86,14 @@ if (!units.length) return { status: 'bad_input', error: 'units required' }
 
 const scenarios = Array.isArray(args.scenarios) ? args.scenarios : []
 if (!scenarios.length) return { status: 'bad_input', error: 'scenarios required' }
+const seenScenarioNames = new Set()
 for (const sc of scenarios) {
   if (!sc || typeof sc.name !== 'string' || !sc.name.trim()) return { status: 'bad_input', error: 'scenario missing name' }
+  // scenario.name is interpolated into the screenshot file-path instruction
+  // (${SCREENSHOTS_DIR}/${sc.name}-01.png) — same treatment and rationale as feature_slug.
+  if (!/^[a-z0-9-]+$/.test(sc.name)) return { status: 'bad_input', error: `scenario.name: ${sc.name}` }
+  if (seenScenarioNames.has(sc.name)) return { status: 'bad_input', error: `duplicate scenario.name: ${sc.name}` }
+  seenScenarioNames.add(sc.name)
   if (!Array.isArray(sc.urls) || !sc.urls.length) return { status: 'bad_input', error: `scenario ${sc.name} missing urls` }
   if (!Array.isArray(sc.assertions) || !sc.assertions.length) return { status: 'bad_input', error: `scenario ${sc.name} missing assertions` }
 }
