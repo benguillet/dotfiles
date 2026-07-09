@@ -12,6 +12,8 @@
 //     // plan mode: { key, path, context? }             (files to read)
 //   ],
 //   focus: ['path or area'],      // optional; each gets ONE extra red-team finder
+//   crosschecks: [{key, prompt}], // optional, code mode only; extra cross-diff
+//                                 // finders — prompt must name its own diffs
 //   lenses: ['correctness'],      // optional; run ONLY these axes (else all)
 //   settled: ['decision …'],      // optional do-not-relitigate list
 //   context_files: ['/abs.md'],   // optional read-first files (intent/research/plan)
@@ -33,6 +35,9 @@ const isCode = mode === 'code'
 
 const targets = Array.isArray(args.targets) ? args.targets : []
 if (!targets.length) return { status: 'bad_input', error: 'targets' }
+
+const crosschecks = Array.isArray(args.crosschecks) ? args.crosschecks : []
+if (crosschecks.length && !isCode) return { status: 'bad_input', error: 'crosschecks (code mode only)' }
 
 // ── shared prelude (canonical copy: docs/plans/2026-07-08-factory-v2.md) ──
 const OBJ = (props, req) => ({ type: 'object', properties: props, required: req || Object.keys(props), additionalProperties: false })
@@ -205,6 +210,9 @@ for (const area of focusAreas) {
     key: `focus:${area}`,
     prompt: `${COMMON}\nRED-TEAM this specific area across ALL axes at once: ${area}\nAssume it is the most dangerous part of the change. Trace it end to end and report every concrete failure you can substantiate, regardless of which axis it belongs to.`,
   })
+}
+for (const c of crosschecks) {
+  finders.push({ key: `xcheck:${c.key}`, prompt: `${COMMON}\n${c.prompt}` })
 }
 
 phase('Find')

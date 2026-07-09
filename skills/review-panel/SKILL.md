@@ -31,6 +31,7 @@ it).
 | `mode` | `'plan' \| 'code'` | yes | — | selects the axis set and target rendering |
 | `targets` | array | yes | — | code: `{key, dir, base, head, context?}`; plan: `{key, path, context?}`. Non-empty. |
 | `focus` | `string[]` | no | `[]` | each entry gets ONE extra full red-team finder scoped to that area (all axes at once) |
+| `crosschecks` | `{key, prompt}[]` | no | `[]` | code mode only (else `bad_input`); each becomes one extra cross-diff finder (`xcheck:<key>`) whose prompt must name the diffs it correlates — for multi-repo contract checks a single-target `focus` can't express |
 | `lenses` | `string[]` | no | all axes | run ONLY the named axes (must be valid keys for the mode; unknown → `bad_input`) |
 | `settled` | `string[]` | no | `[]` | do-not-relitigate decisions; a finding that reopens one is refuted |
 | `context_files` | `string[]` | no | `[]` | absolute paths every finder/refuter reads first (intent.md, research.md, plan.md as applicable) |
@@ -38,8 +39,8 @@ it).
 | `session_dir` | string (abs path) | no | none | when given, agents append events to `events.jsonl` and write `artifacts/review-<mode>/findings.json` here |
 
 Bad input (`mode` not `plan`/`code`, empty/missing `targets`, an unknown lens
-key, a malformed `session_dir`) returns `{status: 'bad_input', error}` — it does
-not throw.
+key, `crosschecks` in plan mode, a malformed `session_dir`) returns
+`{status: 'bad_input', error}` — it does not throw.
 
 ## Code mode — 10 axes
 
@@ -82,6 +83,7 @@ Workflow({
       { key: "paxel",      dir: "/Users/ben/Work/yc/paxel", base: "origin/main",   head: "origin/ben/feat-02-projection", context: "S3 projection reader" },
     ],
     focus: ["app/services/agents/agent_score.rb", "the shared DB connection pool"],
+    crosschecks: [{ key: "projection-shape", prompt: "Compare the S3 projection JSON written by the ycinternal diff with the shape the paxel diff parses — flag any field-name/type mismatch." }],
     settled: ["nightly full reindex is acceptable — do not propose change tracking"],
     context_files: ["/Users/ben/.factory/runs/2026-07-08-scoring/artifacts/plan/plan.md"],
     refuters: 2,
@@ -145,7 +147,7 @@ Each finding:
   detail,        // concrete failure scenario: state + trigger -> observable wrong behavior
   severity,      // 'critical' | 'major' | 'minor'
   fix,           // string (optional)
-  finder,        // which finder produced it, e.g. "ycinternal:correctness" or "focus:<area>"
+  finder,        // which finder produced it, e.g. "ycinternal:correctness", "focus:<area>", or "xcheck:<key>"
   overbuild,     // boolean — true when the fix is DELETION (feeds the report's "possibly-unneeded work")
   verdict,       // 'CONFIRMED' | 'PLAUSIBLE'
   refutations,   // string[] — each refuter's reasoning
