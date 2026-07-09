@@ -31,7 +31,8 @@ tier_color() {
 
 fmt_tokens() {
   awk -v t="$1" 'BEGIN {
-    if (t >= 1000) { v = t / 1000; if (v == int(v)) printf "%dk", v; else printf "%.1fk", v }
+    if (t >= 1000000) { v = t / 1000000; if (v == int(v)) printf "%dM", v; else printf "%.1fM", v }
+    else if (t >= 1000) { v = t / 1000; if (v == int(v)) printf "%dk", v; else printf "%.1fk", v }
     else printf "%d", t
   }'
 }
@@ -45,6 +46,20 @@ model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 fast_mode=$(jq -r '.fastMode // false' "$settings" 2>/dev/null)
 [ "$fast_mode" = "true" ] && model_name="${model_name} ⚡"
 parts+=("$(c $BLUE "$model_name")")
+
+# not `// empty`: jq's // treats false as null, which would eat enabled=false
+thinking_enabled=$(echo "$input" | jq -r '.thinking.enabled | if . == null then "" else . end')
+[ -z "$thinking_enabled" ] && thinking_enabled=$(jq -r '.alwaysThinkingEnabled // empty' "$settings" 2>/dev/null)
+effort=$(echo "$input" | jq -r '.effort.level // empty')
+[ -z "$effort" ] && effort=$(jq -r '.effortLevel // empty' "$settings" 2>/dev/null)
+
+if [ "$thinking_enabled" = "false" ]; then
+  parts+=("${DIM}thinking: off${RESET}")
+elif [ -n "$effort" ]; then
+  parts+=("${DIM}thinking: ${RESET}$(c $PURPLE "$effort")")
+elif [ "$thinking_enabled" = "true" ]; then
+  parts+=("${DIM}thinking: ${RESET}$(c $PURPLE on)")
+fi
 
 worktree=$(echo "$input" | jq -r '.worktree.name // .workspace.git_worktree // empty')
 project_dir=$(echo "$input" | jq -r '.workspace.project_dir // empty')
@@ -84,7 +99,7 @@ fi
 
 if [ -n "$used_pct" ]; then
   pct_int=$(awk -v p="$used_pct" 'BEGIN { printf "%.0f", p }')
-  parts+=("$(c "$(tier_color "$pct_int")" "${pct_int}%")${DIM} used${RESET}")
+  parts+=("${DIM}ctx: ${RESET}$(c "$(tier_color "$pct_int")" "${pct_int}%")${DIM} used${RESET}")
 fi
 
 cost=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
@@ -93,21 +108,7 @@ if [ -n "$cost" ]; then
 else
   cost_display='$0.00'
 fi
-parts+=("$(c $COST_TAN "$cost_display")")
-
-# not `// empty`: jq's // treats false as null, which would eat enabled=false
-thinking_enabled=$(echo "$input" | jq -r '.thinking.enabled | if . == null then "" else . end')
-[ -z "$thinking_enabled" ] && thinking_enabled=$(jq -r '.alwaysThinkingEnabled // empty' "$settings" 2>/dev/null)
-effort=$(echo "$input" | jq -r '.effort.level // empty')
-[ -z "$effort" ] && effort=$(jq -r '.effortLevel // empty' "$settings" 2>/dev/null)
-
-if [ "$thinking_enabled" = "false" ]; then
-  parts+=("${DIM}thinking: off${RESET}")
-elif [ -n "$effort" ]; then
-  parts+=("${DIM}thinking: ${RESET}$(c $PURPLE "$effort")")
-elif [ "$thinking_enabled" = "true" ]; then
-  parts+=("${DIM}thinking: ${RESET}$(c $PURPLE on)")
-fi
+parts+=("${DIM}cost: ${RESET}$(c $COST_TAN "$cost_display")")
 
 rate_part() {
   local label="$1" path="$2" datefmt="$3"
