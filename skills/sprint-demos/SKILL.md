@@ -5,8 +5,10 @@ description: |
   sprint planning (GitLab MRs in yc-software/code, yc-software/data/etl, and
   yc-software/infrastructure/infra + GitHub PRs in yc-software/paxel, merged AND open),
   group into demoable features, determine per-feature whether it's live in prod,
-  produce clickable prod links (or start the right Conductor workspace's local stack, seed
-  data, and give local links), take screenshots, and publish a claude.ai artifact demo deck.
+  compile adoption analytics for features launched to everyone this sprint (staff-only
+  gate removed or feature flag opened to 100%), produce clickable prod links (or start
+  the right Conductor workspace's local stack, seed data, and give local links), take
+  screenshots, and publish a claude.ai artifact demo deck.
   TRIGGER when the user says "sprint demos", "prep sprint planning", "what did I ship",
   "what did I ship this week/last week", "demo prep", "build my demo deck", or any variation
   of preparing demos for sprint planning. Sprint planning is every Wednesday 10:30–11:30am
@@ -16,8 +18,8 @@ description: |
 # Sprint Demos
 
 Assemble a demo-ready package of everything Ben shipped since the end of the last sprint
-planning: grouped features, prod-vs-local status, one-click demo links, screenshots, and a
-published claude.ai artifact deck he can present from.
+planning: grouped features, prod-vs-local status, one-click demo links, launch analytics,
+screenshots, and a published claude.ai artifact deck he can present from.
 
 Work autonomously. Parallelize aggressively (stack startup is slow — kick it off early in
 the background and keep working). Degrade gracefully: a feature you can't fully wire up for
@@ -37,6 +39,7 @@ Parse `$ARGUMENTS` before starting:
 - `no-artifact` — skip the claude.ai artifact; just deliver the report + local HTML deck.
 - `no-local` — don't start any local stacks; unshipped features get MR links + screenshots
   from the MR only.
+- `no-analytics` — skip the step-5 launch-analytics pass.
 - Anything naming a specific feature/branch/MR — scope the run to just that.
 
 ## Environment gotchas (read first, they will bite)
@@ -246,7 +249,53 @@ against each PR's `mergeCommit`. Corroborate with
 If anything is ambiguous, mark the PR "merged — prod status unverified" rather than
 guessing.
 
-### 5. Live features → clickable prod links
+### 5. Launched features → adoption analytics
+
+Runs in parallel with steps 6–8 (it's all read-only prod queries — do it while stacks
+boot). Skip only on `no-analytics`.
+
+**Is it a launch?** A feature is a **launch** when this sprint's work opened it to its
+full audience, not just YC staff or a flag cohort. Any one signal suffices:
+
+- A constituent MR's diff **removes or loosens an access gate**: a `yc_staff?` /
+  `admin?` conditional deleted, a `flag_enabled?` / `YCFlags::Flags.enabled?` /
+  `useFlag` check removed, an allow-list widened, or a staff-only route/nav made
+  general.
+- MR title/description/labels say launch / GA / "open to everyone" / "enable for all" /
+  "roll out to 100%".
+- `$ARGUMENTS` says the feature launched this sprint.
+
+Flag rollouts live in **Unleash, not git** — a flag can go to 100% with no MR at all. If
+a feature is flag-gated and the diff doesn't show the flip, don't guess the rollout
+state: fetch usage analytics anyway and let the data speak — **meaningful non-staff
+usage IS the verification that it's open** (the Unleash context carries `isYCStaff`, so
+staff-only usage means still gated). Report "flag-controlled — rollout % unverified" if
+usage is ambiguous.
+
+**For each launched feature that's ✅ live** (or the live part of a 🟡), compile **2–4
+honest headline numbers** since launch:
+
+| Source | What it gives | How |
+|---|---|---|
+| Prod DB (read-only) | Adoption ground truth: rows created, distinct users/companies, per-day ramp | `/rc` or `ycli tool select-query`, `WHERE created_at >= '<launch_at>'` |
+| BigQuery request logs | Page views + unique visitors on the feature's routes, staff vs non-staff split | `/query-logs` skill |
+| Sentry | New-issue count on the launched surface — "0 new issues since launch" is a demo stat | Sentry MCP `search_issues` |
+| Prometheus | Endpoint request rate, when raw traffic is the story | `/prometheus-metrics` skill |
+
+- `launch_at` = `merged_at` of the gate-removal MR; fall back to the deploy time, or the
+  flag-flip time if Ben gives one.
+- If the surface existed staff-only before, compare an equal-length pre-launch window —
+  "staff-only: 12 views/day → everyone: 340/day" is the money quote.
+- Prefer founder-story units ("N founders", "M companies") over raw request counts when
+  both are available. Label every number's window and exclusions (staff, test data,
+  backfills).
+- If a source is unreachable, note "analytics unavailable: <reason>" on the feature and
+  move on — never block the run on analytics.
+
+Results feed the deck (step 9: a `launch` badge + the feature's `analytics` block) and
+the final report (step 10: headline numbers in the demo notes).
+
+### 6. Live features → clickable prod links
 
 For each ✅ (and the live parts of 🟡) feature, produce direct links to where the feature is
 visible, **with real record IDs** — never `:id` placeholders. Find good demo records with
@@ -266,7 +315,7 @@ Prod hosts (from `YC::Hostnames::SERVICES`):
 All prod apps SSO-bounce through `account.ycombinator.com` and return to the exact deep
 link, so links are safe to hand out (internal.ycinside.com is staff-only — fine for Ben).
 
-### 6. Unshipped features → local demo on the right workspace stack
+### 7. Unshipped features → local demo on the right workspace stack
 
 For each 🔴 feature (and the unshipped parts of 🟡), unless `no-local`. This applies to
 **monorepo** features; etl/infra get MR/dashboard links (step 4), and an unshipped paxel
@@ -289,7 +338,7 @@ PR link + screenshots from the PR.
 3. **Start it (background, early!)**: `cd <workspace> && yc start <app>` for just the
    app(s) the feature needs (`ycinternal`, `bookface`, `apply`; plain `yc start` = all
    three). Startup takes several minutes — launch it as a background task the moment you
-   know you'll need it (i.e. right after step 4) and keep doing steps 5/7 meanwhile. If
+   know you'll need it (i.e. right after step 4) and keep doing steps 5/6/8 meanwhile. If
    multiple features need different workspaces, prefer starting stacks sequentially and
    flag memory pressure rather than launching four stacks blind.
 4. **Get the base URLs**: `yc stacks urls` in the workspace →
@@ -302,7 +351,7 @@ PR link + screenshots from the PR.
 7. Produce the final clickable local link(s), record IDs included, `?cu=benguillet`
    appended.
 
-### 7. Screenshots
+### 8. Screenshots
 
 `mkdir -p /tmp/sprint-demos/shots`. For every feature, capture 1–3 shots of the money
 pages:
@@ -321,7 +370,7 @@ pages:
 
 Crop nothing; full-page or viewport shots are fine. Name files by feature slug.
 
-### 8. Build and publish the "ship log" report
+### 9. Build and publish the "ship log" report
 
 The report is a light-theme, magazine-style **ship log** (modeled on Sean's weekly ship-log
 artifact): kicker pill → big title → subtitle → byline → sticky numbered section nav →
@@ -342,18 +391,23 @@ builder twice:
 
 Content guidance per feature (mirror the reference's voice — technical, concrete, short):
 - `summary`: the 1–2 sentence talk track.
-- `badges`: status pill first (`live` green / `local` amber / `review` amber), then `mr`
-  link pills for the key MRs/PRs, then `plain` pills for context ("inert by default",
+- `badges`: status pill first (`live` green / `local` amber / `review` amber), then a
+  `launch` pill for step-5 launches ("Launched to everyone · Jun 12"), then `mr` link
+  pills for the key MRs/PRs, then `plain` pills for context ("inert by default",
   "plumbing live: …").
 - `why` / `built`: 1 short paragraph each — the problem, then what shipped. Bold the
   load-bearing phrases, use `<code>` for identifiers.
 - `tryit`: one actionable line with the exact click path ("open X, hover Y").
-- `demo`: buttons = the URLs from steps 5/6 (first button is the primary demo link),
-  `shots` = the step-7 screenshots with honest captions.
+- `demo`: buttons = the URLs from steps 6/7 (first button is the primary demo link),
+  `shots` = the step-8 screenshots with honest captions.
+- `analytics` (launched features only): the step-5 numbers as stat chips — `label` names
+  the window ("SINCE LAUNCH · JUN 12"), `stats` = 2–4 headline pairs, `bullets` for the
+  before/after story, `note` for window/exclusions/sources fine print.
 - `how`: 3–5 bullets with bold lead-ins and `<code>` identifiers — pull from the MR
   descriptions. Skip for trivial features.
 - Stats: features shipped · live in prod · local demos · MRs+PRs merged (adapt if a
-  number isn't interesting that week).
+  number isn't interesting that week; a launch week earns its best adoption number a
+  top-level stat card).
 
 Verify the render with agent-browser (open the file://, screenshot top + one feature
 section) before publishing. Also save a copy of the full report into the current
@@ -380,7 +434,7 @@ Then publish to claude.ai (verified flow):
 4. If browser publishing fails after 2–3 attempts, stop retrying: `open` the local HTML
    file instead and say the claude.ai step needs a manual paste.
 
-### 9. Final report
+### 10. Final report
 
 The last message must contain everything (Ben only sees the final message). Format:
 
@@ -388,6 +442,8 @@ The last message must contain everything (Ben only sees the final message). Form
 2. **Per-feature table**: Feature | Status | Demo link (the one to click while presenting)
    | MRs/PRs.
 3. Per-feature demo notes: the 1–2 sentence talk track + which record you staged and why.
+   For launched features, lead with the headline analytics ("launched to everyone Jun 12 —
+   340 founders used it since") and name the source + window.
 4. **Also shipped** one-liners.
 5. Housekeeping: which stacks were started (and that they're left running for the demo),
    what data was seeded, anything unverified (e.g. paxel prod status), and any feature
@@ -396,7 +452,7 @@ The last message must contain everything (Ben only sees the final message). Form
 ## Important Notes
 
 - **Start local stacks as early as possible** (right after step 4 identifies the 🔴
-  features) and do steps 5/7/8 while they boot.
+  features) and do steps 5/6/8/9 while they boot.
 - **Leave the demo stacks running** at the end — Ben is about to present from them.
 - Merged ≠ deployed: a merge from 20 minutes ago is probably still rolling out. Re-check
   the healthcheck SHA right before finishing and update the status if it flipped.

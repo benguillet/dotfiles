@@ -20,7 +20,7 @@ immediately and the history lives in this repo.
 | [`appops-tech-spec`](skills/appops-tech-spec/SKILL.md) | Write a tech spec / design doc following App Ops's standard template (Background → Goal → Scope → Constraints → Design → Monitoring & Tests → Alternatives), grounded in real code references, then publish it as a Google Doc. |
 | [`draft-spec`](skills/draft-spec/SKILL.md) | Draft a concise, architecture-level design spec from a preceding design discussion, in the standard YC design-spec template, pitched at a technically competent reader who already knows the system. |
 | [`gdoc`](skills/gdoc/SKILL.md) | Publish the latest on-disk version of a spec/plan markdown file to Google Docs via the `gws` CLI and return the link. Creates a Doc on first publish, updates the same Doc in place on subsequent publishes. Follow-up to `draft-spec` / `appops-tech-spec`. |
-| [`sprint-demos`](skills/sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped GitLab MRs + GitHub PRs, group into demoable features, check prod status, produce prod/local demo links, screenshots, and a claude.ai artifact deck. Paired with the "Sprint demos draft (Tuesday night)" claude.ai routine. |
+| [`sprint-demos`](skills/sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped GitLab MRs + GitHub PRs, group into demoable features, check prod status, compile adoption analytics for features launched to everyone, produce prod/local demo links, screenshots, and a claude.ai artifact deck. Paired with the "Sprint demos draft (Tuesday night)" claude.ai routine. |
 
 ## Claude config (`claude/`)
 

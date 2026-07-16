@@ -21,6 +21,7 @@ Config shape (all HTML strings may contain inline markup; code terms in <code>):
       "summary": "One-two sentence gray summary under the title.",
       "badges": [
         {"type": "live",    "text": "Live in prod"},          // green dot pill
+        {"type": "launch",  "text": "Launched to everyone · Jun 12"},  // orange dot pill
         {"type": "local",   "text": "Local demo · addis-ababa"},  // amber pill
         {"type": "review",  "text": "In review · branch ..."},    // amber pill
         {"type": "mr",      "text": "MR !52164", "href": "..."},   // blue link pill
@@ -34,6 +35,12 @@ Config shape (all HTML strings may contain inline markup; code terms in <code>):
         "buttons": [{"text": "Open →", "href": "..."}],
         "shots": [["file.png", "caption"], ...],                // from shots_dir
         "note": "small gray note under the shots"               // optional
+      },
+      "analytics": {                                             // optional, launched features
+        "label": "SINCE LAUNCH · JUN 12",                       // uppercase card header
+        "stats": [["340", "founders used it"], ...],            // 2-4 stat chips
+        "bullets": ["<b>Before/after:</b> ... with <code>terms</code>", ...],  // optional
+        "note": "Window Jun 12-24; staff excluded; source: prod DB"  // optional fine print
       },
       "how": ["<b>Lead-in:</b> bullet body with <code>terms</code>", ...]  // optional
     }
@@ -91,6 +98,8 @@ CSS = """
           padding:4px 11px; border-radius:999px; border:1px solid transparent; text-decoration:none; }
   .pill.live { color:var(--green); background:var(--green-soft); }
   .pill.live::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--green); }
+  .pill.launch { color:var(--orange); background:var(--orange-soft); }
+  .pill.launch::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--orange); }
   .pill.local, .pill.review { color:var(--amber); background:var(--amber-soft); }
   .pill.mr { color:var(--blue); background:var(--blue-soft); }
   .pill.plain { color:var(--dim); background:transparent; border-color:var(--line); }
@@ -121,6 +130,12 @@ CSS = """
   .demo-note { color:var(--dim); font-size:12px; }
   .how ul { margin:0; padding-left:18px; }
   .how li { font-size:13.5px; margin:0 0 9px; }
+  .analytics .astats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+                       gap:12px; margin:0 0 12px; }
+  .analytics .astats .stat { padding:12px 14px; }
+  .analytics .astats .stat b { font-size:20px; }
+  .analytics ul { margin:0 0 10px; padding-left:18px; }
+  .analytics li { font-size:13.5px; margin:0 0 8px; }
   section.also { padding:44px 0 10px; }
   section.also h2 { color:var(--ink); font-size:22px; margin:0 0 6px; }
   .also ul { list-style:none; margin:14px 0 0; padding:0; }
@@ -172,6 +187,20 @@ def feature_html(f):
         right += "</div>"
 
     body = f'<div class="cols">{left}{right}</div>' if right else left
+    analytics = ""
+    a = f.get("analytics")
+    if a:
+        analytics = f'<div class="card analytics"><p class="chead">{esc(a.get("label", "Since launch"))}</p>'
+        chips = a.get("stats", [])
+        if chips:
+            analytics += ('<div class="astats">'
+                          + "".join(f'<div class="stat"><b>{esc(n)}</b><span>{esc(l)}</span></div>'
+                                    for n, l in chips) + "</div>")
+        if a.get("bullets"):
+            analytics += "<ul>" + "".join(f"<li>{b}</li>" for b in a["bullets"]) + "</ul>"
+        if a.get("note"):
+            analytics += f'<p class="demo-note">{a["note"]}</p>'
+        analytics += "</div>"
     how = ""
     if f.get("how"):
         how = ('<div class="card how"><p class="chead">How it works</p><ul>'
@@ -180,7 +209,7 @@ def feature_html(f):
     return (f'<section class="feature" id="{f["id"]}"><div class="wrap">'
             f'<div class="fhead"><span class="fnum">{f["num"]}</span><h2>{f["title"]}</h2></div>'
             f'<p class="fsum">{f["summary"]}</p>'
-            f'<div class="badges">{badges}</div>{body}{how}</div></section>')
+            f'<div class="badges">{badges}</div>{body}{analytics}{how}</div></section>')
 
 nav = "".join(f'<a href="#{f["id"]}"><b>{f["num"]}</b>{esc(f["nav"])}</a>' for f in cfg["features"])
 stats = "".join(f'<div class="stat"><b>{esc(n)}</b><span>{esc(l)}</span></div>' for n, l in cfg["stats"])
