@@ -14,9 +14,9 @@ redirecting — just use `>` normally.
 
 Default to writing **no comments**. Only add a comment when:
 
-- The **why** is not obvious from the code itself (a hidden constraint, a
-  workaround for a specific bug, a subtle invariant, behavior that would
-  surprise a reader), or
+- The **why** is not obvious — from the code itself or from the names of the
+  methods/classes being used (a hidden constraint, a workaround for a specific
+  bug, a subtle invariant, behavior that would surprise a reader), or
 - The code is genuinely **complicated** and a short note materially helps the
   reader follow it.
 
@@ -24,6 +24,14 @@ Do not write comments that restate what the code does — well-named identifiers
 already do that. Do not reference the current task, PR, or caller ("used by X",
 "added for the Y flow") — those belong in the commit message or PR description,
 not the code.
+
+## Prefer Timestamps Over Booleans
+
+When you think you want a boolean (column, attribute, or struct field), what you
+really want is usually a **nullable timestamp** (`*_at`): `NULL` == false, set ==
+true in the code logic. It costs nothing extra and preserves *when* the thing
+became true — invaluable for auditing, debugging, ordering, and reconciliation.
+Example: `has_report_at`, not `has_report`.
 
 ## Git Branches
 
@@ -49,6 +57,13 @@ try the change immediately.
   have a concrete ID, query for one (Rails console / DB) rather than emitting a
   template URL.
 - Link to the specific page(s) the change affects so I can verify it end to end.
+
+## Running `yc` Commands (YC code monorepo)
+
+**NEVER pipe `yc` commands through `| tail`, `| head`, or `| grep`.** They take
+a while to run and piping throws away useful output. Either run the command
+directly or redirect to a file (e.g. `yc db migrate > /tmp/migrate.log 2>&1`)
+and inspect the file afterwards.
 
 
 <!-- ycli:start -->
