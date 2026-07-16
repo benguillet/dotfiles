@@ -382,12 +382,12 @@ python3 <this skill's directory>/deck-builder.py <config.json>
 ```
 
 Write a `deck-config.json` (full schema documented in the builder's docstring) and run the
-builder twice. Final reports live in `/Users/ben/Work/yc/reports/` (`mkdir -p` it first),
+builder twice. Final reports live in `/Users/ben/Work/yc/reports/sprints/` (`mkdir -p` it first),
 date-prefixed with `SINCE_DATE` so they sort chronologically and old sprints are easy to
 find; `/tmp/sprint-demos/` stays the working area for shots/configs only:
-- `/Users/ben/Work/yc/reports/<SINCE_DATE>-sprint-demos.html` with `"embed_shots": true` —
+- `/Users/ben/Work/yc/reports/sprints/<SINCE_DATE>-sprint-demos.html` with `"embed_shots": true` —
   the presenting copy, screenshots embedded as base64 data URIs (single file).
-- `/Users/ben/Work/yc/reports/<SINCE_DATE>-sprint-demos-artifact.html` with
+- `/Users/ben/Work/yc/reports/sprints/<SINCE_DATE>-sprint-demos-artifact.html` with
   `"embed_shots": false` — a light (~15–20 KB) variant for claude.ai, since multi-MB
   base64 can't round-trip through a chat into an artifact.
 
@@ -415,7 +415,7 @@ Content guidance per feature (mirror the reference's voice — technical, concre
   top-level stat card).
 
 Verify the render with agent-browser (open the file://, screenshot top + one feature
-section) before publishing. The date-prefixed copies in `/Users/ben/Work/yc/reports/`
+section) before publishing. The date-prefixed copies in `/Users/ben/Work/yc/reports/sprints/`
 are the durable archive — reference those paths (not `/tmp`) in the final report.
 
 Then publish to claude.ai (verified flow):
