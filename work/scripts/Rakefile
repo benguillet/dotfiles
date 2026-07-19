@@ -203,6 +203,15 @@ task :symlinks do
 
   sh "mkdir -p ~/.config/direnv"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.config/direnv/direnv.toml ~/.config/direnv/direnv.toml"
+
+  # Real directories with symlinked files: the ChatGPT desktop app skips
+  # symlinked pet directories (Node dirent.isDirectory() is false for links).
+  Dir["#{__dir__.chomp('/scripts')}/codex/pets/*"].each do |pet|
+    sh "mkdir -p ~/.codex/pets/#{File.basename(pet)}"
+    Dir["#{pet}/*"].each do |file|
+      sh "ln -sf #{file} ~/.codex/pets/#{File.basename(pet)}/#{File.basename(file)}"
+    end
+  end
 end
 
 # task :setup => [:brew, :osx, :symlinks]
