@@ -2,5 +2,6 @@
   "id": "taroko",
   "displayName": "Taroko",
   "description": "A compact Codex-style hiker mascot inspired by a Taroko Gorge hike photo.",
+  "spriteVersionNumber": 2,
   "spritesheetPath": "spritesheet.webp"
 }
