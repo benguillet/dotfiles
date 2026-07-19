@@ -45,6 +45,11 @@ set wildmenu
 set wildmode=list:longest
 set visualbell
 set ttyfast
+set mouse=a                     " Enable mouse (scrolling, selection) in all modes
+if !has('nvim')
+  set ttymouse=sgr              " Modern mouse protocol: works past column 223 & in tmux
+endif
+set clipboard=unnamed           " Yank/delete/paste use the macOS system clipboard
 set backspace=indent,eol,start
 set laststatus=2
 set showmatch
