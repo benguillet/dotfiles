@@ -150,7 +150,7 @@ alias gsb='git status -s'
 alias lg='lazygit'
 
 # Delete already merged branches
-alias gcn="git-delete-merged-branches --effort=3 --branch main"
+alias gcn="git-delete-merged-branches --effort=3 --branch master"
 alias wip='com -S -n -m "WIP"'
 alias pr='gh pr create --fill --reviewer couscous18'
 
@@ -226,3 +226,6 @@ export PATH="/Users/ben/.local/bin:$PATH"
 # direnv: load per-directory env from .envrc / .env (must be last so it hooks
 # after other shell setup).
 eval "$(direnv hook zsh)"
+
+# Added by Devin
+export PATH="/Users/ben/.codeium/windsurf/bin:$PATH"

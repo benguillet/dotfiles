@@ -3,3 +3,4 @@
 if command -v /opt/homebrew/bin/direnv >/dev/null 2>&1; then
   eval "$(/opt/homebrew/bin/direnv export zsh)" 2>/dev/null
 fi
+. "$HOME/.cargo/env"
