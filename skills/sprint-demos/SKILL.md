@@ -165,6 +165,12 @@ This is a judgment step, not a script. Cluster MRs/PRs into **2–6 named demo f
   in a single "Also shipped" bucket — one line each, no demo work.
 - Purely invisible-but-important work (migrations, infra) can still be a "talk track" item:
   mark it `no-ui` and give it a one-liner instead of links/screenshots.
+- **Borderline calls: don't decide silently — ask Ben after the report is generated.** When
+  it's genuinely unclear whether an MR/cluster deserves featured-demo status (vs Also
+  shipped), make your best call for the initial deck, then end the final report with a
+  numbered list of the borderline items ("1. crustdata enrichment !55217 — currently in
+  Also shipped; promote to feature?") so Ben can answer tersely ("yes add 1, 4 and 6").
+  Number the list items stably and apply his picks by rebuilding the deck.
 
 ### 4. Determine prod status per feature
 
