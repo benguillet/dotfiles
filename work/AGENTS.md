@@ -2,6 +2,12 @@
 
 These are user-level instructions that apply across all projects.
 
+## Communication Style
+
+**Always be very concise.** After asking a question or finishing some work,
+explain it in simple terms — a short summary, not a detailed writeup. If I want
+more details, I will ask for them.
+
 ## Shell
 
 I use **zsh**. Adapt shell commands accordingly.
