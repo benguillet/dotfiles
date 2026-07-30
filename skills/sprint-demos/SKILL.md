@@ -30,6 +30,17 @@ what's missing. Never block the whole run on one broken piece.
 
 $ARGUMENTS
 
+## Shared demo memory
+
+Use `/Users/ben/Work/yc/reports/sprints/shared.demos` as the durable demo-memory root.
+It is outside every repository and Conductor worktree, so all workspaces share it and
+workspace archival cannot remove it. Memos are written by the `save-demo-memo` skill.
+Read [the shared-memory workflow](references/shared-demo-memory.md) before compiling a
+report.
+
+Compute `SINCE_DATE` in step 1, then run the compile-time memory pass before collecting
+work in step 2.
+
 ## Options
 
 Parse `$ARGUMENTS` before starting:
@@ -45,8 +56,6 @@ Parse `$ARGUMENTS` before starting:
 ## Environment gotchas (read first, they will bite)
 
 - Every Bash call in Conductor workspaces prints 2 `direnv:` lines on stderr — ignore them.
-- The Bash tool has noclobber ON: `>` fails on existing files. `rm -f` the target first
-  (or use the Write tool).
 - **NEVER pipe `yc` commands through `| head`, `| tail`, or `| grep`** — a hook blocks it.
   Redirect to a file and inspect that.
 - This shell exports `GH_HOST=gitlab.com` and `gh`'s gitlab token is stale — bare `gh`
@@ -362,6 +371,9 @@ PR link + screenshots from the PR.
 `mkdir -p /tmp/sprint-demos/shots`. For every feature, capture 1–3 shots of the money
 pages:
 
+- **Saved demo memory** — reuse matching screenshots and artifacts from the current sprint
+  before capturing anything new. Keep their original files in `shared.demos`; the deck
+  builder can embed screenshots directly from those paths.
 - **Local stack pages** — `agent-browser` (same tool as `/dogfood`; direct binary, never
   npx):
   ```bash
@@ -396,9 +408,6 @@ find; `/tmp/sprint-demos/` stays the working area for shots/configs only:
 - `/Users/ben/Work/yc/reports/sprints/<SINCE_DATE>-sprint-demos-artifact.html` with
   `"embed_shots": false` — a light (~15–20 KB) variant for claude.ai, since multi-MB
   base64 can't round-trip through a chat into an artifact.
-
-Watch the noclobber gotcha on a re-run: the builder (python) overwrites fine, but any
-shell `>` redirect into an existing report fails.
 
 Content guidance per feature (mirror the reference's voice — technical, concrete, short):
 - `summary`: the 1–2 sentence talk track.
@@ -457,8 +466,9 @@ The last message must contain everything (Ben only sees the final message). Form
    340 founders used it since") and name the source + window.
 4. **Also shipped** one-liners.
 5. Housekeeping: which stacks were started (and that they're left running for the demo),
-   what data was seeded, anything unverified (e.g. paxel prod status), and any feature
-   whose demo setup failed and needs a manual look.
+   what data was seeded, how many shared-memory entries/assets were reused, anything
+   unverified (e.g. paxel prod status), and any feature whose demo setup failed and needs
+   a manual look.
 
 ## Important Notes
 
