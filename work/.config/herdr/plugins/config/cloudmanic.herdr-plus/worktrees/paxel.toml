@@ -1,0 +1,9 @@
+repo = "paxel"
+
+[[tabs]]
+name = "codex"
+command = "codex"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"

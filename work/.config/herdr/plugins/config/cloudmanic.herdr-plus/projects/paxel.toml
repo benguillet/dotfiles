@@ -1,0 +1,8 @@
+name = "Paxel"
+description = "YC Paxel"
+group = "YC"
+working_dir = "/Users/ben/Work/yc/paxel"
+
+[[tabs]]
+name = "codex"
+command = "codex"

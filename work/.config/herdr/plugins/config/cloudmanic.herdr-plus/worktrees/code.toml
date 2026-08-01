@@ -1,0 +1,9 @@
+repo = "code"
+
+[[tabs]]
+name = "codex"
+command = "codex"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"

@@ -1,0 +1,8 @@
+name = "ETL"
+description = "YC ETL"
+group = "YC"
+working_dir = "/Users/ben/Work/yc/etl"
+
+[[tabs]]
+name = "codex"
+command = "codex"
