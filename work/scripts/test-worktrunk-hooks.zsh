@@ -41,6 +41,11 @@ test "$(stat -f '%Lp %m' "$repo/.env.local")" = "$(stat -f '%Lp %m' "$worktree/.
   direnv export json >/dev/null
 )
 
+primary_env="$sandbox/primary.env"
+cp "$repo/.env" "$primary_env"
+wt --config "$config_path" -C "$repo" hook pre-start
+cmp "$primary_env" "$repo/.env"
+
 failed_copy_repo="$sandbox/failed-copy-repo"
 mkdir -p "$failed_copy_repo"
 git -C "$failed_copy_repo" init -b main
