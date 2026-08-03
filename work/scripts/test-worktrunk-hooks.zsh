@@ -3,8 +3,10 @@ set -euo pipefail
 
 script_dir=${0:A:h}
 config_path=${script_dir:h}/.config/worktrunk/config.toml
-sandbox=$(mktemp -d)
-trap 'rm -rf "$sandbox"' EXIT
+sandbox_root=$(mktemp -d)
+sandbox="$sandbox_root/worktrunk hook test"
+mkdir -p "$sandbox"
+trap 'rm -rf "$sandbox_root"' EXIT
 
 export XDG_CONFIG_HOME="$sandbox/config"
 export XDG_DATA_HOME="$sandbox/data"
@@ -22,6 +24,8 @@ git -C "$repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsig
 print 'BASE_ENV=1' > "$repo/.env"
 print 'LOCAL_ENV=1' > "$repo/.env.local"
 print 'export DIRENV_READY=1' > "$repo/.envrc"
+chmod 640 "$repo/.env.local"
+touch -t 202401020304.05 "$repo/.env.local"
 
 result=$(wt --config "$config_path" -C "$repo" switch --create feature/test --no-cd --format=json)
 worktree=$(jq -r '.path' <<< "$result")
@@ -29,6 +33,7 @@ worktree=$(jq -r '.path' <<< "$result")
 cmp "$repo/.env" "$worktree/.env"
 cmp "$repo/.env.local" "$worktree/.env.local"
 cmp "$repo/.envrc" "$worktree/.envrc"
+test "$(stat -f '%Lp %m' "$repo/.env.local")" = "$(stat -f '%Lp %m' "$worktree/.env.local")"
 
 (
   cd "$worktree"

@@ -204,13 +204,14 @@ task :symlinks do
   sh "mkdir -p ~/.config/direnv"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.config/direnv/direnv.toml ~/.config/direnv/direnv.toml"
 
+  worktrunk_config_source = "#{__dir__.chomp('/scripts')}/.config/worktrunk/config.toml"
   worktrunk_config = File.expand_path("~/.config/worktrunk/config.toml")
   if File.exist?(worktrunk_config) && !File.symlink?(worktrunk_config)
     raise "#{worktrunk_config} exists and is not a symlink"
   end
 
-  sh "mkdir -p ~/.config/worktrunk"
-  sh "ln -sfn #{__dir__.chomp('/scripts')}/.config/worktrunk/config.toml #{worktrunk_config}"
+  sh "mkdir", "-p", File.dirname(worktrunk_config)
+  sh "ln", "-sfn", worktrunk_config_source, worktrunk_config
 
   herdr_config_root = "#{__dir__.chomp('/scripts')}/.config/herdr"
   herdr_plugin_config = File.expand_path("~/.config/herdr/plugins/config")
