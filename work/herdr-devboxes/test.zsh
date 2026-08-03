@@ -90,6 +90,16 @@ assert_not_contains() {
   fi
 }
 
+assert_json() {
+  local file=$1 filter=$2
+  /usr/bin/jq -e "$filter" "$file" >/dev/null || fail "$file does not satisfy $filter"
+}
+
+command_count() {
+  local exact=$1
+  awk -v exact="$exact" '$0 == exact { count += 1 } END { print count + 0 }' "$COMMAND_LOG"
+}
+
 run_sync() {
   local now=$1
   env \
@@ -120,4 +130,35 @@ run_sync 1060
 [[ "$(grep -c '^start$' "$MIRROR_LOG")" == 1 ]] || fail 'unchanged config restarted mirror'
 [[ "$(grep -c '^devbox sync --quiet$' "$COMMAND_LOG")" == 1 ]] || fail 'fleet sync throttle failed'
 
-print -r -- 'PASS: discovery and unchanged reconciliation'
+assert_json "$STATE" '.devboxes.alpha.workspace_seen_at == 1060'
+print -r -- 0 > "$FIXTURES/alpha"
+run_sync 2000
+assert_json "$STATE" '.devboxes.alpha.empty_since == 2000'
+
+run_sync 88399
+[[ "$(command_count 'stop --remote --name=alpha')" == 0 ]] || fail 'alpha stopped before its grace period'
+run_sync 88400
+[[ "$(command_count 'stop --remote --name=alpha')" == 1 ]] || fail 'alpha was not stopped after its grace period'
+assert_not_contains --force "$COMMAND_LOG"
+assert_not_contains '^\[hosts\."alpha"\]$' "$CONFIG"
+
+print -r -- 1 > "$FIXTURES/beta"
+run_sync 90000
+print -r -- 0 > "$FIXTURES/beta"
+run_sync 91000
+export HERDR_DEVBOX_TEST_STOP_EXIT=1
+run_sync 177400
+[[ "$(command_count 'stop --remote --name=beta')" == 1 ]] || fail 'beta cleanup was not attempted'
+assert_contains '^\[hosts\."beta"\]$' "$CONFIG"
+assert_json "$STATE" '.devboxes.beta.cleanup_attempted_at == 177400'
+run_sync 180999
+[[ "$(command_count 'stop --remote --name=beta')" == 1 ]] || fail 'beta cleanup retried too early'
+run_sync 181000
+[[ "$(command_count 'stop --remote --name=beta')" == 2 ]] || fail 'beta cleanup did not retry after one hour'
+
+print -r -- unreachable > "$FIXTURES/beta"
+run_sync 200000
+assert_json "$STATE" '.devboxes.beta.empty_since == 91000 and .devboxes.beta.cleanup_attempted_at == 181000'
+[[ "$(command_count 'stop --remote --name=beta')" == 2 ]] || fail 'unreachable beta was treated as empty'
+
+print -r -- 'PASS: discovery, reconciliation, timestamps, and safe cleanup'

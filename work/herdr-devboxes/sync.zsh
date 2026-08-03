@@ -141,11 +141,80 @@ while IFS= read -r name; do
 done < <(print -r -- "$registry" | /usr/bin/jq -r \
   'to_entries[] | select(.value.remote == true) | .key' | sort)
 
+stopped_names=()
 for name in "${names[@]}"; do
-  probe_workspaces "$name" >/dev/null || true
+  if ! workspaces=$(probe_workspaces "$name"); then
+    continue
+  fi
+  workspace_count=$(print -r -- "$workspaces" | /usr/bin/jq -r '.result.workspaces | length')
+  if (( workspace_count > 0 )); then
+    state=$(print -r -- "$state" | /usr/bin/jq -c \
+      --arg name "$name" --argjson now "$NOW" '
+        .devboxes[$name] = (
+          (.devboxes[$name] // {
+            workspace_seen_at: null,
+            empty_since: null,
+            cleanup_attempted_at: null
+          })
+          | .workspace_seen_at = $now
+          | .empty_since = null
+          | .cleanup_attempted_at = null
+        )
+      ')
+  else
+    state=$(print -r -- "$state" | /usr/bin/jq -c \
+      --arg name "$name" --argjson now "$NOW" '
+        .devboxes[$name] = (
+          (.devboxes[$name] // {
+            workspace_seen_at: null,
+            empty_since: null,
+            cleanup_attempted_at: null
+          })
+          | if .workspace_seen_at != null and .empty_since == null then
+              .empty_since = $now
+            else
+              .
+            end
+        )
+      ')
+    workspace_seen_at=$(print -r -- "$state" | /usr/bin/jq -r --arg name "$name" \
+      '.devboxes[$name].workspace_seen_at // 0')
+    empty_since=$(print -r -- "$state" | /usr/bin/jq -r --arg name "$name" \
+      '.devboxes[$name].empty_since // 0')
+    cleanup_attempted_at=$(print -r -- "$state" | /usr/bin/jq -r --arg name "$name" \
+      '.devboxes[$name].cleanup_attempted_at // 0')
+    if (( workspace_seen_at > 0 && NOW - empty_since >= CLEANUP_GRACE_SECONDS &&
+          NOW - cleanup_attempted_at >= CLEANUP_RETRY_SECONDS )); then
+      state=$(print -r -- "$state" | /usr/bin/jq -c \
+        --arg name "$name" --argjson now "$NOW" \
+        '.devboxes[$name].cleanup_attempted_at = $now')
+      atomic_write "$STATE_PATH" "$state"
+      if "$YC_BIN" stop --remote "--name=$name" </dev/null; then
+        stopped_names+=("$name")
+        state=$(print -r -- "$state" | /usr/bin/jq -c --arg name "$name" \
+          'del(.devboxes[$name])')
+      else
+        log "$name: safe cleanup was blocked or failed"
+      fi
+    fi
+  fi
 done
 
-desired=$(render_config "${names[@]}")
+remaining_names=()
+for name in "${names[@]}"; do
+  if (( ${stopped_names[(Ie)$name]} == 0 )); then
+    remaining_names+=("$name")
+  fi
+done
+
+registry_names=$(
+  print -rl -- "${names[@]}" | /usr/bin/jq -Rsc 'split("\n") | map(select(length > 0))'
+)
+state=$(print -r -- "$state" | /usr/bin/jq -c --argjson names "$registry_names" '
+  .devboxes |= with_entries(select(.key as $name | $names | index($name)))
+')
+
+desired=$(render_config "${remaining_names[@]}")
 current=''
 [[ -e "$CONFIG_PATH" ]] && current=$(<"$CONFIG_PATH")
 
@@ -154,7 +223,7 @@ if [[ "$desired" != "$current" ]]; then
   if [[ -n "$current" && -x "$mirror_bin" ]] && local_herdr_running; then
     "$mirror_bin" teardown
   fi
-  if (( ${#names[@]} == 0 )); then
+  if (( ${#remaining_names[@]} == 0 )); then
     rm -f "$CONFIG_PATH"
   else
     atomic_write "$CONFIG_PATH" "$desired"
