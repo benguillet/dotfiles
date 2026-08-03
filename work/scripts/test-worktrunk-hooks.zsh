@@ -34,3 +34,15 @@ cmp "$repo/.envrc" "$worktree/.envrc"
   cd "$worktree"
   direnv export json >/dev/null
 )
+
+failed_copy_repo="$sandbox/failed-copy-repo"
+mkdir -p "$failed_copy_repo"
+git -C "$failed_copy_repo" init -b main
+git -C "$failed_copy_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit --allow-empty -m init
+print 'BASE_ENV=1' > "$failed_copy_repo/.env"
+chmod 000 "$failed_copy_repo/.env"
+
+if wt --config "$config_path" -C "$failed_copy_repo" switch --create feature/copy-failure --no-cd; then
+  print -u2 'expected worktrunk to fail when copying an unreadable environment file'
+  exit 1
+fi

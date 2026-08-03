@@ -1,6 +1,9 @@
 [[pre-start]]
 copy_env = """
-find {{ primary_worktree_path }} -maxdepth 1 -type f \\( -name '.env' -o -name '.env.*' -o -name '.envrc' \\) -exec cp -p {} . \\;
+for env_file in "{{ primary_worktree_path }}"/.env "{{ primary_worktree_path }}"/.env.* "{{ primary_worktree_path }}"/.envrc; do
+  [ -f "$env_file" ] && [ ! -L "$env_file" ] || continue
+  cp -p "$env_file" . || exit $?
+done
 """
 
 [[pre-start]]
