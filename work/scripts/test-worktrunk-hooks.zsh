@@ -8,6 +8,8 @@ trap 'rm -rf "$sandbox"' EXIT
 
 export XDG_CONFIG_HOME="$sandbox/config"
 export XDG_DATA_HOME="$sandbox/data"
+export GIT_CONFIG_GLOBAL=/dev/null
+export GIT_CONFIG_NOSYSTEM=1
 
 repo="$sandbox/repo"
 mkdir -p "$repo"
