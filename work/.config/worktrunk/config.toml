@@ -2,6 +2,8 @@
 copy_env = """
 for env_file in {{ primary_worktree_path }}/.env {{ primary_worktree_path }}/.env.* {{ primary_worktree_path }}/.envrc; do
   [ -f "$env_file" ] && [ ! -L "$env_file" ] || continue
+  destination_file="./${env_file##*/}"
+  rm -f "$destination_file" || exit $?
   cp -p "$env_file" . || exit $?
 done
 """

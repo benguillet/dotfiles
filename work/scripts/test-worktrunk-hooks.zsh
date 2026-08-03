@@ -10,6 +10,7 @@ trap 'rm -rf "$sandbox_root"' EXIT
 
 export XDG_CONFIG_HOME="$sandbox/config"
 export XDG_DATA_HOME="$sandbox/data"
+export DIRENV_CONFIG="$XDG_CONFIG_HOME/direnv"
 export GIT_CONFIG_GLOBAL=/dev/null
 export GIT_CONFIG_NOSYSTEM=1
 
@@ -51,3 +52,35 @@ if wt --config "$config_path" -C "$failed_copy_repo" switch --create feature/cop
   print -u2 'expected worktrunk to fail when copying an unreadable environment file'
   exit 1
 fi
+
+destination_symlink_repo="$sandbox/destination-symlink-repo"
+outside_env="$sandbox/outside.env"
+mkdir -p "$destination_symlink_repo"
+print 'OUTSIDE_ENV=1' > "$outside_env"
+git -C "$destination_symlink_repo" init -b main
+print '.env*' > "$destination_symlink_repo/.gitignore"
+ln -s "$outside_env" "$destination_symlink_repo/.env"
+git -C "$destination_symlink_repo" add .gitignore -f .env
+git -C "$destination_symlink_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit -m init
+rm "$destination_symlink_repo/.env"
+print 'BASE_ENV=1' > "$destination_symlink_repo/.env"
+
+wt --config "$config_path" -C "$destination_symlink_repo" switch --create feature/destination-symlink --no-cd
+test "$(<"$outside_env")" = 'OUTSIDE_ENV=1'
+
+direnv_failure_repo="$sandbox/direnv-failure-repo"
+direnv_stub_dir="$sandbox/direnv-stub"
+real_direnv=$(command -v direnv)
+mkdir -p "$direnv_failure_repo" "$direnv_stub_dir"
+git -C "$direnv_failure_repo" init -b main
+git -C "$direnv_failure_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit --allow-empty -m init
+print 'export DIRENV_READY=1' > "$direnv_failure_repo/.envrc"
+print -rl -- '#!/bin/sh' 'if [ "$1" = allow ] && [ "$2" = . ]; then' '  exit 1' 'fi' "exec \"$real_direnv\" \"\$@\"" > "$direnv_stub_dir/direnv"
+chmod +x "$direnv_stub_dir/direnv"
+
+if direnv_failure_output=$(PATH="$direnv_stub_dir:$PATH" wt --config "$config_path" -C "$direnv_failure_repo" switch --create feature/direnv-failure --no-cd 2>&1); then
+  print -u2 'expected worktrunk to fail when direnv allow fails'
+  exit 1
+fi
+print -r -- "$direnv_failure_output"
+[[ "$direnv_failure_output" == *'pre-start command failed: direnv_allow'* ]]
