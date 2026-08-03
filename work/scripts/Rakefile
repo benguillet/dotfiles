@@ -214,6 +214,11 @@ task :symlinks do
   sh "ln -sfn #{herdr_config_root}/config.toml ~/.config/herdr/config.toml"
   sh "ln -sfn #{herdr_config_root}/plugins/config #{herdr_plugin_config}"
 
+  herdr_devboxes_root = "#{__dir__.chomp('/scripts')}/herdr-devboxes"
+  sh "mkdir -p ~/.local/bin ~/Library/LaunchAgents"
+  sh "ln -sfn #{herdr_devboxes_root}/sync.zsh ~/.local/bin/herdr-devbox-sync"
+  sh "ln -sfn #{herdr_devboxes_root}/com.benguillet.herdr-devbox-sync.plist ~/Library/LaunchAgents/com.benguillet.herdr-devbox-sync.plist"
+
   # Real directories with symlinked files: the ChatGPT desktop app skips
   # symlinked pet directories (Node dirent.isDirectory() is false for links).
   Dir["#{__dir__.chomp('/scripts')}/codex/pets/*"].each do |pet|
@@ -225,4 +230,3 @@ task :symlinks do
 end
 
 # task :setup => [:brew, :osx, :symlinks]
-

@@ -161,4 +161,8 @@ run_sync 200000
 assert_json "$STATE" '.devboxes.beta.empty_since == 91000 and .devboxes.beta.cleanup_attempted_at == 181000'
 [[ "$(command_count 'stop --remote --name=beta')" == 2 ]] || fail 'unreachable beta was treated as empty'
 
-print -r -- 'PASS: discovery, reconciliation, timestamps, and safe cleanup'
+RAKEFILE="$ROOT/../scripts/Rakefile"
+assert_contains '~/.local/bin/herdr-devbox-sync' "$RAKEFILE"
+assert_contains '~/Library/LaunchAgents/com.benguillet.herdr-devbox-sync.plist' "$RAKEFILE"
+
+print -r -- 'PASS: reconciler behavior and dotfiles wiring'
