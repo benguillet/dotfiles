@@ -5,6 +5,13 @@ work_root=${0:A:h:h}
 herdr_config="$work_root/.config/herdr/config.toml"
 layouts_dir="$work_root/.config/herdr/plugins/config/cloudmanic.herdr-plus/worktrees"
 expected_command='command = "wt hook pre-start && exec direnv exec . codex"'
+expected_layouts=(code.toml etl.toml infra.toml paxel.toml)
+actual_layouts=("$layouts_dir"/*.toml(N:t))
+
+if [[ "${(j:\n:)actual_layouts}" != "${(j:\n:)expected_layouts}" ]]; then
+  print -u2 'invalid Herdr Plus worktree layout set'
+  exit 1
+fi
 
 for repo in code paxel infra etl; do
   layout="$layouts_dir/$repo.toml"
@@ -18,7 +25,7 @@ done
 
 command_stanzas=$(awk '
   function emit() {
-    if (in_command) print key "\t" command
+    if (in_command) print key "\t" type "\t" command
   }
 
   {
@@ -29,14 +36,14 @@ command_stanzas=$(awk '
   line ~ /^[[:space:]]*\[\[keys\.command\]\][[:space:]]*$/ {
     emit()
     in_command = 1
-    key = command = ""
+    key = type = command = ""
     next
   }
 
   line ~ /^[[:space:]]*\[/ {
     emit()
     in_command = 0
-    key = command = ""
+    key = type = command = ""
     next
   }
 
@@ -44,6 +51,13 @@ command_stanzas=$(awk '
     sub(/^[^\"]*\"/, "", line)
     sub(/\".*$/, "", line)
     key = line
+    next
+  }
+
+  in_command && line ~ /^[[:space:]]*type[[:space:]]*=/ {
+    sub(/^[^\"]*\"/, "", line)
+    sub(/\".*$/, "", line)
+    type = line
     next
   }
 
@@ -58,18 +72,19 @@ command_stanzas=$(awk '
   }
 ' "$herdr_config")
 
-for key in prefix+up prefix+shift+n; do
-  expected_stanza="$key"$'\tcloudmanic.herdr-plus.projects'
-  key_stanza_count=$(print -r -- "$command_stanzas" | rg -F -c -- "$key"$'\t' || true)
-  expected_stanza_count=$(print -r -- "$command_stanzas" | rg -F -x -c -- "$expected_stanza" || true)
+projects_stanzas=$(
+  print -r -- "$command_stanzas" |
+    awk -F '\t' '$3 == "cloudmanic.herdr-plus.projects" { print $1 "\t" $2 }' |
+    LC_ALL=C sort
+)
+expected_projects_stanzas=$'prefix+shift+n\tplugin_action\nprefix+up\tplugin_action'
 
-  if [[ "$key_stanza_count" != 1 || "$expected_stanza_count" != 1 ]]; then
-    print -u2 "expected $key to run cloudmanic.herdr-plus.projects"
-    exit 1
-  fi
-done
+if [[ "$projects_stanzas" != "$expected_projects_stanzas" ]]; then
+  print -u2 'expected only prefix+up and prefix+shift+n to run Herdr Plus Projects as plugin_action'
+  exit 1
+fi
 
-if print -r -- "$command_stanzas" | rg -Fq -- $'prefix+shift+g\t'; then
+if print -r -- "$command_stanzas" | rg -q -- $'^prefix\\+shift\\+g\t'; then
   print -u2 'legacy Worktrunk key override remains'
   exit 1
 fi
