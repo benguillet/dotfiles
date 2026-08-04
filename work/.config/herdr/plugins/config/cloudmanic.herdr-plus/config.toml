@@ -1,2 +1,3 @@
 [worktree]
 branch_prefix = "ben/"
+create_base = "remote"
