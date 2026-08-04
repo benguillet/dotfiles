@@ -74,7 +74,7 @@ if print -r -- "$command_stanzas" | rg -Fq -- $'prefix+shift+g\t'; then
   exit 1
 fi
 
-if print -r -- "$command_stanzas" | rg -Fq -- $'\tworktrunk.open'; then
+if print -r -- "$command_stanzas" | rg -q -- $'\tworktrunk\\.open$'; then
   print -u2 'legacy Worktrunk key override remains'
   exit 1
 fi
