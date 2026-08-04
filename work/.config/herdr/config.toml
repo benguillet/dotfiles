@@ -41,3 +41,16 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer in tab"
+
+[ui.sidebar.spaces]
+row_gap = 0
+rows = [
+  [
+    "state_icon",
+    { token = "$local", fg = "#a6e3a1", bold = true },
+    { token = "$remote", fg = "#89b4fa", bold = true },
+    "workspace",
+  ],
+  ["branch", "git_status"],
+  ["$worktree"],
+]

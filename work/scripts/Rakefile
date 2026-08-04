@@ -13,6 +13,10 @@ task :herdr_plus do
   sh File.expand_path("install-herdr-plus.zsh", __dir__)
 end
 
+task :workspace_smart_rename do
+  sh File.expand_path("install-workspace-smart-rename.zsh", __dir__)
+end
+
 task :osx do
    # Use plistwatch to find the keys
 
