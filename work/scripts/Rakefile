@@ -9,6 +9,10 @@ task :brew do
   sh '/opt/homebrew/bin/brew bundle'
 end
 
+task :herdr_plus do
+  sh File.expand_path("install-herdr-plus.zsh", __dir__)
+end
+
 task :osx do
    # Use plistwatch to find the keys
 
@@ -225,4 +229,3 @@ task :symlinks do
 end
 
 # task :setup => [:brew, :osx, :symlinks]
-
