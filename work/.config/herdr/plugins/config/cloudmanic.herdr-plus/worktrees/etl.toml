@@ -1,4 +1,4 @@
-repo = "code"
+repo = "etl"
 
 [[tabs]]
 name = "codex"

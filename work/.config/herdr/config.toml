@@ -19,6 +19,12 @@ command = "cloudmanic.herdr-plus.projects"
 description = "herdr-plus: projects"
 
 [[keys.command]]
+key = "prefix+shift+n"
+type = "plugin_action"
+command = "cloudmanic.herdr-plus.projects"
+description = "herdr-plus: projects"
+
+[[keys.command]]
 key = "prefix+down"
 type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"

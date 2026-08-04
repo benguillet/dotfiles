@@ -2,8 +2,4 @@ repo = "paxel"
 
 [[tabs]]
 name = "codex"
-command = "codex"
-
-[[tabs]]
-name = "lazygit"
-command = "lazygit"
+command = "wt hook pre-start && exec direnv exec . codex"

@@ -1,4 +1,4 @@
-repo = "code"
+repo = "infra"
 
 [[tabs]]
 name = "codex"
