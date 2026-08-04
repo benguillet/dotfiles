@@ -72,6 +72,18 @@ command_stanzas=$(awk '
   }
 ' "$herdr_config")
 
+for key in prefix+up prefix+shift+n; do
+  key_stanza_count=$(
+    print -r -- "$command_stanzas" |
+      awk -F '\t' -v expected_key="$key" '$1 == expected_key { count++ } END { print count + 0 }'
+  )
+
+  if [[ "$key_stanza_count" != 1 ]]; then
+    print -u2 "expected exactly one $key command stanza"
+    exit 1
+  fi
+done
+
 projects_stanzas=$(
   print -r -- "$command_stanzas" |
     awk -F '\t' '$3 == "cloudmanic.herdr-plus.projects" { print $1 "\t" $2 }' |
