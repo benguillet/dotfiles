@@ -46,6 +46,23 @@ cp "$repo/.env" "$primary_env"
 wt --config "$config_path" -C "$repo" hook pre-start
 cmp "$primary_env" "$repo/.env"
 
+dotenv_repo="$sandbox/dotenv-repo"
+mkdir -p "$dotenv_repo"
+git -C "$dotenv_repo" init -b main
+print '.env*' > "$dotenv_repo/.gitignore"
+git -C "$dotenv_repo" add .gitignore
+git -C "$dotenv_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit -m init
+print 'BASE_ENV=1' > "$dotenv_repo/.env"
+print 'LOCAL_ENV=1' > "$dotenv_repo/.env.local"
+
+dotenv_result=$(wt --config "$config_path" -C "$dotenv_repo" switch --create feature/dotenv --no-cd --format=json)
+dotenv_worktree=$(jq -r '.path' <<< "$dotenv_result")
+(
+  cd "$dotenv_worktree"
+  direnv exec . sh -c '[ "$BASE_ENV" = 1 ] && [ "$LOCAL_ENV" = 1 ]'
+)
+test "$(<"$dotenv_worktree/.envrc")" = $'dotenv_if_exists .env\ndotenv_if_exists .env.local'
+
 failed_copy_repo="$sandbox/failed-copy-repo"
 mkdir -p "$failed_copy_repo"
 git -C "$failed_copy_repo" init -b main

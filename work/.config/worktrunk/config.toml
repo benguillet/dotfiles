@@ -12,4 +12,19 @@ done
 """
 
 [[pre-start]]
-direnv_allow = "if [ -f .envrc ]; then direnv allow .; fi"
+direnv_allow = """
+if [ {{ worktree_path }} = {{ primary_worktree_path }} ] && [ ! -f .envrc ]; then
+  exit 0
+fi
+if [ ! -e .envrc ] && [ ! -L .envrc ] && { [ -f .env ] || [ -f .env.local ]; }; then
+  {
+    if [ -f .env ]; then
+      printf '%s\n' 'dotenv_if_exists .env'
+    fi
+    if [ -f .env.local ]; then
+      printf '%s\n' 'dotenv_if_exists .env.local'
+    fi
+  } > .envrc || exit $?
+fi
+if [ -f .envrc ]; then direnv allow .; fi
+"""
