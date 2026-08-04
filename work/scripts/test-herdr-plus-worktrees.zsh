@@ -16,17 +16,65 @@ for repo in code paxel infra etl; do
   fi
 done
 
-if [[ $(rg -F -c 'command = "cloudmanic.herdr-plus.projects"' "$herdr_config") != 2 ]]; then
-  print -u2 'expected Herdr Plus Projects on prefix+up and prefix+shift+n'
+command_stanzas=$(awk '
+  function emit() {
+    if (in_command) print key "\t" command
+  }
+
+  {
+    line = $0
+    sub(/[[:space:]]*#.*/, "", line)
+  }
+
+  line ~ /^[[:space:]]*\[\[keys\.command\]\][[:space:]]*$/ {
+    emit()
+    in_command = 1
+    key = command = ""
+    next
+  }
+
+  line ~ /^[[:space:]]*\[/ {
+    emit()
+    in_command = 0
+    key = command = ""
+    next
+  }
+
+  in_command && line ~ /^[[:space:]]*key[[:space:]]*=/ {
+    sub(/^[^\"]*\"/, "", line)
+    sub(/\".*$/, "", line)
+    key = line
+    next
+  }
+
+  in_command && line ~ /^[[:space:]]*command[[:space:]]*=/ {
+    sub(/^[^\"]*\"/, "", line)
+    sub(/\".*$/, "", line)
+    command = line
+  }
+
+  END {
+    emit()
+  }
+' "$herdr_config")
+
+for key in prefix+up prefix+shift+n; do
+  expected_stanza="$key"$'\tcloudmanic.herdr-plus.projects'
+  key_stanza_count=$(print -r -- "$command_stanzas" | rg -F -c -- "$key"$'\t' || true)
+  expected_stanza_count=$(print -r -- "$command_stanzas" | rg -F -x -c -- "$expected_stanza" || true)
+
+  if [[ "$key_stanza_count" != 1 || "$expected_stanza_count" != 1 ]]; then
+    print -u2 "expected $key to run cloudmanic.herdr-plus.projects"
+    exit 1
+  fi
+done
+
+if print -r -- "$command_stanzas" | rg -Fq -- $'prefix+shift+g\t'; then
+  print -u2 'legacy Worktrunk key override remains'
   exit 1
 fi
 
-if ! rg -Fq 'key = "prefix+shift+n"' "$herdr_config"; then
-  print -u2 'missing prefix+shift+n Herdr Plus binding'
-  exit 1
-fi
-
-if rg -Fq 'command = "worktrunk.open"' "$herdr_config" || rg -Fq 'key = "prefix+shift+g"' "$herdr_config"; then
+if print -r -- "$command_stanzas" | rg -Fq -- $'\tworktrunk.open'; then
   print -u2 'legacy Worktrunk key override remains'
   exit 1
 fi
