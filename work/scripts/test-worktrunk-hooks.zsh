@@ -63,6 +63,17 @@ dotenv_worktree=$(jq -r '.path' <<< "$dotenv_result")
 )
 test "$(<"$dotenv_worktree/.envrc")" = $'dotenv_if_exists .env\ndotenv_if_exists .env.local'
 
+no_env_repo="$sandbox/no-env-repo"
+mkdir -p "$no_env_repo"
+git -C "$no_env_repo" init -b main
+git -C "$no_env_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit --allow-empty -m init
+
+no_env_result=$(wt --config "$config_path" -C "$no_env_repo" switch --create feature/no-env --no-cd --format=json)
+no_env_worktree=$(jq -r '.path' <<< "$no_env_result")
+test -d "$no_env_worktree"
+no_env_files=("$no_env_worktree"/.env(N) "$no_env_worktree"/.env.*(N) "$no_env_worktree"/.envrc(N))
+(( ${#no_env_files} == 0 ))
+
 failed_copy_repo="$sandbox/failed-copy-repo"
 mkdir -p "$failed_copy_repo"
 git -C "$failed_copy_repo" init -b main
@@ -89,6 +100,31 @@ print 'BASE_ENV=1' > "$destination_symlink_repo/.env"
 
 wt --config "$config_path" -C "$destination_symlink_repo" switch --create feature/destination-symlink --no-cd
 test "$(<"$outside_env")" = 'OUTSIDE_ENV=1'
+
+broken_envrc_repo="$sandbox/broken-envrc-repo"
+broken_envrc_target="$sandbox/broken-envrc-target"
+broken_direnv_marker="$sandbox/broken-direnv-called"
+broken_direnv_stub_dir="$sandbox/broken-direnv-stub"
+mkdir -p "$broken_envrc_repo" "$broken_direnv_stub_dir"
+git -C "$broken_envrc_repo" init -b main
+print '.env*' > "$broken_envrc_repo/.gitignore"
+print 'BASE_ENV=1' > "$broken_envrc_repo/.env"
+ln -s "$broken_envrc_target" "$broken_envrc_repo/.envrc"
+git -C "$broken_envrc_repo" add .gitignore -f .envrc
+git -C "$broken_envrc_repo" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false commit -m init
+print -rl -- '#!/bin/sh' ': > "$BROKEN_DIRENV_MARKER"' 'exit 1' > "$broken_direnv_stub_dir/direnv"
+chmod +x "$broken_direnv_stub_dir/direnv"
+
+broken_envrc_result=$(BROKEN_DIRENV_MARKER="$broken_direnv_marker" PATH="$broken_direnv_stub_dir:$PATH" wt --config "$config_path" -C "$broken_envrc_repo" switch --create feature/broken-envrc --no-cd --format=json)
+broken_envrc_worktree=$(jq -r '.path' <<< "$broken_envrc_result")
+test -d "$broken_envrc_worktree"
+cmp "$broken_envrc_repo/.env" "$broken_envrc_worktree/.env"
+test -L "$broken_envrc_worktree/.envrc"
+test ! -e "$broken_envrc_worktree/.envrc"
+test "$(readlink "$broken_envrc_worktree/.envrc")" = "$broken_envrc_target"
+test ! -e "$broken_envrc_target"
+test ! -L "$broken_envrc_target"
+test ! -e "$broken_direnv_marker"
 
 direnv_failure_repo="$sandbox/direnv-failure-repo"
 direnv_stub_dir="$sandbox/direnv-stub"
