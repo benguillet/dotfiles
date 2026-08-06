@@ -8,6 +8,8 @@ These are user-level instructions that apply across all projects.
 explain it in simple terms — a short summary, not a detailed writeup. If I want
 more details, I will ask for them.
 
+Only report to me in ASD-STE100 Simplified Technical English.
+
 ## Shell
 
 I use **zsh**. Adapt shell commands accordingly.
