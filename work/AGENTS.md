@@ -39,6 +39,15 @@ true in the code logic. It costs nothing extra and preserves *when* the thing
 became true — invaluable for auditing, debugging, ordering, and reconciliation.
 Example: `has_report_at`, not `has_report`.
 
+## Repo Shorthand
+
+When I mention these, I mean these local folders:
+
+- **infra repo** → `~/Work/yc/infra`
+- **paxel repo** → `~/Work/yc/paxel`
+- **etl repo** → `~/Work/yc/etl`
+- **"add to my reports"** → the reports in `~/Work/yc/reports`
+
 ## Git Branches
 
 Always prefix local branches you create with **`ben/`** (e.g.
