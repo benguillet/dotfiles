@@ -236,6 +236,19 @@ task :symlinks do
   sh "ln -sfn #{herdr_devboxes_root}/sync.zsh ~/.local/bin/herdr-devbox-sync"
   sh "ln -sfn #{herdr_devboxes_root}/com.benguillet.herdr-devbox-sync.plist ~/Library/LaunchAgents/com.benguillet.herdr-devbox-sync.plist"
 
+  Dir[File.expand_path("../../skills/*", __dir__)].each do |skill|
+    %w[.claude/skills .codex/skills].each do |skills_dir|
+      target_root = File.expand_path("~/#{skills_dir}")
+      target = File.join(target_root, File.basename(skill))
+      if File.exist?(target) && !File.symlink?(target)
+        raise "#{target} exists and is not a symlink"
+      end
+
+      sh "mkdir", "-p", target_root
+      sh "ln", "-sfn", skill, target
+    end
+  end
+
   # Real directories with symlinked files: the ChatGPT desktop app skips
   # symlinked pet directories (Node dirent.isDirectory() is false for links).
   Dir["#{__dir__.chomp('/scripts')}/codex/pets/*"].each do |pet|

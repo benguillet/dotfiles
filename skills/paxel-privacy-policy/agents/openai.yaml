@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paxel Privacy Policy"
+  short_description: "Refresh Paxel privacy and data-handling docs"
+  default_prompt: "Use $paxel-privacy-policy to refresh the Paxel privacy policy reference Google Doc from current source."
