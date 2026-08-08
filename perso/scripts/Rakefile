@@ -218,7 +218,7 @@ task :symlinks do
   sh "ln -sfn #{herdr_config_root}/config.toml ~/.config/herdr/config.toml"
   sh "ln -sfn #{herdr_config_root}/plugins/config #{herdr_plugin_config}"
 
-  Dir[File.expand_path("../skills/*", __dir__)].each do |skill|
+  Dir[File.expand_path("../ai/skills/*", __dir__)].each do |skill|
     %w[.claude/skills .codex/skills].each do |skills_dir|
       target_root = File.expand_path("~/#{skills_dir}")
       target = File.join(target_root, File.basename(skill))
@@ -231,7 +231,7 @@ task :symlinks do
     end
   end
 
-  Dir["#{__dir__.chomp('/scripts')}/claude/skills/*"].each do |skill|
+  Dir["#{__dir__.chomp('/scripts')}/ai/claude/skills/*"].each do |skill|
     target = File.expand_path("~/.claude/skills/#{File.basename(skill)}")
     if File.exist?(target) && !File.symlink?(target)
       raise "#{target} exists and is not a symlink"
@@ -242,14 +242,14 @@ task :symlinks do
   end
 
   sh "mkdir -p ~/.codex ~/.claude"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/codex/config.toml ~/.codex/config.toml"
-  sh "ln -sf #{__dir__.chomp('/scripts')}/claude/statusline.sh ~/.claude/statusline.sh"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/ai/codex/config.toml ~/.codex/config.toml"
+  sh "ln -sf #{__dir__.chomp('/scripts')}/ai/claude/statusline.sh ~/.claude/statusline.sh"
   sh "ln -sf #{__dir__.chomp('/scripts')}/AGENTS.md ~/.claude/CLAUDE.md"
   sh "ln -sf #{__dir__.chomp('/scripts')}/AGENTS.md ~/.codex/AGENTS.md"
 
   # Real directories with symlinked files: the ChatGPT desktop app skips
   # symlinked pet directories (Node dirent.isDirectory() is false for links).
-  Dir["#{__dir__.chomp('/scripts')}/codex/pets/*"].each do |pet|
+  Dir["#{__dir__.chomp('/scripts')}/ai/codex/pets/*"].each do |pet|
     pet_dir = File.expand_path("~/.codex/pets/#{File.basename(pet)}")
     # A symlinked pet dir would make ln -sf write back into the repo itself
     File.unlink(pet_dir) if File.symlink?(pet_dir)
