@@ -18,6 +18,7 @@ STAR_YELLOW=220
 COST_TAN=180
 
 c() { printf '%s' "${ESC}[38;5;$1m$2${RESET}"; }
+lower() { tr '[:upper:]' '[:lower:]'; }
 
 tier_color() {
   if [ "$1" -ge 80 ]; then
@@ -31,7 +32,7 @@ tier_color() {
 
 fmt_tokens() {
   awk -v t="$1" 'BEGIN {
-    if (t >= 1000000) { v = t / 1000000; if (v == int(v)) printf "%dM", v; else printf "%.1fM", v }
+    if (t >= 1000000) { v = t / 1000000; if (v == int(v)) printf "%dm", v; else printf "%.1fm", v }
     else if (t >= 1000) { v = t / 1000; if (v == int(v)) printf "%dk", v; else printf "%.1fk", v }
     else printf "%d", t
   }'
@@ -42,6 +43,7 @@ parts=()
 settings="$HOME/.claude/settings.json"
 
 model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
+model_name=$(printf '%s' "$model_name" | lower)
 # fast mode isn't in the statusline stdin JSON, so read the persisted setting
 fast_mode=$(jq -r '.fastMode // false' "$settings" 2>/dev/null)
 [ "$fast_mode" = "true" ] && model_name="${model_name} ⚡"
@@ -56,6 +58,7 @@ effort=$(echo "$input" | jq -r '.effort.level // empty')
 if [ "$thinking_enabled" = "false" ]; then
   parts+=("${DIM}thinking: off${RESET}")
 elif [ -n "$effort" ]; then
+  effort=$(printf '%s' "$effort" | lower)
   parts+=("${DIM}thinking: ${RESET}$(c $PURPLE "$effort")")
 elif [ "$thinking_enabled" = "true" ]; then
   parts+=("${DIM}thinking: ${RESET}$(c $PURPLE on)")
@@ -64,17 +67,17 @@ fi
 worktree=$(echo "$input" | jq -r '.worktree.name // .workspace.git_worktree // empty')
 project_dir=$(echo "$input" | jq -r '.workspace.project_dir // empty')
 [ -z "$worktree" ] && [ -n "$project_dir" ] && worktree=$(basename "$project_dir")
-[ -n "$worktree" ] && parts+=("$(c $TEAL "$worktree")")
+[ -n "$worktree" ] && parts+=("$(c $TEAL "$(printf '%s' "$worktree" | lower)")")
 
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
 dir_name=""
 [ -n "$cwd" ] && dir_name=$(basename "$cwd")
-[ -n "$dir_name" ] && [ "$dir_name" != "$worktree" ] && parts+=("$(c $GRAY "$dir_name")")
+[ -n "$dir_name" ] && [ "$dir_name" != "$worktree" ] && parts+=("$(c $GRAY "$(printf '%s' "$dir_name" | lower)")")
 
 if [ -n "$cwd" ] && [ -d "$cwd" ]; then
   branch=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null)
   if [ -n "$branch" ]; then
-    branch_display="$(c $GRAY "$branch")"
+    branch_display="$(c $GRAY "$(printf '%s' "$branch" | lower)")"
     # -uno skips the untracked-file scan, which is slow in this monorepo
     if [ -n "$(git -C "$cwd" --no-optional-locks status --porcelain -uno 2>/dev/null)" ]; then
       branch_display="${branch_display}$(c $STAR_YELLOW '*')"
@@ -99,7 +102,7 @@ fi
 
 if [ -n "$used_pct" ]; then
   pct_int=$(awk -v p="$used_pct" 'BEGIN { printf "%.0f", p }')
-  parts+=("${DIM}ctx: ${RESET}$(c "$(tier_color "$pct_int")" "${pct_int}%")${DIM} used${RESET}")
+  parts+=("${DIM}ctx: ${RESET}$(c "$(tier_color "$pct_int")" "${pct_int}%")")
 fi
 
 cost=$(echo "$input" | jq -r '.cost.total_cost_usd // empty')
