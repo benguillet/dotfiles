@@ -198,6 +198,25 @@ task :symlinks do
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zprofile ~/.zprofile"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.zshrc ~/.zshrc"
   sh "ln -sf #{__dir__.chomp('/scripts')}/.psqlrc ~/.psqlrc"
+
+  worktrunk_config_source = "#{__dir__.chomp('/scripts')}/.config/worktrunk/config.toml"
+  worktrunk_config = File.expand_path("~/.config/worktrunk/config.toml")
+  if File.exist?(worktrunk_config) && !File.symlink?(worktrunk_config)
+    raise "#{worktrunk_config} exists and is not a symlink"
+  end
+
+  sh "mkdir", "-p", File.dirname(worktrunk_config)
+  sh "ln", "-sfn", worktrunk_config_source, worktrunk_config
+
+  herdr_config_root = "#{__dir__.chomp('/scripts')}/.config/herdr"
+  herdr_plugin_config = File.expand_path("~/.config/herdr/plugins/config")
+  if File.exist?(herdr_plugin_config) && !File.symlink?(herdr_plugin_config)
+    raise "#{herdr_plugin_config} exists and is not a symlink"
+  end
+
+  sh "mkdir -p ~/.config/herdr/plugins"
+  sh "ln -sfn #{herdr_config_root}/config.toml ~/.config/herdr/config.toml"
+  sh "ln -sfn #{herdr_config_root}/plugins/config #{herdr_plugin_config}"
 end
 
 # task :setup => [:brew, :osx, :symlinks]

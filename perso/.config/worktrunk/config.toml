@@ -1,0 +1,30 @@
+[[pre-start]]
+copy_env = """
+if [ {{ worktree_path }} = {{ primary_worktree_path }} ]; then
+  exit 0
+fi
+for env_file in {{ primary_worktree_path }}/.env {{ primary_worktree_path }}/.env.* {{ primary_worktree_path }}/.envrc; do
+  [ -f "$env_file" ] && [ ! -L "$env_file" ] || continue
+  destination_file="./${env_file##*/}"
+  rm -f "$destination_file" || exit $?
+  cp -p "$env_file" . || exit $?
+done
+"""
+
+[[pre-start]]
+direnv_allow = """
+if [ {{ worktree_path }} = {{ primary_worktree_path }} ] && [ ! -f .envrc ]; then
+  exit 0
+fi
+if [ ! -e .envrc ] && [ ! -L .envrc ] && { [ -f .env ] || [ -f .env.local ]; }; then
+  {
+    if [ -f .env ]; then
+      printf '%s\n' 'dotenv_if_exists .env'
+    fi
+    if [ -f .env.local ]; then
+      printf '%s\n' 'dotenv_if_exists .env.local'
+    fi
+  } > .envrc || exit $?
+fi
+if [ -f .envrc ]; then direnv allow .; fi
+"""
