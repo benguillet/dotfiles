@@ -11,22 +11,22 @@ description: Save skills, Claude config, or knowledge docs to Ben's dotfiles rep
 
 | Path | Contents |
 |---|---|
-| `skills/<name>/SKILL.md` | Personal skills, each symlinked into BOTH `~/.claude/skills/<name>` and `~/.codex/skills/<name>` |
+| `work/skills/<name>/SKILL.md` | Personal skills, each symlinked into BOTH `~/.claude/skills/<name>` and `~/.codex/skills/<name>` |
 | `work/claude/statusline.sh` | Status line script — the REAL file; `~/.claude/statusline.sh` is a symlink to it |
 | `work/claude/settings.json` | Snapshot copy of `~/.claude/settings.json` (copy, NOT symlink — see below) |
 | `work/codex/config.toml` | Codex config — the REAL file; `~/.codex/config.toml` is a symlink to it |
 | `work/brain/` | Durable knowledge docs (architecture/system notes, e.g. `yc-architecture.md`) |
-| `docs/` | Misc documentation, plans, specs |
+| `work/docs/` | Misc documentation, plans, specs |
 | `work/tools/` | Helper scripts |
 
 ## Wiring rules
 
-- **All symlinks are managed by `rake symlinks`** (run from `work/scripts/`). It loops over `skills/*` and links each into `~/.claude/skills` and `~/.codex/skills`, and links the statusline and codex config.
+- **All symlinks are managed by `rake symlinks`** (run from `work/scripts/`). It loops over `work/skills/*` and links each into `~/.claude/skills` and `~/.codex/skills`, and links the statusline and codex config.
 - **Skills are symlinked**: always edit the repo copy (the symlink target); never create a sibling real directory in `~/.claude/skills` or `~/.codex/skills`. For a single new skill, instead of the full rake task you can run:
 
   ```bash
-  ln -sfn /Users/ben/Work/dotfiles/skills/<name> ~/.claude/skills/<name>
-  ln -sfn /Users/ben/Work/dotfiles/skills/<name> ~/.codex/skills/<name>
+  ln -sfn /Users/ben/Work/dotfiles/work/skills/<name> ~/.claude/skills/<name>
+  ln -sfn /Users/ben/Work/dotfiles/work/skills/<name> ~/.codex/skills/<name>
   ```
 
 - **`work/claude/statusline.sh`**: edit the repo file directly — the `~/.claude` symlink picks it up and Claude Code re-reads it on the next interaction. Keep it `/bin/bash` 3.2 compatible (macOS system bash: no `$'\u…'`, use `$'\xHH'` byte escapes).
@@ -38,14 +38,14 @@ description: Save skills, Claude config, or knowledge docs to Ben's dotfiles rep
 
 ## Adding a new skill
 
-1. Create `skills/<name>/SKILL.md` with `name` + `description` frontmatter. The description MUST spell out trigger phrases ("TRIGGER when Ben says …") — that's what makes Claude invoke it.
+1. Create `work/skills/<name>/SKILL.md` with `name` + `description` frontmatter. The description MUST spell out trigger phrases ("TRIGGER when Ben says …") — that's what makes Claude invoke it.
 2. Symlink it into both skill dirs (see Wiring rules) or run `rake symlinks`.
-3. Add a row to the skills table in `skills/README.md`.
+3. Add a row to the skills table in `work/skills/README.md`.
 4. Commit + push.
 
 ## Saving "this" to the repo
 
-When Ben says "save this to my repo", infer the destination from what "this" is — a skill → `skills/`, Claude config → `work/claude/`, an architecture/system note → `work/brain/`, a helper script → `work/tools/` — place it, wire the symlink if applicable, update `skills/README.md` when adding a skill, then commit and push in one go. Don't ask which directory unless it's genuinely ambiguous.
+When Ben says "save this to my repo", infer the destination from what "this" is — a skill → `work/skills/`, Claude config → `work/claude/`, an architecture/system note → `work/brain/`, a helper script → `work/tools/` — place it, wire the symlink if applicable, update `work/skills/README.md` when adding a skill, then commit and push in one go. Don't ask which directory unless it's genuinely ambiguous.
 
 ## Committing and pushing
 

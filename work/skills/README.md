@@ -5,14 +5,14 @@ Personal Claude Code / Codex skills, versioned in the dotfiles repo
 
 ## Wiring
 
-`rake symlinks` (from `work/scripts/`) links every `skills/<name>` into both
+`rake symlinks` (from `work/scripts/`) links every `work/skills/<name>` into both
 `~/.claude/skills/<name>` and `~/.codex/skills/<name>`. Both tools follow
 symlinked skill directories, so edits here are picked up immediately and the
 history lives in this repo. For a single new skill:
 
 ```bash
-ln -sfn "$PWD/skills/<name>" ~/.claude/skills/<name>
-ln -sfn "$PWD/skills/<name>" ~/.codex/skills/<name>
+ln -sfn "$PWD/work/skills/<name>" ~/.claude/skills/<name>
+ln -sfn "$PWD/work/skills/<name>" ~/.codex/skills/<name>
 ```
 
 | Skill | What it does |

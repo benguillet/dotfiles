@@ -1,0 +1,4 @@
+interface:
+  display_name: "Save Demo Memo"
+  short_description: "Save sprint demo material for later reuse"
+  default_prompt: "Use $save-demo-memo to save this for the current sprint demo."

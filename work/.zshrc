@@ -235,7 +235,7 @@ export EDITOR=vim
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
 # ryc dotfile sync source (ryc bootstrap mirrors this to the dev server)
-export BOOTSTRAP="$HOME/Work/dotfiles/ryc"
+export BOOTSTRAP="$HOME/Work/dotfiles/work/ryc"
 
 # API keys: locally derived from the ryc config; on the dev server they are
 # synced into ~/.claude-env by `ryc bootstrap`.
