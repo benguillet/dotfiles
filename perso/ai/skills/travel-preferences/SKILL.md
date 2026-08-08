@@ -16,8 +16,12 @@ Entry point for Ben's personal travel preferences. This skill holds no preferenc
 | Trains / ground transport | — | No skill yet |
 | Car rentals | — | No skill yet |
 
+## Points inventory
+
+Ben holds transferable points in **Chase Ultimate Rewards** and **Capital One** only. Gate award-booking transfer paths to programs reachable from these two currencies; ignore Citi/Amex/Bilt-only bonuses.
+
 ## How to apply
 
 - Any flight-related preference question routes to `flight-preferences` — do not duplicate flight rules here.
 - When Ben states a new durable travel preference, add it to the matching domain skill (create the skill if it doesn't exist), then register it in the routing table above.
-- Skills live in `~/dotfiles/perso/claude/skills/` (version-controlled) and are symlinked into `~/.claude/skills/`.
+- Skills live in `~/dotfiles/perso/ai/skills/` (version-controlled) and are symlinked into `~/.claude/skills/` and `~/.codex/skills/`.
