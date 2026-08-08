@@ -5,14 +5,14 @@ Personal Claude Code / Codex skills, versioned in the dotfiles repo
 
 ## Wiring
 
-`rake symlinks` (from `work/scripts/`) links every `work/skills/<name>` into both
+`rake symlinks` (from `work/scripts/`) links every `work/ai/skills/<name>` into both
 `~/.claude/skills/<name>` and `~/.codex/skills/<name>`. Both tools follow
 symlinked skill directories, so edits here are picked up immediately and the
 history lives in this repo. For a single new skill:
 
 ```bash
-ln -sfn "$PWD/work/skills/<name>" ~/.claude/skills/<name>
-ln -sfn "$PWD/work/skills/<name>" ~/.codex/skills/<name>
+ln -sfn "$PWD/work/ai/skills/<name>" ~/.claude/skills/<name>
+ln -sfn "$PWD/work/ai/skills/<name>" ~/.codex/skills/<name>
 ```
 
 | Skill | What it does |
@@ -30,17 +30,17 @@ ln -sfn "$PWD/work/skills/<name>" ~/.codex/skills/<name>
 | [`sprint-demos`](sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped MRs/PRs, group into features, check prod status, compile adoption analytics, produce demo links, screenshots, and an artifact deck. |
 | [`work-summary`](work-summary/SKILL.md) | Concise, verified end-of-work handoff report: what shipped, manual steps left, risks, rollback plan, and MR/PR links in safe merge order. |
 
-## Claude config (`work/claude/`)
+## Claude config (`work/ai/claude/`)
 
-- `work/claude/statusline.sh` — the status line script. `~/.claude/statusline.sh` is a
+- `work/ai/claude/statusline.sh` — the status line script. `~/.claude/statusline.sh` is a
   symlink to it, so edits here go live on the next Claude Code interaction.
-- `work/claude/settings.json` — a snapshot **copy** of `~/.claude/settings.json`, not a
+- `work/ai/claude/settings.json` — a snapshot **copy** of `~/.claude/settings.json`, not a
   symlink: Claude Code rewrites the live file at runtime (`/fast`, `/config`), which
   would keep the repo dirty and its atomic writes could silently replace a symlink.
   Re-sync after meaningful changes:
 
 ```bash
-cp ~/.claude/settings.json work/claude/settings.json
+cp ~/.claude/settings.json work/ai/claude/settings.json
 ```
 
 ## Setup on a new machine
@@ -48,5 +48,5 @@ cp ~/.claude/settings.json work/claude/settings.json
 ```bash
 git clone git@github.com:benguillet/dotfiles.git ~/Work/dotfiles
 cd ~/Work/dotfiles/work/scripts && rake symlinks
-cp -n ../claude/settings.json ~/.claude/settings.json  # seed once; Claude Code owns it after
+cp -n ../ai/claude/settings.json ~/.claude/settings.json  # seed once; Claude Code owns it after
 ```
