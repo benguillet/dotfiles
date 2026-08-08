@@ -1,0 +1,8 @@
+name = "Dotfiles"
+description = "Personal dotfiles"
+group = "Perso"
+working_dir = "/Users/ben/dotfiles/perso"
+
+[[tabs]]
+name = "claude"
+command = "claude"
