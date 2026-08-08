@@ -109,6 +109,7 @@ if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZDOTDIR:-${HOME}}/.zimrc ]]; then
   source ${ZIM_HOME}/zimfw.zsh init -q
 fi
 # Initialize modules.
+fpath=(/Users/ben/.local/share/zsh/site-functions $fpath)
 source ${ZIM_HOME}/init.zsh
 
 # ------------------------------
@@ -232,3 +233,13 @@ export PATH="/Users/ben/.codeium/windsurf/bin:$PATH"
 export EDITOR=vim
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# ryc dotfile sync source (ryc bootstrap mirrors this to the dev server)
+export BOOTSTRAP="$HOME/Work/dotfiles/ryc"
+
+# API keys: locally derived from the ryc config; on the dev server they are
+# synced into ~/.claude-env by `ryc bootstrap`.
+if [[ -z "${OPENAI_API_KEY:-}" && -f "$HOME/.config/yc-remote-dev/config" ]]; then
+  export OPENAI_API_KEY="$(sed -n 's/^OPENAI_API_KEY=//p' "$HOME/.config/yc-remote-dev/config" | tr -d '"')"
+fi
+[[ -f "$HOME/.claude-env" ]] && source "$HOME/.claude-env"

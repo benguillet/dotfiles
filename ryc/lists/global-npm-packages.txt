@@ -1,0 +1,2 @@
+# One package per line. Installed globally by bin/bootstrap-linux when
+# BOOTSTRAP_INSTALL_PACKAGES=1.

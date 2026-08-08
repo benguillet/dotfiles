@@ -1,0 +1,8 @@
+# One package per line. Installed by bin/bootstrap-linux when
+# BOOTSTRAP_INSTALL_PACKAGES=1 (every `ryc bootstrap` run).
+zsh
+rbenv
+direnv
+mise
+eza
+bat

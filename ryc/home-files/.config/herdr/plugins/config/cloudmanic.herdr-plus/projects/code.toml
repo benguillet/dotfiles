@@ -1,0 +1,8 @@
+name = "Code"
+description = "YC code monorepo"
+group = "YC"
+working_dir = "/data/repos/code"
+
+[[tabs]]
+name = "codex"
+command = "codex"

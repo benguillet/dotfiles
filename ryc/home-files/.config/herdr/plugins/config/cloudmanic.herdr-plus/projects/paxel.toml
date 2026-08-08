@@ -1,0 +1,8 @@
+name = "Paxel"
+description = "YC Paxel"
+group = "YC"
+working_dir = "/data/repos/paxel"
+
+[[tabs]]
+name = "codex"
+command = "codex"

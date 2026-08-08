@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "plugins": {
+    "superpowers@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ben/.claude/plugins/cache/claude-plugins-official/superpowers/6.2.0",
+        "version": "6.2.0",
+        "installedAt": "2026-07-03T20:09:36.364Z",
+        "lastUpdated": "2026-07-24T16:36:42.468Z",
+        "gitCommitSha": "d884ae04edebef577e82ff7c4e143debd0bbec99"
+      }
+    ],
+    "i-have-adhd@i-have-adhd": [
+      {
+        "scope": "user",
+        "installPath": "/Users/ben/.claude/plugins/cache/i-have-adhd/i-have-adhd/72c33eee81ea",
+        "version": "72c33eee81ea",
+        "installedAt": "2026-07-19T23:47:44.023Z",
+        "lastUpdated": "2026-07-19T23:47:44.023Z",
+        "gitCommitSha": "72c33eee81ea439cf01991e93729adfce2ffc99e"
+      }
+    ]
+  }
+}

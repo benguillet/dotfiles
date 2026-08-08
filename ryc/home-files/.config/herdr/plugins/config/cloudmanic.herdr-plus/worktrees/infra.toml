@@ -1,0 +1,5 @@
+repo = "infra"
+
+[[tabs]]
+name = "codex"
+command = "wt hook pre-start && exec direnv exec . codex"

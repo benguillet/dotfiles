@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BOOTSTRAP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+read_list() {
+  grep -vE '^\s*(#|$)' "$1" 2>/dev/null || true
+}
+
+if [[ "${BOOTSTRAP_INSTALL_PACKAGES:-0}" == "1" ]]; then
+  # mise is not in the Ubuntu archive; it ships its own apt repo.
+  if [[ ! -f /etc/apt/sources.list.d/mise.list ]]; then
+    sudo install -dm 755 /etc/apt/keyrings
+    curl -fsSL https://mise.jdx.dev/gpg-key.pub |
+      gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg >/dev/null
+    echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=$(dpkg --print-architecture)] https://mise.jdx.dev/deb stable main" |
+      sudo tee /etc/apt/sources.list.d/mise.list >/dev/null
+  fi
+
+  apt_pkgs=$(read_list "$BOOTSTRAP_DIR/lists/apt-packages.txt")
+  if [[ -n "$apt_pkgs" ]]; then
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    # shellcheck disable=SC2086
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $apt_pkgs
+  fi
+
+  # Ubuntu ships bat as batcat (binary name collision in Debian).
+  if [[ -x /usr/bin/batcat && ! -e /usr/local/bin/bat ]]; then
+    sudo ln -s /usr/bin/batcat /usr/local/bin/bat
+  fi
+
+  npm_pkgs=$(read_list "$BOOTSTRAP_DIR/lists/global-npm-packages.txt")
+  if [[ -n "$npm_pkgs" ]] && command -v npm >/dev/null 2>&1; then
+    # shellcheck disable=SC2086
+    npm install -g $npm_pkgs
+  fi
+fi
+
+# Merge, never delete: the remote HOME carries live state (~/.claude/projects
+# etc.) that must survive re-runs.
+rsync -a "$BOOTSTRAP_DIR/home-files/" "$HOME/"

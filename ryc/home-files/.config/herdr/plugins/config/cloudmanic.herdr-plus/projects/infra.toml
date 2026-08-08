@@ -1,0 +1,8 @@
+name = "Infra"
+description = "YC infrastructure"
+group = "YC"
+working_dir = "/data/repos/infra"
+
+[[tabs]]
+name = "codex"
+command = "codex"

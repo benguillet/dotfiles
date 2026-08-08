@@ -1,0 +1,18 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/ben/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-08-06T22:07:30.121Z"
+  },
+  "i-have-adhd": {
+    "source": {
+      "source": "directory",
+      "path": "/Users/ben/Work/yc/i-have-adhd"
+    },
+    "installLocation": "/Users/ben/Work/yc/i-have-adhd",
+    "lastUpdated": "2026-07-19T23:47:26.795Z"
+  }
+}
