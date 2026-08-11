@@ -25,6 +25,7 @@ ln -sfn "$PWD/work/ai/skills/<name>" ~/.codex/skills/<name>
 | [`mockup`](mockup/SKILL.md) | High-fidelity UI mockups matched to the target app's real design tokens, published to a claude.ai/design project and screenshotted. |
 | [`paxel-privacy-policy`](paxel-privacy-policy/SKILL.md) | Refresh, audit, or publish Paxel privacy-policy reference material from current source. |
 | [`pier70-lunch`](pier70-lunch/SKILL.md) | Weekday office lunch: pick Ben's most likely item, confirm, add it to the shared DoorDash group cart. Has an "arm" mode for the 7:40am cron. |
+| [`polling-ticker`](polling-ticker/SKILL.md) | When Ben asks to monitor/poll every `<frequency>`: run a visible ticker — one status line per tick, even unchanged, ending with a loud DONE line. Never a silent background watch. |
 | [`review-panel`](review-panel/SKILL.md) | Adversarial review panel over diffs or plan documents: finders per target×axis plus red-teams, then independent refuters verify every finding. |
 | [`save-demo-memo`](save-demo-memo/SKILL.md) | Save links, screenshots, artifacts, results, setup state, and talk tracks from the current session into the shared sprint-demo folder. |
 | [`sprint-demos`](sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped MRs/PRs, group into features, check prod status, compile adoption analytics, produce demo links, screenshots, and an artifact deck. |
