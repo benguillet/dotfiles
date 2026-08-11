@@ -86,12 +86,9 @@ and inspect the file afterwards.
 ## Monitoring / Polling — Visible Ticker
 
 When I ask to monitor, poll, watch, or check something **every <frequency>**,
-run a visible ticker: one status line per tick at that frequency
-(`HH:MM:SS — <state>`), even when nothing changed. Noise is fine; silence
-reads as "the agent stopped polling". Never swap the ticker for a silent
-background monitor or "I'll report when it changes". End with an explicit
-DONE/stopped line. If I ask for a watch without a frequency, pick one and
-announce it. Full mechanics: the `polling-ticker` skill.
+use the `polling-ticker` skill: a visible ticker — one status line per tick at
+that frequency, even when nothing changed — never a silent background monitor
+or "I'll report when it changes".
 
 <!-- ycli:start -->
 ## Using `ycli`
