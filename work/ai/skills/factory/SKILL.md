@@ -128,7 +128,7 @@ while true; do
   for d in $DIRS; do
     for f in "$d"/agent-*.jsonl "$d"/journal.jsonl; do
       [ -e "$f" ] || continue
-      m=$(stat -f %m "$f")
+      m=$(stat -f %m "$f" 2>/dev/null || stat -c %Y "$f")   # macOS || Linux
       [ "$m" -gt "$newest" ] && newest=$m
       case "$f" in *agent-*) total=$((total+1)); [ $((now-m)) -lt 60 ] && active=$((active+1));; esac
     done
