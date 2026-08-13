@@ -1,6 +1,6 @@
 ---
 name: factory
-description: Ship a prompt, spec, or approved plan as a fleet of small stacked MRs/PRs across repos through a workflow-native pipeline — triage, intent sharpening, dual-model (Claude + codex) planning, plan/risk review, parallel worktree build with per-unit adversarial codex review, axis-based review panels, browser verification with seeded data, fix on the owning branches, and an HTML launch report. Every long phase is a live Workflow watchable in /workflows, backed by an on-disk session state store (state.json / STATUS.md / events) that makes the run crash-resilient (survey → TaskStop zombies → relaunch) and always visible. TRIGGER when the user types /factory <spec/plan path, gdoc link, or description>, or asks to "implement the spec as stacked MRs", "run the factory", or to turn an approved plan into shippable MRs end to end.
+description: Ship a prompt, spec, or approved plan as a fleet of small stacked MRs/PRs across repos through a workflow-native pipeline — triage, intent sharpening, dual-model (Claude + codex) planning, plan/risk review, parallel worktree build with per-unit adversarial codex review, axis-based review panels, browser verification with seeded data, fix on the owning branches, and an HTML launch report. Every long phase is a live Workflow with a visible 15s ticker + stall watchdog (diagnose → fix cause → relaunch), backed by an on-disk session state store (state.json / STATUS.md / events) that makes the run crash-resilient and always visible. TRIGGER when the user types /factory <spec/plan path, gdoc link, or description>, or asks to "implement the spec as stacked MRs", "run the factory", or to turn an approved plan into shippable MRs end to end.
 ---
 
 # /factory — prompt in, reviewed MR fleet out
@@ -13,10 +13,13 @@ narrow and exact:
 1. Resolve the prompt and set up the run.
 2. Run the interactive checkpoints (only the conductor may `AskUserQuestion`).
 3. Chain the phase workflows in order, in the exact arg shapes below.
-4. After every phase, persist the workflow's output into the session store,
+4. Keep the live ticker running — one visible status line every ~15s while
+   anything is in flight ("Ticker + watchdog" below).
+5. After every phase, persist the workflow's output into the session store,
    atomic-rewrite `state.json`, regenerate `STATUS.md`, `TaskUpdate`, stamp
    timings, append events, and post a one-line milestone.
-5. Recover from crashes per `RECOVERY.md`.
+6. Watch for stalls, diagnose and FIX the crash cause, and relaunch dead
+   workflows per `RECOVERY.md`.
 
 Companion files (same tree; **expand `~`/`<$HOME>` to the real `$HOME`** before
 use — the `Workflow` and `Skill` tools do NOT expand it):
@@ -37,7 +40,9 @@ use — the `Workflow` and `Skill` tools do NOT expand it):
    step", never "start over".
 2. **The user can always see what's happening.** The session store
    (`state.json` + `STATUS.md`) + task list + milestone messages are not
-   optional. If the user asks "status?" the answer must already exist on disk.
+   optional. If the user asks "status?" the answer must already exist on disk
+   — and while anything is in flight, a tick line lands in chat every ~15s
+   unprompted. Silence is indistinguishable from a dead run.
 
 ## 0. Kickoff
 
@@ -65,9 +70,11 @@ use — the `Workflow` and `Skill` tools do NOT expand it):
    `links`). Append the `run_created` event. Write `STATUS.md`.
 5. **Read `RECOVERY.md`.** Resolve each repo's test/lint/migration/MR
    conventions from its `CLAUDE.md`/`AGENTS.md` when you reach it — never assume.
-6. **Arm the heartbeat.** `ScheduleWakeup` 1200–1800s, prompt: *"check agents,
-   recover per RECOVERY.md, continue per state.json."* Re-arm it each phase. Do
-   NOT use wakeups for streaming — use `Monitor` when there is a pollable signal.
+6. **Arm the fallback heartbeat.** `ScheduleWakeup` 1200–1800s, prompt: *"check
+   agents, recover per RECOVERY.md, continue per state.json."* Re-arm it each
+   phase. The heartbeat is a dead-man's switch, NOT the liveness channel — the
+   15s ticker ("Ticker + watchdog" below) is; a wakeup that finds no live
+   ticker is itself a stall.
 7. **`TaskCreate`** one task per phase (and, once planned, one per shipping
    unit); `TaskUpdate` at every transition.
 
@@ -92,6 +99,77 @@ use — the `Workflow` and `Skill` tools do NOT expand it):
 `unit_codex_review`, `unit_pushed`, `mr_created`, `finding_confirmed`,
 `fix_applied`, `verify_state`, `artifact_written`) is emitted by the agents
 INSIDE the workflows — do not double-write those.
+
+## Ticker + watchdog — mandatory while anything is in flight
+
+Task notifications are NOT a liveness channel: a crashed workflow never
+notifies. Never sit in a naked wait. The moment you launch a `Workflow` (or
+any long-running background agent), start a ticker `Monitor` in the SAME
+turn — one ticker per in-flight window; a concurrent pair shares one ticker
+watching both transcript dirs. Capture each Workflow's task id + transcript
+dir from its tool result first.
+
+The ticker follows the `polling-ticker` contract: one line per tick,
+unchanged state is still a tick, errors are ticks, end loudly. One line
+every 15s, unconditionally. Use `Monitor` with `persistent: true` (phases
+outrun the 1h `timeout_ms` cap). Template — bake in real paths (no spaces),
+the phase label, and the phase key(s):
+
+```bash
+RUN="$HOME/.factory/runs/<run-id>"; EV="$RUN/events.jsonl"
+PH="build 5/8"                                    # pair: "review_code ∥ verify 6/8"
+KEYS='.phases.build.status'                       # pair: '.phases.review_code.status, .phases.verify.status'
+DIRS="<transcriptDir-A> <transcriptDir-B>"        # one per running workflow
+last=$(wc -l < "$EV" 2>/dev/null || echo 0)
+while true; do
+  alldone=$(jq -r "[$KEYS] | map(. == \"done\" or . == \"failed\") | all" "$RUN/state.json" 2>/dev/null)
+  [ "$alldone" = "true" ] && { st=$(jq -r "[$KEYS] | join(\"/\")" "$RUN/state.json" 2>/dev/null); echo "⏹ $(date +%H:%M:%S) [$PH] ended: ${st:-?} — ticker exiting"; exit 0; }
+  now=$(date +%s); newest=0; active=0; total=0
+  for d in $DIRS; do
+    for f in "$d"/agent-*.jsonl "$d"/journal.jsonl; do
+      [ -e "$f" ] || continue
+      m=$(stat -f %m "$f")
+      [ "$m" -gt "$newest" ] && newest=$m
+      case "$f" in *agent-*) total=$((total+1)); [ $((now-m)) -lt 60 ] && active=$((active+1));; esac
+    done
+  done
+  cur=$(wc -l < "$EV" 2>/dev/null || echo 0); newev=$((cur-last)); last=$cur
+  lastev=$(tail -1 "$EV" 2>/dev/null | jq -r '.type + (if .unit then ":"+.unit else "" end)' 2>/dev/null)
+  units=$(jq -r '[.units[]? | .id+":"+.status] | join(" ")' "$RUN/state.json" 2>/dev/null)
+  age=$(( newest > 0 ? now - newest : 0 ))
+  flag=""; [ "$age" -ge 300 ] && flag=" ⚠ quiet ${age}s"
+  [ "$age" -ge 600 ] && flag=" ⚠⚠ STALL ${age}s — investigate NOW"
+  echo "⏱ $(date +%H:%M:%S) [$PH] agents ${active}/${total} active · last write ${age}s ago · +${newev} events (${lastev:--}) · ${units:--}$flag"
+  sleep 15
+done
+```
+
+Relay every Monitor notification to chat as its own one-line message,
+verbatim. A clean tick is relay-only: ZERO tool calls — that is what keeps
+4 ticks/min affordable. The leading `[$PH]` is the at-a-glance "which step
+are we on": phase name + pipeline number, `∥` when two phases run
+concurrently.
+
+Escalation:
+
+- `⚠ quiet ≥300s` — relay it, take no action; one long test suite or build
+  can legitimately go quiet.
+- `⚠⚠ STALL ≥600s` — act now, per RECOVERY.md "Stall → diagnose → fix →
+  relaunch". Never blind-restart on a first `⚠`; never relaunch the same
+  failure twice without changing something.
+- Phase workflow returns → `TaskStop` the ticker, post the milestone. If
+  the ticker itself dies (app restart), the §0.6 heartbeat is the backstop:
+  a wakeup that finds no live ticker treats it as a stall.
+
+Conductor-dispatched single agents get the same treatment, scaled: run
+triage in the foreground (≤2 min); for plan-amend / UI-smoke /
+`/work-summary`, run foreground or start a ticker watching the files they
+write (`plan.md`, screenshots dir, `artifacts/report/`), same thresholds.
+
+Red flags — you are about to violate this section: "the task notification
+will tell me when it's done" · "this phase is short, no ticker needed" ·
+more than a minute since the last visible tick with nothing said. All of
+these mean: start/restart the ticker NOW.
 
 ## 1. Pipeline overview
 
@@ -421,8 +499,8 @@ every unit's `dir`; `fix` has no `already_pushed`) and trim `findings` to those
 not yet actioned in `artifacts/fix/fixes.json` instead. Same-session interruptions MAY reuse the
 Workflow journal via `resumeFromRunId` (from the stored `workflow_run_id`), but
 correctness never depends on it — artifact idempotence + git survey is the real
-recovery. Emit `recovery_performed`, update `state.json`/`STATUS.md`, re-arm the
-heartbeat.
+recovery. Emit `recovery_performed`, update `state.json`/`STATUS.md`, restart
+the ticker on the new transcript dir, re-arm the heartbeat.
 
 ## Concurrency & house rules
 
@@ -430,7 +508,8 @@ heartbeat.
   or isolated worktrees only; stacked branches in one repo are sequential.
 - Launch each concurrent pair (plan-panel ∥ risk, code-panel ∥ verify) as two
   `Workflow` calls **in the same assistant message**, and do not proceed until
-  both have returned.
+  both have returned. One ticker watches the pair (both transcript dirs); its
+  label shows both phases, e.g. `[review_code ∥ verify 6/8]`.
 - `state.json` is conductor-only and always written tmp-then-`mv`. `STATUS.md`
   regenerates on every rewrite; during a concurrent window its header may render
   `**Phase:** review_code ∥ verify`.

@@ -16,6 +16,38 @@ cost minutes, not hours.
   test suite) trips "no progress" and the harness kills the agent. Build agents
   must redirect long commands to a log file and poll it.
 
+## Stall → diagnose → fix → relaunch (the ticker watchdog path)
+
+The 15s ticker (SKILL.md "Ticker + watchdog") turns every death into a
+visible `⚠⚠ STALL` within ~10 minutes. When one fires:
+
+1. **Confirm it's real.** `TaskGet` the workflow's task. Still `running`,
+   and the quiet agent's `agent-*.jsonl` tail shows a long tool call
+   mid-flight (test suite, big install)? Not a stall — say so on the next
+   tick and keep watching.
+2. **Diagnose before touching anything.** Tail the workflow's
+   `journal.jsonl` and the quiet/dead `agent-*.jsonl`(s). Classify:
+
+   | evidence in the tails | fix BEFORE relaunching |
+   |---|---|
+   | `ENOMEM` / OOM during pnpm/bundle/webpack | flush the OrbStack page cache (`/reclaim-memory`), retry |
+   | docker: "all predefined address pools have been fully subnetted" | `docker network prune -f` |
+   | port in use / stray per-worktree stack | `docker ps`, stop stale `wt-*` stacks |
+   | `ConcurrentMigrationError` | another lane is migrating — wait it out, then relaunch |
+   | `tsc: command not found` / missing node_modules in a worktree | `pnpm install` in that worktree, or commit from the main tree |
+   | workflow returned `{status:'codex-unavailable'}` | codex policy: pause the phase, surface `detail` verbatim — do NOT relaunch |
+   | workflow returned `{status:'bad_input'}` | conductor bug — fix the arg shape, relaunch |
+   | agent killed by the 600s no-progress watchdog | relaunch; the replacement must redirect long commands to a log file and poll it |
+   | nothing conclusive | relaunch once (`resumeFromRunId`) and watch the same spot |
+
+3. **`TaskStop` first** (zombie rule below), clean stale worktrees/stacks,
+   then relaunch the phase per the procedure below.
+4. **Two identical crashes = stop.** If the relaunch dies the same way, do
+   not loop: set the phase `failed`, emit `phase_failed`, and surface the
+   evidence to the human.
+5. Emit `recovery_performed`, rewrite `state.json`/`STATUS.md`, and
+   **restart the ticker** pointed at the NEW workflow's transcript dir.
+
 ## Recovery procedure (any death / stall / fresh session)
 
 1. **Read the store, don't assume.** Read `state.json`, tail the last ~20
@@ -70,7 +102,8 @@ cost minutes, not hours.
 6. **Close the loop.** Append a `recovery_performed` event (what died, what
    the survey found, what you relaunched), atomic-rewrite `state.json`
    (tmp file + `mv`, never in place), regenerate `STATUS.md`, `TaskUpdate`
-   the affected phase/unit tasks, and re-arm the heartbeat (`ScheduleWakeup`).
+   the affected phase/unit tasks, restart the ticker on the new transcript
+   dir, and re-arm the heartbeat (`ScheduleWakeup`).
 
 **Stale worktrees and docker stacks:** dead build agents leave both behind.
 `git -C <repo> worktree list` to find worktrees (`<scratch_dir>/wt-<unit
