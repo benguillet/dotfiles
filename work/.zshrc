@@ -121,6 +121,19 @@ source ${ZIM_HOME}/init.zsh
 # Must come after Zim init: the environment module sets NO_CLOBBER.
 unsetopt noclobber
 
+# Remote TUIs can leave tracking modes enabled when SSH disconnects unexpectedly.
+_reset_terminal_tracking() {
+  [[ -t 1 ]] && printf '\e[?1000l\e[?1002l\e[?1003l\e[?1004l\e[?1006l' > /dev/tty
+}
+
+ssh() {
+  _reset_terminal_tracking
+  command ssh "$@"
+  local ssh_status=$?
+  _reset_terminal_tracking
+  return $ssh_status
+}
+
 #
 # zsh-history-substring-search
 #
