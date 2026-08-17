@@ -1,9 +1,6 @@
 {
   "agentPushNotifEnabled": true,
   "alwaysThinkingEnabled": true,
-  "env": {
-    "CLAUDE_CODE_DISABLE_MOUSE": "1"
-  },
   "effortLevel": "xhigh",
   "enabledPlugins": {
     "i-have-adhd@i-have-adhd": true,
