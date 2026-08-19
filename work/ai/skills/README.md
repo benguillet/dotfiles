@@ -30,6 +30,7 @@ ln -sfn "$PWD/work/ai/skills/<name>" ~/.codex/skills/<name>
 | [`save-demo-memo`](save-demo-memo/SKILL.md) | Save links, screenshots, artifacts, results, setup state, and talk tracks from the current session into the shared sprint-demo folder. |
 | [`sprint-demos`](sprint-demos/SKILL.md) | Build the weekly sprint-planning demo package: collect shipped MRs/PRs, group into features, check prod status, compile adoption analytics, produce demo links, screenshots, and an artifact deck. |
 | [`standup`](standup/SKILL.md) | Prepare a concise daily standup from verified GitHub PR, GitLab MR, and Conductor AI-session activity. |
+| [`test-apply-locally`](test-apply-locally/SKILL.md) | Start, repair, sign into, and browser-test Apply and its YC Agent chat in the local YC stack. |
 | [`work-summary`](work-summary/SKILL.md) | Concise, verified end-of-work handoff report: what shipped, manual steps left, risks, rollback plan, and MR/PR links in safe merge order. |
 
 ## Claude config (`work/ai/claude/`)

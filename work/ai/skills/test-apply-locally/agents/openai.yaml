@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Apply Locally"
+  short_description: "Start and verify Apply end to end locally"
+  default_prompt: "Use $test-apply-locally to start Apply and verify YC Agent chat in my local Work Chrome."
