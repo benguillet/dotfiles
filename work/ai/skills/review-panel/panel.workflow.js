@@ -17,7 +17,7 @@
 //   lenses: ['correctness'],      // optional; run ONLY these axes (else all)
 //   settled: ['decision …'],      // optional do-not-relitigate list
 //   context_files: ['/abs.md'],   // optional read-first files (intent/research/plan)
-//   refuters: 2,                  // optional; verifiers per finding (default 2)
+//   refuters: 1,                  // optional; verifiers per finding (default 1)
 //   session_dir: '/abs'           // optional; events + findings.json land here
 // }
 export const meta = {
@@ -168,7 +168,7 @@ if (a.lenses?.length) {
 }
 
 const focusAreas = Array.isArray(a.focus) ? a.focus.filter(Boolean) : []
-const refuterCount = a.refuters || 2
+const refuterCount = a.refuters || 1
 const settled = (a.settled || []).map(s => `- ${s}`).join('\n')
 const contextFiles = (a.context_files || []).join(', ')
 

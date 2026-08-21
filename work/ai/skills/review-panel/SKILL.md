@@ -35,7 +35,7 @@ it).
 | `lenses` | `string[]` | no | all axes | run ONLY the named axes (must be valid keys for the mode; unknown → `bad_input`) |
 | `settled` | `string[]` | no | `[]` | do-not-relitigate decisions; a finding that reopens one is refuted |
 | `context_files` | `string[]` | no | `[]` | absolute paths every finder/refuter reads first (intent.md, research.md, plan.md as applicable) |
-| `refuters` | `integer` | no | `2` | independent verifiers per deduped finding |
+| `refuters` | `integer` | no | `1` | independent verifiers per deduped finding |
 | `session_dir` | string (abs path) | no | none | when given, agents append events to `events.jsonl` and write `artifacts/review-<mode>/findings.json` here |
 
 Bad input (`mode` not `plan`/`code`, empty/missing `targets`, an unknown lens
@@ -86,7 +86,6 @@ Workflow({
     crosschecks: [{ key: "projection-shape", prompt: "Compare the S3 projection JSON written by the ycinternal diff with the shape the paxel diff parses — flag any field-name/type mismatch." }],
     settled: ["nightly full reindex is acceptable — do not propose change tracking"],
     context_files: ["/Users/ben/.factory/runs/2026-07-08-scoring/artifacts/plan/plan.md"],
-    refuters: 2,
     session_dir: "/Users/ben/.factory/runs/2026-07-08-scoring",
   },
 })
@@ -108,7 +107,6 @@ Workflow({
       "/Users/ben/.factory/runs/2026-07-08-scoring/artifacts/intent/intent.md",
       "/Users/ben/.factory/runs/2026-07-08-scoring/artifacts/research/research.md",
     ],
-    refuters: 2,
     session_dir: "/Users/ben/.factory/runs/2026-07-08-scoring",
   },
 })
