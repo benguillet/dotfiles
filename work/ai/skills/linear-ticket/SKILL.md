@@ -64,5 +64,13 @@ MR/PR in both directions.
   the list for a duplicate before assuming.
 - Keyboard shortcut `cmd+enter` also submits the composer; the Create issue
   button is fine too.
+- **Comments/replies submit on plain Enter** — never `type` multi-line text
+  into a comment box: the first newline posts the fragment and the remaining
+  keystrokes leak into the page as global shortcuts (they can open a New-issue
+  composer). Write comments as ONE line, or send `shift+Return` between typed
+  segments for deliberate line breaks.
+- If a stray composer/dropdown opens, don't spam Escape blindly — `find` the
+  dialog to confirm it still exists (screenshots can be stale) and close via
+  its X or one targeted Escape, then re-`find` the field you wanted.
 - Ben's Linear workspace slug is `ycm`; teams seen there: Ben Personal
   (private), App Ops, Y Combinator.
