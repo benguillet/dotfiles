@@ -22,6 +22,7 @@ ln -sfn "$PWD/work/ai/skills/<name>" ~/.codex/skills/<name>
 | [`factory`](factory/SKILL.md) | Ship a prompt, spec, or approved plan as a fleet of small stacked MRs/PRs through a workflow-native pipeline with adversarial review and browser verification. |
 | [`feature-pipeline`](feature-pipeline/SKILL.md) | Run a task folder through the full feature pipeline: triage → sharpen → research → dual plans → critique → implement → review → verify → ship. |
 | [`gdoc`](gdoc/SKILL.md) | Publish the latest on-disk version of a spec/plan markdown file to Google Docs and return the link; updates the same Doc in place on republish. |
+| [`linear-ticket`](linear-ticket/SKILL.md) | Create a Linear ticket via browser automation, defaulting to the private Ben Personal team, and cross-link a GitLab MR / GitHub PR both ways. |
 | [`mockup`](mockup/SKILL.md) | High-fidelity UI mockups matched to the target app's real design tokens, published to a claude.ai/design project and screenshotted. |
 | [`paxel-privacy-policy`](paxel-privacy-policy/SKILL.md) | Refresh, audit, or publish Paxel privacy-policy reference material from current source. |
 | [`pier70-lunch`](pier70-lunch/SKILL.md) | Weekday office lunch: pick Ben's most likely item, confirm, add it to the shared DoorDash group cart. Has an "arm" mode for the 7:40am cron. |
