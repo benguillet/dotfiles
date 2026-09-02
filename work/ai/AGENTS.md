@@ -61,6 +61,23 @@ Never swallow exceptions silently: Let things break when it's unexpected
 behavior, we use Sentry to know when such things happen and be aware of edge
 cases. Only rescue errors that are expected.
 
+## Fixing CI Failures You Did Not Cause
+
+When an MR pipeline fails on files the branch did not touch (flaky/time-rot
+spec, stale shared-gem lockfile, missing RBI, master breakage), **do not author
+a fix MR right away.** First:
+
+1. `git fetch origin master` and `git log -3 origin/master -- <failing files>`
+   — master often already carries the fix (it may have landed minutes after the
+   pipeline's merge ref was taken).
+2. Search open MRs touching those files — usually the author of the breaking
+   commit is already on it.
+3. Only if neither exists, open a fix MR. Otherwise re-trigger the pipeline
+   (`POST /merge_requests/:iid/pipelines`); a job retry keeps the stale merge
+   ref and will fail the same way.
+
+Duplicate fixes waste reviewer attention and race the real fix.
+
 ## Local Links for Frontend Work (YC code monorepo)
 
 When doing any frontend work on the YC code monorepo, **always try to give me
