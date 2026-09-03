@@ -252,6 +252,7 @@ task :symlinks do
   sh "mkdir -p ~/.codex ~/.claude"
   sh "ln -sf #{__dir__.chomp('/scripts')}/ai/codex/config.toml ~/.codex/config.toml"
   sh "ln -sf #{__dir__.chomp('/scripts')}/ai/claude/statusline.sh ~/.claude/statusline.sh"
+  sh "ln -sfn #{__dir__.chomp('/scripts')}/ai/claude/prompts ~/.claude/prompts"
 
   # Real directories with symlinked files: the ChatGPT desktop app skips
   # symlinked pet directories (Node dirent.isDirectory() is false for links).

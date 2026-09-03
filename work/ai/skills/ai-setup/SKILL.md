@@ -14,6 +14,7 @@ description: Save skills, Claude config, or knowledge docs to Ben's dotfiles rep
 | `work/ai/skills/<name>/SKILL.md` | Personal skills, each symlinked into BOTH `~/.claude/skills/<name>` and `~/.codex/skills/<name>` |
 | `work/ai/claude/statusline.sh` | Status line script — the REAL file; `~/.claude/statusline.sh` is a symlink to it |
 | `work/ai/claude/settings.json` | Snapshot copy of `~/.claude/settings.json` (copy, NOT symlink — see below) |
+| `work/ai/claude/prompts/` | Prompt text injected by hooks (e.g. `mannered-prose.txt`, added as a user message by a `SessionStart` hook in settings.json). The REAL dir; `~/.claude/prompts` is a symlink to it |
 | `work/ai/codex/config.toml` | Codex config — the REAL file; `~/.codex/config.toml` is a symlink to it |
 | `work/ai/brain/` | Durable knowledge docs (architecture/system notes, e.g. `yc-architecture.md`) |
 | `work/ai/docs/` | Misc documentation, plans, specs |
