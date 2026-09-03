@@ -7,12 +7,10 @@ service_tier = "fast"
 approvals_reviewer = "auto_review"
 
 [marketplaces.openai-bundled]
-last_updated = "2026-08-01T21:30:52Z"
 source_type = "local"
 source = "/Users/ben/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-08-01T21:31:27Z"
 source_type = "local"
 source = "/Users/ben/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -40,6 +38,12 @@ enabled = true
 [plugins."template-creator@openai-primary-runtime"]
 enabled = true
 
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
 [features]
 hooks = true
 js_repl = false
@@ -53,22 +57,16 @@ startup_timeout_sec = 120
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
 NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/ben/.codex"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/ben/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
 CODEX_HOME = "/Users/ben/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,f204d340535055781952b10ed396de20b842f00a19e430852f7e121ad1ce91f6"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
-NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.727.51351"
+BROWSER_USE_CODEX_APP_VERSION = "26.901.22334"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/ben/.codex/plugins/cache/openai-bundled/browser/26.901.22334/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
-
-[mcp_servers.computer-use]
-command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
-args = ["mcp"]
-cwd = "."
-enabled = false
 
 [mcp_servers.openaiDeveloperDocs]
 url = "https://developers.openai.com/mcp"
@@ -82,6 +80,7 @@ show-context-window-usage = true
 selected-avatar-id = "custom:taroko"
 git-branch-prefix = "ben/"
 git-pull-request-merge-method = "squash"
+open-link-in-target-preference = "in-app-browser"
 
 [desktop.open-in-target-preferences]
 global = "zed"
@@ -135,12 +134,34 @@ pet = "custom:taroko"
 "gpt-5.6-sol" = 4
 
 [shell_environment_policy.set]
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,f204d340535055781952b10ed396de20b842f00a19e430852f7e121ad1ce91f6"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/ben/.codex"
 
 [hooks.state]
 
 [hooks.state."/Users/ben/.codex/hooks.json:session_start:0:0"]
 trusted_hash = "sha256:a5eabd29c80d8d2402076537979a3b7bbebe1681bcfb7dbb8d89b63a91a1226b"
 enabled = true
+
+[hooks.state."/Users/ben/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:5b81e1345499eba3de0ad13306a39b2b5517afafa4503734e1a3576e31184de3"
+
+[hooks.state."/Users/ben/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:a290a1760970aa5cb22f7d4c29ab2968fc641f89dcdbfc7b1f96a0aa886a1ca4"
+
+[hooks.state."/Users/ben/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:77de7017dd8f09a27b6bee28ca7a0afe0be4587381902b1ae4b6b25e5bed2c64"
+
+[hooks.state."/Users/ben/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:66526fb89912ae15163280efada8c96e2ff1e9c5734c256a9567ce31383370a8"
+
+[hooks.state."/Users/ben/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:a603061d5816d1b453a5042f2f66322b476370732563ec4093893a50b5549eb6"
+
+[hooks.state."/Users/ben/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:377e5007c271ca74e12b3c3466242720bcaa1d40bf9e35fdcd3b2634e47624c0"
+
+[hooks.state."/Users/ben/.codex/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:42cd43aa6ccfa412ac67c94a2da10e21fe3c625258add0b132f43437214cd40a"
+
+[hooks.state."/Users/ben/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:a53a13c43f956d63be1a09daa0d23ba13c47992d6cfc8791c8dbbffab137f6da"
