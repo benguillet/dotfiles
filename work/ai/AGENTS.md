@@ -36,13 +36,24 @@ Default to writing **no comments**. Only add a comment when:
 - The **why** is not obvious — from the code itself or from the names of the
   methods/classes being used (a hidden constraint, a workaround for a specific
   bug, a subtle invariant, behavior that would surprise a reader), or
-- The code is genuinely **complicated** and a short note materially helps the
-  reader follow it.
+- The code is genuinely **complicated after splitting it** and a short note
+  materially helps the reader follow it.
 
 Do not write comments that restate what the code does — well-named identifiers
 already do that. Do not reference the current task, PR, or caller ("used by X",
 "added for the Y flow") — those belong in the commit message or PR description,
 not the code.
+
+## Optimize Code for Readability
+
+Code is read far more often than it is written. Optimize for the reader.
+
+**Break up long or complex methods.** When a method gets very long or its
+cyclomatic complexity gets high (many branches, nested conditionals, loops
+inside loops), split it into smaller methods. Name each one after the step it
+performs. The original method then becomes a short, ordered sequence of calls,
+and a reader understands what it does just by reading the names of the methods
+it calls, in order, without opening their bodies.
 
 ## Prefer Timestamps Over Booleans
 
